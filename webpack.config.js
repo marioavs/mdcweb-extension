@@ -132,7 +132,7 @@ module.exports = [{
 }, {
   name: 'css',
   entry: {
-    'material-components-web': path.resolve(
+    'mdcweb-extension': path.resolve(
         './packages/mdcweb-extension/mdcweb-extension.scss'),
     'mdcext.autocomplete': path.resolve('./packages/mdc-ext-autocomplete/mdc-ext-autocomplete.scss'),
     'mdcext.table': path.resolve('./packages/mdc-ext-table/mdc-ext-table.scss')
