@@ -69,9 +69,9 @@ export class MDCExtAutocomplete extends MDCComponent {
   }
 
   initialize(menuFactory = (el) => new MDCSimpleMenu(el)) {
-    this.menuEl_ = this.root_.querySelector('.mdc-select__menu');
+    this.menuEl_ = this.root_.querySelector('.mdc-ext-autocomplete__menu');
     this.menu_ = menuFactory(this.menuEl_);
-    this.selectedText_ = this.root_.querySelector('.mdc-select__selected-text');
+    this.selectedText_ = this.root_.querySelector('.mdc-ext-autocomplete__selected-text');
   }
 
   getDefaultFoundation() {
