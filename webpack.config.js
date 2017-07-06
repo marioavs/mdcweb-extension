@@ -56,7 +56,7 @@ const CSS_LOADER_CONFIG = [
   {
     loader: 'postcss-loader',
     options: {
-      sourceMap: IS_DEV,
+      sourceMap: true,
       plugins: () =>[require('autoprefixer')({grid: false})]
     }
   },
@@ -134,8 +134,8 @@ module.exports = [{
   entry: {
     'mdcweb-extension': path.resolve(
         './packages/mdcweb-extension/mdcweb-extension.scss'),
-    'mdcext.autocomplete': path.resolve('./packages/mdc-ext-autocomplete/mdc-ext-autocomplete.scss'),
-    'mdcext.table': path.resolve('./packages/mdc-ext-table/mdc-ext-table.scss')
+    'mdc-ext.autocomplete': path.resolve('./packages/mdc-ext-autocomplete/mdc-ext-autocomplete.scss'),
+    'mdc-ext.table': path.resolve('./packages/mdc-ext-table/mdc-ext-table.scss')
   },
   output: {
     path: OUT_PATH,
