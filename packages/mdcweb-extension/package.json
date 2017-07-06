@@ -1,0 +1,19 @@
+{
+  "name": "mdcweb-extension",
+  "description": "Extension of additional Material Components Web",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "keywords": [
+    "material components extension",
+    "material design"
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marioavs/mdcweb-extension.git"
+  },
+  "dependencies": {
+    "@mdcext/autocomplete": "^0.0.1",
+    "@mdcext/table": "^0.0.1"
+  }
+}

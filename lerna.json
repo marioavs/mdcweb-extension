@@ -1,0 +1,15 @@
+{
+  "lerna": "2.0.0-rc.5",
+  "version": "independent",
+  "commands": {
+    "publish": {
+      "ignore": [
+        "*.md"
+      ]
+    }
+  },
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.0.0"
+}
