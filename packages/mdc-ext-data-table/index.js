@@ -15,13 +15,13 @@
  */
 
 import {MDCComponent} from '@material/base';
-import MDCExtTableFoundation from './foundation';
+import MDCExtDataTableFoundation from './foundation';
 
-export {MDCExtTableFoundation};
+export {MDCExtDataTableFoundation};
 
-export class MDCExtTable extends MDCComponent {
+export class MDCExtDataTable extends MDCComponent {
   static attachTo(root) {
-    return new MDCExtTable(root);
+    return new MDCExtDataTable(root);
   }
 
   set input(input) {
@@ -33,11 +33,11 @@ export class MDCExtTable extends MDCComponent {
   }
 
   get label_() {
-    return this.root_.querySelector(MDCExtTableFoundation.strings.LABEL_SELECTOR);
+    return this.root_.querySelector(MDCExtDataTableFoundation.strings.LABEL_SELECTOR);
   }
 
   getDefaultFoundation() {
-    return new MDCExtTableFoundation({
+    return new MDCExtDataTableFoundation({
       registerInteractionHandler: (type, handler) => this.label_.addEventListener(type, handler),
       deregisterInteractionHandler: (type, handler) => this.label_.removeEventListener(type, handler),
       activateInputRipple: () => {

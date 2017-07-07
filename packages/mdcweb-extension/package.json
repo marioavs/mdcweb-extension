@@ -14,6 +14,6 @@
   },
   "dependencies": {
     "@mdcext/autocomplete": "^0.0.1",
-    "@mdcext/table": "^0.0.1"
+    "@mdcext/data-table": "^0.0.1"
   }
 }

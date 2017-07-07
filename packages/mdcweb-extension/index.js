@@ -15,15 +15,15 @@
  */
 
 import * as autocomplete from '@mdcext/autocomplete';
-import * as table from '@mdcext/table';
+import * as dataTable from '@mdcext/data-table';
 import autoInit from '@material/auto-init';
 
 // Register all components
 autoInit.register('MDCExtAutocomplete', autocomplete.MDCExtAutocomplete);
-autoInit.register('MDCExtTable', table.MDCExtTable);
+autoInit.register('MDCExtDataTable', dataTable.MDCExtDataTable);
 
 // Export all components.
 export {
   autocomplete,
-  table
+  dataTable
 };

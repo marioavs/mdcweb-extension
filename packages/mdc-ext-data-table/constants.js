@@ -15,9 +15,9 @@
  */
 
 export const cssClasses = {
-  ROOT: 'mdc-ext-table',
+  ROOT: 'mdc-ext-data-table',
 };
 
 export const strings = {
-  LABEL_SELECTOR: '.mdc-ext-table > label',
+  LABEL_SELECTOR: '.mdc-ext-data-table > label',
 };

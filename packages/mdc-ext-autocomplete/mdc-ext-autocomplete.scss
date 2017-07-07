@@ -92,24 +92,6 @@
     overflow-y: scroll;
     z-index: 4; // Should pop up above everything else. temporary-drawer is next highest at 3.
   }
-
-  &__selected-text {
-    transition:
-      mdc-animation-exit(opacity, 125ms),
-      mdc-animation-exit(transform, 125ms);
-    white-space: nowrap;
-    overflow: hidden;
-  }
-}
-
-.mdc-ext-autocomplete--open {
-  .mdc-ext-autocomplete__selected-text {
-    transform: translateY(8px);
-    transition:
-      mdc-animation-enter(opacity, 125ms, 125ms),
-      mdc-animation-enter(transform, 125ms, 125ms);
-    opacity: 0;
-  }
 }
 
 .mdc-ext-autocomplete--disabled,

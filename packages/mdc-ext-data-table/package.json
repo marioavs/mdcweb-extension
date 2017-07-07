@@ -1,12 +1,12 @@
 {
-  "name": "@mdcext/table",
+  "name": "@mdcext/data-table",
   "description": "The additional Material Components Web table component",
   "version": "0.0.1",
   "license": "Apache-2.0",
   "keywords": [
     "material components extension",
     "material design",
-    "table"
+    "data table"
   ],
   "main": "index.js",
   "repository": {

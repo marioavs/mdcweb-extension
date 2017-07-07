@@ -17,7 +17,7 @@
 import {MDCFoundation} from '@material/base';
 import {cssClasses, strings} from './constants';
 
-export default class MDCExtTableFoundation extends MDCFoundation {
+export default class MDCExtDataTableFoundation extends MDCFoundation {
   static get cssClasses() {
     return cssClasses;
   }
@@ -36,7 +36,7 @@ export default class MDCExtTableFoundation extends MDCFoundation {
   }
 
   constructor(adapter) {
-    super(Object.assign(MDCExtTableFoundation.defaultAdapter, adapter));
+    super(Object.assign(MDCExtDataTableFoundation.defaultAdapter, adapter));
     this.clickHandler_ = (evt) => this.handleClick_(evt);
   }
 
