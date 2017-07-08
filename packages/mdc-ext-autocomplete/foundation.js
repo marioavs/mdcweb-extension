@@ -68,6 +68,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       deregisterMenuInteractionHandler: (/* type: string, handler: EventListener */) => {},
       notifyChange: () => {},
       getWindowInnerHeight: () => /* number */ 0,
+      getNativeInput: () => /* HTMLInputElement */ ({})
     };
   }
 
@@ -118,6 +119,16 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.deregisterMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.CANCEL_EVENT, this.cancelHandler_);
+  }
+
+  /** @return {?string} */
+  getValue() {
+    return this.getNativeInput_().value;
+  }
+
+  /** @param {?string} value */
+  setValue(value) {
+    this.getNativeInput_().value = value;
   }
 
   getValue() {
@@ -185,13 +196,24 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   open_() {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
     const focusIndex = this.selectedIndex_ < 0 ? 0 : this.selectedIndex_;
-    const {left, top, transformOrigin} = this.computeMenuStylesForOpenAtIndex_(focusIndex);
+    // const {left, top, transformOrigin} = this.computeMenuStylesForOpenAtIndex_(focusIndex);
+    const {left, top, transformOrigin} = this.computeMenuStylesForOpen_();
 
     this.adapter_.setMenuElStyle('left', left);
     this.adapter_.setMenuElStyle('top', top);
     this.adapter_.setMenuElStyle('transform-origin', transformOrigin);
     this.adapter_.addClass(OPEN);
     this.adapter_.openMenu(focusIndex);
+  }
+
+  computeMenuStylesForOpen_() {
+    const {left, top} = this.adapter_.computeBoundingRect();
+
+    let adjustedTop = top + this.adapter_.getNativeOffsetHeight();
+    return {
+      left: left,
+      top: adjustedTop
+    }
   }
 
   computeMenuStylesForOpenAtIndex_(index) {
@@ -205,7 +227,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.setMenuElStyle('display', '');
     this.adapter_.rmMenuElAttr('aria-hidden');
 
-    let adjustedTop = top - itemOffsetTop;
+    let adjustedTop = top + itemOffsetTop;
     const adjustedHeight = menuHeight - itemOffsetTop;
     const overflowsTop = adjustedTop < 0;
     const overflowsBottom = adjustedTop + adjustedHeight > innerHeight;
@@ -248,5 +270,18 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     if (isOpenerKey) {
       this.displayHandler_(evt);
     }
+  }
+
+  /**
+   * @return {!InputElementState}
+   * @private
+   */
+  getNativeInput_() {
+    return this.adapter_.getNativeInput() || {
+      checked: false,
+      indeterminate: false,
+      disabled: false,
+      value: null,
+    };
   }
 }

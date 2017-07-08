@@ -52,6 +52,9 @@
   background: none;
   background-repeat: no-repeat;
   background-position: right center;
+  position: relative;
+  overflow: visible;
+
 
   @include mdc-ext-autocomplete-dd-arrow-svg-bg_;
 

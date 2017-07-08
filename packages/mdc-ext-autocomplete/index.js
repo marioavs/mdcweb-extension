@@ -16,6 +16,7 @@
 
 import {MDCComponent} from '@material/base';
 import {MDCSimpleMenu} from '@material/menu';
+import {MDCTextfield} from '@material/textfield';
 
 import MDCExtAutocompleteFoundation from './foundation';
 
@@ -26,8 +27,14 @@ export class MDCExtAutocomplete extends MDCComponent {
     return new MDCExtAutocomplete(root);
   }
 
+  /** @return {?string} */
   get value() {
     return this.foundation_.getValue();
+  }
+
+  /** @param {?string} value */
+  set value(value) {
+    this.foundation_.setValue(value);
   }
 
   get options() {
@@ -68,10 +75,11 @@ export class MDCExtAutocomplete extends MDCComponent {
     return null;
   }
 
-  initialize(menuFactory = (el) => new MDCSimpleMenu(el)) {
+  initialize(menuFactory = (el) => new MDCSimpleMenu(el), textFactory = (el) => new MDCTextfield(el)) {
     this.menuEl_ = this.root_.querySelector('.mdc-ext-autocomplete__menu');
     this.menu_ = menuFactory(this.menuEl_);
-    this.selectedText_ = this.root_.querySelector('.mdc-ext-autocomplete__selected-text');
+    this.textEl_ = this.root_.querySelector('.mdc-ext-autocomplete__textfield');
+    this.text_ = textFactory(this.textEl_);
   }
 
   getDefaultFoundation() {
@@ -100,7 +108,7 @@ export class MDCExtAutocomplete extends MDCComponent {
       openMenu: (focusIndex) => this.menu_.show({focusIndex}),
       isMenuOpen: () => this.menu_.open,
       setSelectedTextContent: (selectedTextContent) => {
-        this.selectedText_.textContent = selectedTextContent;
+        this.text_.foundation_.getNativeInput_().value = selectedTextContent;
       },
       getNumberOfOptions: () => this.options.length,
       getTextForOptionAtIndex: (index) => this.options[index].textContent,
@@ -112,6 +120,8 @@ export class MDCExtAutocomplete extends MDCComponent {
       deregisterMenuInteractionHandler: (type, handler) => this.menu_.unlisten(type, handler),
       notifyChange: () => this.emit(MDCExtAutocompleteFoundation.strings.CHANGE_EVENT, this),
       getWindowInnerHeight: () => window.innerHeight,
+      getNativeOffsetHeight: () => this.root_.offsetHeight,
+      getNativeInput: () => this.text_.foundation_.getNativeInput_()
     });
   }
 
