@@ -1,0 +1,66 @@
+<html class="mdc-typography">
+  <head>
+    <meta charset="utf-8">
+    <title>Data Table - Extension with additional Material Components Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/images/logo_components_color_2x_web_48dp.png" />
+    <script src="assets/mdcweb-extension.css.js" charset="utf-8"></script>
+    <script src="assets/demo-styles.css.js" charset="utf-8"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <style type="text/css">
+      .mdc-theme--dark {
+        background-color: #303030;
+      }
+
+      #demo-wrapper {
+        padding: 4px;
+        padding-left: 0;
+      }
+
+      /* Hack to work around style-loader asynchronously loading styles. */
+      /* Equivalent to using mdc-typography's subheading2, which is used in the sass file. */
+      .mdc-ext-autocomplete {
+        font-family: Roboto, sans-serif;
+        font-size: 1rem;
+        font-weight: 400;
+        letter-spacing: .04em;
+      }
+
+      .example {
+        margin: 24px;
+        padding: 24px;
+      }
+    </style>
+  </head>
+  <body>
+<table class="mdc-ext-data-table mdl-js-data-table mdc-ext-data-table--selectable mdl-shadow--2dp">
+  <thead>
+    <tr>
+      <th class="mdc-ext-data-table__cell--non-numeric">Material</th>
+      <th>Quantity</th>
+      <th>Unit price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="mdc-ext-data-table__cell--non-numeric">Acrylic (Transparent)</td>
+      <td>25</td>
+      <td>$2.90</td>
+    </tr>
+    <tr>
+      <td class="mdc-ext-data-table__cell--non-numeric">Plywood (Birch)</td>
+      <td>50</td>
+      <td>$1.25</td>
+    </tr>
+    <tr>
+      <td class="mdc-ext-data-table__cell--non-numeric">Laminate (Gold on Blue)</td>
+      <td>10</td>
+      <td>$2.35</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>
