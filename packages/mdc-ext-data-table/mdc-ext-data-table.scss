@@ -46,48 +46,127 @@ $ext-data-table-card-title-top: 20px !default;
 $ext-data-table-card-padding: 24px !default;
 $ext-data-table-button-padding-right: 16px !default;
 $ext-data-table-cell-top: $ext-data-table-card-padding / 2;
+$color-white : "FFF";
 
 $mdc-ext-data-table-item-spacing: 4px;
+$animation-curve-fast-out-slow-in: cubic-bezier(0.4, 0, 0.2, 1) !default;
+$animation-curve-default: $animation-curve-fast-out-slow-in !default;
 
 /* stylelint-disable selector-no-type */
+
 .mdc-ext-data-table {
-  @include mdc-typography(body1);
-  @include mdc-theme-prop(color, text-primary-on-light);
+  position: relative;
+  border: $ext-data-table-dividers;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: $ext-data-table-font-size;
+  background-color: unquote("rgb(#{$color-white})");
 
-  display: inline-flex;
-  align-items: center;
-  vertical-align: middle;
+  thead {
+    padding-bottom: 3px;
 
-  @include mdc-theme-dark {
-    @include mdc-theme-prop(color, text-primary-on-dark);
+    .mdc-ext-data-table__select {
+      margin-top: 0;
+    }
   }
 
-  > label {
-    order: 0;
-    margin-right: auto;
-    padding-left: $mdc-ext-data-table-item-spacing;
+  tbody {
+    tr {
+      position: relative;
+      height: $ext-data-table-row-height;
+      transition-duration: 0.28s;
+      transition-timing-function: $animation-curve-default;
+      transition-property: background-color;
+
+      &.is-selected {
+        background-color: $ext-data-table-selection-color;
+      }
+
+      &:hover {
+        background-color: $ext-data-table-hover-color;
+      }
+    }
   }
 
-  @include mdc-rtl {
-    > label {
-      margin-left: auto;
-      padding-right: $mdc-ext-data-table-item-spacing;
+  td, th {
+    padding: 0 $ext-data-table-column-padding 12px $ext-data-table-column-padding;
+    text-align: right;
+
+    &:first-of-type {
+      padding-left: 24px;
+    }
+
+    &:last-of-type {
+      padding-right: 24px;
+    }
+  }
+
+  td {
+    position: relative;
+    vertical-align: middle;
+    height: $ext-data-table-row-height;
+    border-top: $ext-data-table-dividers;
+    border-bottom: $ext-data-table-dividers;
+    padding-top: $ext-data-table-cell-top;
+    box-sizing: border-box;
+
+    .mdc-ext-data-table__select {
+      vertical-align: middle;
+    }
+  }
+
+  th {
+    position: relative;
+    vertical-align: bottom;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 24px;
+    letter-spacing: 0;
+    height: $ext-data-table-row-height;
+    font-size: $ext-data-table-header-font-size;
+    color: $ext-data-table-header-color;
+    padding-bottom: 8px;
+    box-sizing: border-box;
+    &.mdc-ext-data-table__header--sorted-ascending,
+    &.mdc-ext-data-table__header--sorted-descending {
+      color: $ext-data-table-header-sorted-color;
+      &:before {
+        font-family: 'Material Icons';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        word-wrap: normal;
+        font-feature-settings: 'liga';
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+        font-size: $ext-data-table-header-sort-icon-size;
+        content: "\e5d8";
+        margin-right: 5px;
+        vertical-align: sub;
+      }
+      &:hover {
+        cursor: pointer;
+        &:before {
+          color: $ext-data-table-header-sorted-icon-hover-color;
+        }
+      }
+    }
+    &.mdc-ext-data-table__header--sorted-descending:before {
+      content: "\e5db";
     }
   }
 }
 
-.mdc-ext-data-table--align-end {
-  > label {
-    order: -1;
-    margin-left: auto;
-    padding-right: $mdc-ext-data-table-item-spacing;
-  }
+.mdc-ext-data-table__select {
+  width: 16px;
+}
 
-  @include mdc-rtl {
-    > label {
-      margin-right: auto;
-      padding-left: $mdc-ext-data-table-item-spacing;
-    }
-  }
+.mdc-ext-data-table__cell--non-numeric.mdc-ext-data-table__cell--non-numeric {
+  text-align: left;
 }
 /* stylelint-enable selector-no-type */
