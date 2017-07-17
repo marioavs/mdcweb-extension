@@ -75,6 +75,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   constructor(adapter) {
     super(Object.assign(MDCExtAutocompleteFoundation.defaultAdapter, adapter));
     this.ctx_ = null;
+    this.items_ = [];
     this.selectedIndex_ = -1;
     this.disabled_ = false;
     this.displayHandler_ = (evt) => {
@@ -102,6 +103,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInteractionHandler('keyup', this.displayViaKeyboardHandler_);
+    this.adapter_.registerInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
     this.adapter_.registerMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.registerMenuInteractionHandler(
@@ -115,6 +117,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInteractionHandler('keyup', this.displayViaKeyboardHandler_);
+    this.adapter_.deregisterInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
     this.adapter_.deregisterMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.deregisterMenuInteractionHandler(
@@ -170,6 +173,11 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       this.adapter_.rmAttr('aria-disabled');
       this.adapter_.makeTabbable();
     }
+  }
+
+  addItem(option){
+    if (this.items_ === undefined)
+      return;
   }
 
   resize() {
@@ -248,6 +256,10 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
     this.adapter_.removeClass(OPEN);
     this.adapter_.focus();
+  }
+
+  handleInputKeyboardEvent_(evt) {
+    console.log(evt.key)
   }
 
   handleDisplayViaKeyboard_(evt) {

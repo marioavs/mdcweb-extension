@@ -37,11 +37,11 @@ export class MDCExtAutocomplete extends MDCComponent {
     this.foundation_.setValue(value);
   }
 
-  get options() {
+  get items() {
     return this.menu_.items;
   }
 
-  get selectedOptions() {
+  get selectedItems() {
     return this.root_.querySelectorAll('[aria-selected]');
   }
 
@@ -62,14 +62,14 @@ export class MDCExtAutocomplete extends MDCComponent {
   }
 
   item(index) {
-    return this.options[index] || null;
+    return this.items[index] || null;
   }
 
-  nameditem(key) {
+  namedItem(key) {
     // NOTE: IE11 precludes us from using Array.prototype.find
-    for (let i = 0, options = this.options, option; (option = options[i]); i++) {
-      if (option.id === key || option.getAttribute('name') === key) {
-        return option;
+    for (let i = 0, items = this.items, item; (item = items[i]); i++) {
+      if (item.id === key || item.getAttribute('name') === key) {
+        return item;
       }
     }
     return null;
@@ -82,12 +82,24 @@ export class MDCExtAutocomplete extends MDCComponent {
     this.text_ = textFactory(this.textEl_);
   }
 
+  destroy() {
+    if (this.menu_) {
+      this.menu_.destroy();
+    }
+    if (this.text_) {
+      this.text_.destroy();
+    }
+    super.destroy();
+  }
+
   getDefaultFoundation() {
     return new MDCExtAutocompleteFoundation({
       addClass: (className) => this.root_.classList.add(className),
       removeClass: (className) => this.root_.classList.remove(className),
       setAttr: (attr, value) => this.root_.setAttribute(attr, value),
       rmAttr: (attr, value) => this.root_.removeAttribute(attr, value),
+      registerInputInteractionHandler: (type, handler) => this.textEl_.addEventListener(type, handler),
+      deregisterInputInteractionHandler: (type, handler) => this.textEl_.removeEventListener(type, handler),
       computeBoundingRect: () => this.root_.getBoundingClientRect(),
       registerInteractionHandler: (type, handler) => this.root_.addEventListener(type, handler),
       deregisterInteractionHandler: (type, handler) => this.root_.removeEventListener(type, handler),
@@ -110,12 +122,12 @@ export class MDCExtAutocomplete extends MDCComponent {
       setSelectedTextContent: (selectedTextContent) => {
         this.text_.foundation_.getNativeInput_().value = selectedTextContent;
       },
-      getNumberOfOptions: () => this.options.length,
-      getTextForOptionAtIndex: (index) => this.options[index].textContent,
-      getValueForOptionAtIndex: (index) => this.options[index].id || this.options[index].textContent,
-      setAttrForOptionAtIndex: (index, attr, value) => this.options[index].setAttribute(attr, value),
-      rmAttrForOptionAtIndex: (index, attr) => this.options[index].removeAttribute(attr),
-      getOffsetTopForOptionAtIndex: (index) => this.options[index].offsetTop,
+      getNumberOfItems: () => this.items.length,
+      getTextForItemAtIndex: (index) => this.items[index].textContent,
+      getValueForItemAtIndex: (index) => this.items[index].id || this.items[index].textContent,
+      setAttrForItemAtIndex: (index, attr, value) => this.items[index].setAttribute(attr, value),
+      rmAttrForItemAtIndex: (index, attr) => this.items[index].removeAttribute(attr),
+      getOffsetTopForItemAtIndex: (index) => this.items[index].offsetTop,
       registerMenuInteractionHandler: (type, handler) => this.menu_.listen(type, handler),
       deregisterMenuInteractionHandler: (type, handler) => this.menu_.unlisten(type, handler),
       notifyChange: () => this.emit(MDCExtAutocompleteFoundation.strings.CHANGE_EVENT, this),
@@ -126,8 +138,8 @@ export class MDCExtAutocomplete extends MDCComponent {
   }
 
   initialSyncWithDOM() {
-    const selectedOption = this.selectedOptions[0];
-    const idx = selectedOption ? this.options.indexOf(selectedOption) : -1;
+    const selectedItem = this.selectedItems[0];
+    const idx = selectedItem ? this.items.indexOf(selectedItem) : -1;
     if (idx >= 0) {
       this.selectedIndex = idx;
     }

@@ -23,6 +23,8 @@ $mdc-theme-primary: #212121;
 $mdc-theme-accent: #64dd17;
 
 @import "../../mdcweb-extension/mdcweb-extension";
+@import "@material/toolbar/mdc-toolbar";
+
 
 body {
   font-family: Roboto, Helvetica, Arial, sans-serif;

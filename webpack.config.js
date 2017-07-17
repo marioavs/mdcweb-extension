@@ -64,7 +64,7 @@ const CSS_LOADER_CONFIG = [
     loader: 'sass-loader',
     options: {
       sourceMap: true,
-      includePaths: glob.sync('packages/*/node_modules').map((d) => path.join(__dirname, d))
+      includePaths: glob.sync('packages/*/node_modules').concat(glob.sync('node_modules')).map((d) => path.join(__dirname, d))
     }
   }
 ];
