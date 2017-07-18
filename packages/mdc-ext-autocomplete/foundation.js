@@ -58,12 +58,12 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       openMenu: (/* focusIndex: number */) => {},
       isMenuOpen: () => /* boolean */ false,
       setSelectedTextContent: (/* textContent: string */) => {},
-      getNumberOfOptions: () => /* number */ 0,
-      getTextForOptionAtIndex: (/* index: number */) => /* string */ '',
-      getValueForOptionAtIndex: (/* index: number */) => /* string */ '',
-      setAttrForOptionAtIndex: (/* index: number, attr: string, value: string */) => {},
-      rmAttrForOptionAtIndex: (/* index: number, attr: string */) => {},
-      getOffsetTopForOptionAtIndex: (/* index: number */) => /* number */ 0,
+      getNumberOfItems: () => /* number */ 0,
+      getTextForItemAtIndex: (/* index: number */) => /* string */ '',
+      getValueForItemAtIndex: (/* index: number */) => /* string */ '',
+      setAttrForItemAtIndex: (/* index: number, attr: string, value: string */) => {},
+      rmAttrForItemAtIndex: (/* index: number, attr: string */) => {},
+      getOffsetTopForItemAtIndex: (/* index: number */) => /* number */ 0,
       registerMenuInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterMenuInteractionHandler: (/* type: string, handler: EventListener */) => {},
       notifyChange: () => {},
@@ -75,8 +75,10 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   constructor(adapter) {
     super(Object.assign(MDCExtAutocompleteFoundation.defaultAdapter, adapter));
     this.ctx_ = null;
+    this.items_ = [];
     this.selectedIndex_ = -1;
     this.disabled_ = false;
+    this.lastValue_ = '';
     this.displayHandler_ = (evt) => {
       evt.preventDefault();
       if (!this.adapter_.isMenuOpen()) {
@@ -102,6 +104,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInteractionHandler('keyup', this.displayViaKeyboardHandler_);
+    this.adapter_.registerInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
     this.adapter_.registerMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.registerMenuInteractionHandler(
@@ -115,6 +118,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInteractionHandler('keyup', this.displayViaKeyboardHandler_);
+    this.adapter_.deregisterInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
     this.adapter_.deregisterMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.deregisterMenuInteractionHandler(
@@ -122,17 +126,17 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   /** @return {?string} */
-  getValue() {
+  getInputValue() {
     return this.getNativeInput_().value;
   }
 
   /** @param {?string} value */
-  setValue(value) {
+  setInputValue(value) {
     this.getNativeInput_().value = value;
   }
 
   getValue() {
-    return this.selectedIndex_ >= 0 ? this.adapter_.getValueForOptionAtIndex(this.selectedIndex_) : '';
+    return this.selectedIndex_ >= 0 ? this.adapter_.getValueForItemAtIndex(this.selectedIndex_) : '';
   }
 
   getSelectedIndex() {
@@ -142,14 +146,14 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   setSelectedIndex(index) {
     const prevSelectedIndex = this.selectedIndex_;
     if (prevSelectedIndex >= 0) {
-      this.adapter_.rmAttrForOptionAtIndex(this.selectedIndex_, 'aria-selected');
+      this.adapter_.rmAttrForItemAtIndex(this.selectedIndex_, 'aria-selected');
     }
 
-    this.selectedIndex_ = index >= 0 && index < this.adapter_.getNumberOfOptions() ? index : -1;
+    this.selectedIndex_ = index >= 0 && index < this.adapter_.getNumberOfItems() ? index : -1;
     let selectedTextContent = '';
     if (this.selectedIndex_ >= 0) {
-      selectedTextContent = this.adapter_.getTextForOptionAtIndex(this.selectedIndex_).trim();
-      this.adapter_.setAttrForOptionAtIndex(this.selectedIndex_, 'aria-selected', 'true');
+      selectedTextContent = this.adapter_.getTextForItemAtIndex(this.selectedIndex_).trim();
+      this.adapter_.setAttrForItemAtIndex(this.selectedIndex_, 'aria-selected', 'true');
     }
     this.adapter_.setSelectedTextContent(selectedTextContent);
   }
@@ -172,6 +176,11 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     }
   }
 
+  addItem(option){
+    if (this.items_ === undefined)
+      return;
+  }
+
   resize() {
     const font = this.adapter_.getComputedStyleValue('font');
     const letterSpacing = parseFloat(this.adapter_.getComputedStyleValue('letter-spacing'));
@@ -184,8 +193,8 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     }
 
     let maxTextLength = 0;
-    for (let i = 0, l = this.adapter_.getNumberOfOptions(); i < l; i++) {
-      const txt = this.adapter_.getTextForOptionAtIndex(i).trim();
+    for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
+      const txt = this.adapter_.getTextForItemAtIndex(i).trim();
       const {width} = this.ctx_.measureText(txt);
       const addedSpace = letterSpacing * txt.length;
       maxTextLength = Math.max(maxTextLength, Math.ceil(width + addedSpace));
@@ -223,7 +232,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.setMenuElAttr('aria-hidden', 'true');
     this.adapter_.setMenuElStyle('display', 'block');
     const menuHeight = this.adapter_.getMenuElOffsetHeight();
-    const itemOffsetTop = this.adapter_.getOffsetTopForOptionAtIndex(index);
+    const itemOffsetTop = this.adapter_.getOffsetTopForItemAtIndex(index);
     this.adapter_.setMenuElStyle('display', '');
     this.adapter_.rmMenuElAttr('aria-hidden');
 
@@ -248,6 +257,24 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
     this.adapter_.removeClass(OPEN);
     this.adapter_.focus();
+  }
+
+  applyQuery_(value) {
+    for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
+      const txt = this.adapter_.getTextForItemAtIndex(i).trim();
+      if (txt.toUpperCase().includes(value.toUpperCase()))
+        this.adapter_.rmAttrForItemAtIndex(i, 'aria-hidden');
+      else
+        this.adapter_.setAttrForItemAtIndex(i, 'aria-hidden');
+    }
+  }
+
+  handleInputKeyboardEvent_(evt) {
+    let curretValue = this.getInputValue();
+    if (currentValue !== this.lastValue_) {
+      this.applyQuery_(currentValue);
+    }
+    console.log(currentValue);
   }
 
   handleDisplayViaKeyboard_(evt) {
