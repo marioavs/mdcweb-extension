@@ -104,7 +104,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    this.adapter_.registerInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
+    this.adapter_.registerInputInteractionHandler('keyup', this.handleInputKeyboardEvent_.bind(this));
     this.adapter_.registerMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.registerMenuInteractionHandler(
@@ -259,20 +259,20 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.focus();
   }
 
-  applyQuery_(value) {
+ applyQueryAriel(value) {
     for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
       const txt = this.adapter_.getTextForItemAtIndex(i).trim();
       if (txt.toUpperCase().includes(value.toUpperCase()))
-        this.adapter_.rmAttrForItemAtIndex(i, 'aria-hidden');
+        this.adapter_.rmAttrForItemAtIndex(i, 'style');
       else
-        this.adapter_.setAttrForItemAtIndex(i, 'aria-hidden');
+        this.adapter_.setAttrForItemAtIndex(i, 'style', 'display:none;');
     }
   }
 
   handleInputKeyboardEvent_(evt) {
-    let curretValue = this.getInputValue();
+    let currentValue = this.getInputValue();
     if (currentValue !== this.lastValue_) {
-      this.applyQuery_(currentValue);
+      this.applyQueryAriel(currentValue);
     }
     console.log(currentValue);
   }
