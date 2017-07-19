@@ -75,11 +75,13 @@ export class MDCExtAutocomplete extends MDCComponent {
     return null;
   }
 
-  initialize(menuFactory = (el) => new MDCSimpleMenu(el), textFactory = (el) => new MDCTextfield(el)) {
-    this.menuEl_ = this.root_.querySelector('.mdc-ext-autocomplete__menu');
+  initialize(settings = {}, menuFactory = (el) => new MDCSimpleMenu(el), textFactory = (el) => new MDCTextfield(el)) {
+    this.settings_ = settings;
+    this.menuEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.MENU);
     this.menu_ = menuFactory(this.menuEl_);
     this.textEl_ = this.root_.querySelector('.mdc-ext-autocomplete__textfield');
     this.text_ = textFactory(this.textEl_);
+    this.menuItemsEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.ITEMS);
   }
 
   destroy() {
@@ -98,12 +100,22 @@ export class MDCExtAutocomplete extends MDCComponent {
       removeClass: (className) => this.root_.classList.remove(className),
       setAttr: (attr, value) => this.root_.setAttribute(attr, value),
       rmAttr: (attr, value) => this.root_.removeAttribute(attr, value),
-      registerInputInteractionHandler: (type, handler) => this.textEl_.addEventListener(type, handler),
-      deregisterInputInteractionHandler: (type, handler) => this.textEl_.removeEventListener(type, handler),
       computeBoundingRect: () => this.root_.getBoundingClientRect(),
       registerInteractionHandler: (type, handler) => this.root_.addEventListener(type, handler),
       deregisterInteractionHandler: (type, handler) => this.root_.removeEventListener(type, handler),
       focus: () => this.root_.focus(),
+      hasItemsLoader: () => {
+        return ((this.settings_ !== undefined) && (typeof this.settings_.itemsLoader === 'function'));
+      },
+      applyItemsLoader: (query) => {
+        this.applyItemsLoader_(query)
+      },
+      removeAllItems: () => {
+        this.removeAllItems_()
+      },
+      addItem: (value, description) => {
+        this.addItem_(value, description)
+      },
       makeTabbable: () => {
         this.root_.tabIndex = 0;
       },
@@ -125,6 +137,8 @@ export class MDCExtAutocomplete extends MDCComponent {
       getNumberOfItems: () => this.items.length,
       getTextForItemAtIndex: (index) => this.items[index].textContent,
       getValueForItemAtIndex: (index) => this.items[index].id || this.items[index].textContent,
+      addClassForItemAtIndex: (index, className) => this.items[index].classList.add(className),
+      rmClassForItemAtIndex: (index, className) => this.items[index].classList.remove(className),
       setAttrForItemAtIndex: (index, attr, value) => this.items[index].setAttribute(attr, value),
       rmAttrForItemAtIndex: (index, attr) => this.items[index].removeAttribute(attr),
       getOffsetTopForItemAtIndex: (index) => this.items[index].offsetTop,
@@ -146,6 +160,35 @@ export class MDCExtAutocomplete extends MDCComponent {
 
     if (this.root_.getAttribute('aria-disabled') === 'true') {
       this.disabled = true;
+    }
+  }
+
+  applyItemsLoader_(query) {
+    var self = this;
+    this.settings_.itemsLoader.apply(self, [query, function(results) {
+            if (results && results.length) {
+                    self.foundation_.addItems(results);
+                    self.foundation_.refreshItems();
+            }
+    }]);
+  }
+
+  removeAllItems_() {
+    if (this.menuItemsEl_ !== undefined) {
+      while(this.menuItemsEl_.hasChildNodes()) this.menuItemsEl_.removeChild(this.menuItemsEl_.firstChild);
+    }
+  }
+
+  addItem_(value, description) {
+    const {LIST_ITEM} = MDCExtAutocompleteFoundation.cssClasses;
+    if (this.menuItemsEl_ !== undefined) {
+      var node = document.createElement('li');
+      node.classList.add(LIST_ITEM);
+      node.setAttribute('role', 'option');
+      node.setAttribute('value', value);
+      var textnode = document.createTextNode(description);
+      node.appendChild(textnode);
+      this.menuItemsEl_.appendChild(node);
     }
   }
 }
