@@ -104,7 +104,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    this.adapter_.registerInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
+    // this.adapter_.registerInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
     this.adapter_.registerMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.registerMenuInteractionHandler(
@@ -118,17 +118,17 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    this.adapter_.deregisterInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
+    // this.adapter_.deregisterInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
     this.adapter_.deregisterMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.deregisterMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.CANCEL_EVENT, this.cancelHandler_);
   }
 
-  /** @return {?string} */
-  getInputValue() {
-    return this.getNativeInput_().value;
-  }
+  // /** @return {?string} */
+  // getInputValue() {
+  //   return this.getNativeInput_().value;
+  // }
 
   /** @param {?string} value */
   setInputValue(value) {
@@ -260,24 +260,36 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   applyQuery_(value) {
+    const {ARIA_HIDDEN} = MDCExtAutocompleteFoundation.strings;
+    const {ITEM_NOMATCH} = MDCExtAutocompleteFoundation.cssClasses;
     for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
       const txt = this.adapter_.getTextForItemAtIndex(i).trim();
-      if (txt.toUpperCase().includes(value.toUpperCase()))
-        this.adapter_.rmAttrForItemAtIndex(i, 'aria-hidden');
-      else
-        this.adapter_.setAttrForItemAtIndex(i, 'aria-hidden');
+      if (txt.toUpperCase().includes(value.toUpperCase())) {
+        this.adapter_.rmClassForItemAtIndex(i, ITEM_NOMATCH);
+        this.adapter_.rmAttrForItemAtIndex(i, ARIA_HIDDEN);
+      }
+      else {
+        this.adapter_.addClassForItemAtIndex(i, ITEM_NOMATCH);
+        this.adapter_.setAttrForItemAtIndex(i, ARIA_HIDDEN, 'true');
+      }
     }
   }
 
-  handleInputKeyboardEvent_(evt) {
-    let curretValue = this.getInputValue();
-    if (currentValue !== this.lastValue_) {
-      this.applyQuery_(currentValue);
-    }
-    console.log(currentValue);
-  }
+  // handleInputKeyboardEvent_(evt) {
+  //   let curretValue = this.getNativeInput_().value;
+  //   if (currentValue !== this.lastValue_) {
+  //     this.applyQuery_(currentValue);
+  //   }
+  //   console.log(currentValue);
+  // }
 
   handleDisplayViaKeyboard_(evt) {
+    let currentValue = this.getNativeInput_().value;
+    if (currentValue !== this.lastValue_) {
+      this.applyQuery_(currentValue);
+      this.lastValue_ = currentValue;
+    }
+
     // We use a hard-coded 2 instead of Event.AT_TARGET to avoid having to reference a browser
     // global.
     const EVENT_PHASE_AT_TARGET = 2;
@@ -297,6 +309,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     if (isOpenerKey) {
       this.displayHandler_(evt);
     }
+
   }
 
   /**

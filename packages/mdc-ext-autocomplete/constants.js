@@ -17,8 +17,10 @@ export const cssClasses = {
   ROOT: 'mdc-ext-autocomplete',
   OPEN: 'mdc-ext-autocomplete--open',
   DISABLED: 'mdc-ext-autocomplete--disabled',
+  ITEM_NOMATCH: 'mdc-list-item__nomatch'
 };
 
 export const strings = {
-  CHANGE_EVENT: 'MDCExtAutocomplete:change',
+  ARIA_HIDDEN: 'aria-hidden',
+  CHANGE_EVENT: 'MDCExtAutocomplete:change'
 };
