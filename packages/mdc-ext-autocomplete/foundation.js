@@ -75,7 +75,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   constructor(adapter) {
     super(Object.assign(MDCExtAutocompleteFoundation.defaultAdapter, adapter));
     this.ctx_ = null;
-    this.items_ = [];
     this.selectedIndex_ = -1;
     this.disabled_ = false;
     this.lastValue_ = '';
@@ -104,7 +103,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    // this.adapter_.registerInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
     this.adapter_.registerMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.registerMenuInteractionHandler(
@@ -118,7 +116,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    // this.adapter_.deregisterInputInteractionHandler('keyup', this.handleInputKeyboardEvent_);
     this.adapter_.deregisterMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.deregisterMenuInteractionHandler(
@@ -176,9 +173,15 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     }
   }
 
-  addItem(option){
-    if (this.items_ === undefined)
-      return;
+  addItems(items) {
+    this.adapter_.removeAllItems();
+    for (let i = 0, l = items.length; i < l; i++) {
+      this.adapter_.addItem(items[i].value, items[i].description);
+    }
+  }
+
+  refreshItems() {
+
   }
 
   resize() {
@@ -275,19 +278,15 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     }
   }
 
-  // handleInputKeyboardEvent_(evt) {
-  //   let curretValue = this.getNativeInput_().value;
-  //   if (currentValue !== this.lastValue_) {
-  //     this.applyQuery_(currentValue);
-  //   }
-  //   console.log(currentValue);
-  // }
-
   handleDisplayViaKeyboard_(evt) {
     let currentValue = this.getNativeInput_().value;
     if (currentValue !== this.lastValue_) {
-      this.applyQuery_(currentValue);
-      this.lastValue_ = currentValue;
+      if (this.adapter_.hasItemsLoader())
+        this.adapter_.applyItemsLoader(currentValue);
+      else {
+        this.applyQuery_(currentValue);
+        this.lastValue_ = currentValue;
+      }
     }
 
     // We use a hard-coded 2 instead of Event.AT_TARGET to avoid having to reference a browser

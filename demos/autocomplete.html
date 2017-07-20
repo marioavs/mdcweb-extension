@@ -334,7 +334,7 @@
               <span class="mdc-textfield__label">Pick a food group</span>
             </label>
             <div class="mdc-simple-menu mdc-ext-autocomplete__menu">
-              <ul class="mdc-list mdc-simple-menu__items">
+              <ul class="mdc-list mdc-simple-menu__items mdc-ext-autocomplete__items">
                 <li class="mdc-list-item" role="option" id="grains" aria-disabled="true">
                   Pick a food group
                 </li>
@@ -374,6 +374,23 @@
           <label for="disabled">Disabled</label>
         </div>
       </section>
+
+      <section class="load-items-example">
+        <h2 class="mdc-typography--title">Load-Items Component</h2>
+        <section id="demo-wrapper">
+          <div id="js-load-items" class="mdc-ext-autocomplete" role="listbox" tabindex="0">
+            <label class="mdc-textfield mdc-ext-autocomplete__textfield">
+              <input type="text" class="mdc-textfield__input">
+              <span class="mdc-textfield__label">Pick an item</span>
+            </label>
+            <div class="mdc-simple-menu mdc-ext-autocomplete__menu">
+              <ul class="mdc-list mdc-simple-menu__items mdc-ext-autocomplete__items">
+              </ul>
+            </div>
+          </div>
+        </section>
+        <p>Currently selected: <span id="load-items-currently-selected">(none)</span></p>
+      </section>
     </main>
     <script src="assets/mdc-ext.autocomplete.js"></script>
     <script>
@@ -410,6 +427,23 @@
 
         var heroSelect = document.getElementById('hero-js-select');
         mdcext.autocomplete.MDCExtAutocomplete.attachTo(heroSelect);
+
+        var loadItems = document.getElementById('js-load-items');
+        autocompleteLoadItems =  new MDCExtAutocomplete(loadItems, undefined, {
+            itemsLoader: function(query, callback) {
+              if (!query.length) return callback();
+              callback([{
+                  value: '01',
+                  description: 'first'
+                },
+                {
+                  value: '02',
+                  description: 'second'
+                }
+              ]);
+            }
+          }
+        );
       })();
     </script>
   </body>
