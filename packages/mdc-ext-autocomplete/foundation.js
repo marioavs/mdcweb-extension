@@ -281,8 +281,13 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   handleDisplayViaKeyboard_(evt) {
     let currentValue = this.getNativeInput_().value;
     if (currentValue !== this.lastValue_) {
-      if (this.adapter_.hasItemsLoader())
-        this.adapter_.applyItemsLoader(currentValue);
+      if (this.adapter_.hasItemsLoader()){
+        if(this.adapter_.getNumberOfItems()==0){
+            this.adapter_.applyItemsLoader(currentValue);
+        }
+        this.applyQuery_(currentValue);
+        this.lastValue_ = currentValue;
+      }
       else {
         this.applyQuery_(currentValue);
         this.lastValue_ = currentValue;

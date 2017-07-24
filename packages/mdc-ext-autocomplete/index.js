@@ -159,7 +159,8 @@ export class MDCExtAutocomplete extends MDCComponent {
     }
 
     if (this.root_.getAttribute('aria-disabled') === 'true') {
-      this.disabled = true;
+      this
+      this.applyItemsLoader_('text');
     }
   }
 
