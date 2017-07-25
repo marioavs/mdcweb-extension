@@ -101,6 +101,7 @@
 // postcss-bem-linter: end
 
 .mdc-ext-autocomplete__menu {
+  tabindex: -1;
   .mdc-list-item {
     @include mdc-typography(subheading2);
     @include mdc-theme-prop(color, text-secondary-on-light);

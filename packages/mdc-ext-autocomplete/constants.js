@@ -27,3 +27,9 @@ export const strings = {
   ARIA_HIDDEN: 'aria-hidden',
   CHANGE_EVENT: 'MDCExtAutocomplete:change'
 };
+
+/** @enum {number} */
+export const numbers = {
+  // Amount of miliseconds to wait before triggering a change value functionality.
+  CHANGE_VALUE_TRIGGER_DELAY: 500
+}

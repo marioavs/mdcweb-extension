@@ -166,6 +166,7 @@ export class MDCExtAutocomplete extends MDCComponent {
 
   applyItemsLoader_(query) {
     var self = this;
+    console.log(`quering for: ${query}`);
     this.settings_.itemsLoader.apply(self, [query, function(results) {
             if (results && results.length) {
                     self.foundation_.addItems(results);

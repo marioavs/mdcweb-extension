@@ -64,7 +64,7 @@
     <main>
       <div class="mdc-toolbar-fixed-adjust"></div>
       <section class="hero">
-        <div id="hero-js-select" class="mdc-ext-autocomplete mdc-menu-anchor" role="listbox" tabindex="0">
+        <div id="hero-js-select" class="mdc-ext-autocomplete mdc-menu-anchor" role="listbox">
           <label class="mdc-textfield mdc-ext-autocomplete__textfield">
             <input type="text" class="mdc-textfield__input mdc-ext-autocomplete__input">
             <span class="mdc-textfield__label">Pick a country</span>
@@ -328,7 +328,7 @@
       <section class="example">
         <h2 class="mdc-typography--title">Fully-Featured Component</h2>
         <section id="demo-wrapper">
-          <div id="js-select" class="mdc-ext-autocomplete" role="listbox" tabindex="0">
+          <div id="js-select" class="mdc-ext-autocomplete" role="listbox">
             <label class="mdc-textfield mdc-ext-autocomplete__textfield">
               <input type="text" class="mdc-textfield__input">
               <span class="mdc-textfield__label">Pick a food group</span>
@@ -338,22 +338,22 @@
                 <li class="mdc-list-item" role="option" id="grains" aria-disabled="true">
                   Pick a food group
                 </li>
-                <li class="mdc-list-item" role="option" id="grains" tabindex="0">
+                <li class="mdc-list-item" role="option" id="grains">
                   Bread, Cereal, Rice, and Pasta
                 </li>
-                <li class="mdc-list-item" role="option" id="vegetables" aria-disabled="true" tabindex="0">
+                <li class="mdc-list-item" role="option" id="vegetables" aria-disabled="true">
                   Vegetables
                 </li>
-                <li class="mdc-list-item" role="option" id="fruit" tabindex="0">
+                <li class="mdc-list-item" role="option" id="fruit">
                   Fruit
                 </li>
-                <li class="mdc-list-item" role="option" id="dairy" tabindex="0">
+                <li class="mdc-list-item" role="option" id="dairy">
                   Milk, Yogurt, and Cheese
                 </li>
-                <li class="mdc-list-item" role="option" id="meat" tabindex="0">
+                <li class="mdc-list-item" role="option" id="meat">
                   Meat, Poultry, Fish, Dry Beans, Eggs, and Nuts
                 </li>
-                <li class="mdc-list-item" role="option" id="fats" tabindex="0">
+                <li class="mdc-list-item" role="option" id="fats">
                   Fats, Oils, and Sweets
                 </li>
               </ul>
@@ -378,7 +378,7 @@
       <section class="load-items-example">
         <h2 class="mdc-typography--title">Load-Items Component</h2>
         <section id="demo-wrapper">
-          <div id="js-load-items" class="mdc-ext-autocomplete" role="listbox" tabindex="0">
+          <div id="js-load-items" class="mdc-ext-autocomplete" role="listbox">
             <label class="mdc-textfield mdc-ext-autocomplete__textfield">
               <input type="text" class="mdc-textfield__input">
               <span class="mdc-textfield__label">Pick an item</span>
@@ -431,7 +431,6 @@
         var loadItems = document.getElementById('js-load-items');
         autocompleteLoadItems =  new MDCExtAutocomplete(loadItems, undefined, {
             itemsLoader: function(query, callback) {
-              if (!query.length) return callback();
               callback([{
                   value: '01',
                   description: 'first'

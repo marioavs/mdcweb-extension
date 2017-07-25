@@ -15,7 +15,7 @@
  */
 
 import {MDCFoundation} from '@material/base';
-import {cssClasses, strings} from './constants';
+import {cssClasses, strings, numbers} from './constants';
 import {MDCSimpleMenuFoundation} from '@material/menu';
 
 const OPENER_KEYS = [
@@ -77,10 +77,12 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.ctx_ = null;
     this.selectedIndex_ = -1;
     this.disabled_ = false;
-    this.lastValue_ = '';
+    this.lastValue_ = undefined;
     this.displayHandler_ = (evt) => {
       evt.preventDefault();
-      if (!this.adapter_.isMenuOpen()) {
+      this.handleInputValue_();
+
+      if ((this.adapter_.getNumberOfItems() > 0) && !this.adapter_.isMenuOpen()) {
         this.open_();
       }
     };
@@ -96,6 +98,8 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.cancelHandler_ = () => {
       this.close_();
     };
+    /** @private {number} */
+    this.changeValueTriggerTimerId_ = 0;
   }
 
   init() {
@@ -111,6 +115,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   destroy() {
+    clearTimeout(this.changeValueTriggerTimerId_);
     // Drop reference to context object to prevent potential leaks
     this.ctx_ = null;
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
@@ -181,7 +186,9 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   refreshItems() {
-
+    if ((this.adapter_.getNumberOfItems() > 0) && !this.adapter_.isMenuOpen()) {
+      this.open_();
+    }
   }
 
   resize() {
@@ -207,7 +214,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
   open_() {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
-    const focusIndex = this.selectedIndex_ < 0 ? 0 : this.selectedIndex_;
+    const focusIndex = this.selectedIndex_ < 0 ? null : this.selectedIndex_;
     // const {left, top, transformOrigin} = this.computeMenuStylesForOpenAtIndex_(focusIndex);
     const {left, top, transformOrigin} = this.computeMenuStylesForOpen_();
 
@@ -276,23 +283,11 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
         this.adapter_.setAttrForItemAtIndex(i, ARIA_HIDDEN, 'true');
       }
     }
+    this.refreshItems();
   }
 
   handleDisplayViaKeyboard_(evt) {
-    let currentValue = this.getNativeInput_().value;
-    if (currentValue !== this.lastValue_) {
-      if (this.adapter_.hasItemsLoader()){
-        if(this.adapter_.getNumberOfItems()==0){
-            this.adapter_.applyItemsLoader(currentValue);
-        }
-        this.applyQuery_(currentValue);
-        this.lastValue_ = currentValue;
-      }
-      else {
-        this.applyQuery_(currentValue);
-        this.lastValue_ = currentValue;
-      }
-    }
+    this.handleInputValue_();
 
     // We use a hard-coded 2 instead of Event.AT_TARGET to avoid having to reference a browser
     // global.
@@ -313,7 +308,22 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     if (isOpenerKey) {
       this.displayHandler_(evt);
     }
+  }
 
+  handleInputValue_() {
+    let currentValue = this.getNativeInput_().value;
+    if (currentValue !== this.lastValue_) {
+      this.lastValue_ = currentValue;
+      // Debounce multiple changed values
+      clearTimeout(this.changeValueTriggerTimerId_);
+      this.changeValueTriggerTimerId_ = setTimeout(() => {
+        if (this.adapter_.hasItemsLoader())
+          this.adapter_.applyItemsLoader(currentValue);
+        else {
+          this.applyQuery_(currentValue);
+        }
+      }, numbers.CHANGE_VALUE_TRIGGER_DELAY);
+    }
   }
 
   /**
@@ -322,8 +332,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
    */
   getNativeInput_() {
     return this.adapter_.getNativeInput() || {
-      checked: false,
-      indeterminate: false,
       disabled: false,
       value: null,
     };
