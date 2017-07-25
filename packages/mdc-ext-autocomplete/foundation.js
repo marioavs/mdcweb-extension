@@ -20,8 +20,7 @@ import {MDCSimpleMenuFoundation} from '@material/menu';
 
 const OPENER_KEYS = [
   {key: 'ArrowUp', keyCode: 38, forType: 'keydown'},
-  {key: 'ArrowDown', keyCode: 40, forType: 'keydown'},
-  {key: 'Space', keyCode: 32, forType: 'keyup'},
+  {key: 'ArrowDown', keyCode: 40, forType: 'keydown'}
 ];
 
 export default class MDCExtAutocompleteFoundation extends MDCFoundation {
@@ -68,7 +67,11 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       deregisterMenuInteractionHandler: (/* type: string, handler: EventListener */) => {},
       notifyChange: () => {},
       getWindowInnerHeight: () => /* number */ 0,
-      getNativeInput: () => /* HTMLInputElement */ ({})
+      getNativeOffsetHeight: () => /* number */ 0,
+      registerInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      getNativeInput: () => /* HTMLInputElement */ ({}),
+      getNativeMenu: () => /* HTMLInputElement */ ({})
     };
   }
 
@@ -105,8 +108,8 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   init() {
     this.ctx_ = this.adapter_.create2dRenderingContext();
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
-    this.adapter_.registerInteractionHandler('keydown', this.displayViaKeyboardHandler_);
-    this.adapter_.registerInteractionHandler('keyup', this.displayViaKeyboardHandler_);
+    this.adapter_.registerInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
+    this.adapter_.registerInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
     this.adapter_.registerMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.registerMenuInteractionHandler(
@@ -119,8 +122,8 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     // Drop reference to context object to prevent potential leaks
     this.ctx_ = null;
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
-    this.adapter_.deregisterInteractionHandler('keydown', this.displayViaKeyboardHandler_);
-    this.adapter_.deregisterInteractionHandler('keyup', this.displayViaKeyboardHandler_);
+    this.adapter_.deregisterInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
+    this.adapter_.deregisterInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterMenuInteractionHandler(
       MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
     this.adapter_.deregisterMenuInteractionHandler(
@@ -287,8 +290,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   handleDisplayViaKeyboard_(evt) {
-    this.handleInputValue_();
-
     // We use a hard-coded 2 instead of Event.AT_TARGET to avoid having to reference a browser
     // global.
     const EVENT_PHASE_AT_TARGET = 2;
@@ -296,10 +297,24 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       return;
     }
 
-    // Prevent pressing space down from scrolling the page
-    const isSpaceDown = evt.type === 'keydown' && (evt.key === 'Space' || evt.keyCode === 32);
-    if (isSpaceDown) {
-      evt.preventDefault();
+    this.handleInputValue_();
+
+    // Do nothing if Alt, Ctrl or Meta are pressed.
+    if (evt.altKey || evt.ctrlKey || evt.metaKey) {
+      return;
+    }
+
+    const {keyCode, key, shiftKey} = evt;
+    const isTab = key === 'Tab' || keyCode === 9;
+    const isArrowUp = key === 'ArrowUp' || keyCode === 38;
+    const isArrowDown = key === 'ArrowDown' || keyCode === 40;
+
+    if (isTab || isArrowUp || isArrowDown) {
+      if ((this.adapter_.getNumberOfItems() > 0) && (this.selectedIndex_ < 0)) {
+        this.setSelectedIndex(0);
+      }
+      let newKeyboardEvent = new evt.constructor(evt.type, evt);
+      this.getNativeMenu_().dispatchEvent(newKeyboardEvent);
     }
 
     const isOpenerKey = OPENER_KEYS.some(({key, keyCode, forType}) => {
@@ -334,6 +349,16 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     return this.adapter_.getNativeInput() || {
       disabled: false,
       value: null,
+    };
+  }
+
+  /**
+   * @return {!MenuElementState}
+   * @private
+   */
+  getNativeMenu_() {
+    return this.adapter_.getNativeMenu() || {
+      disabled: false
     };
   }
 }

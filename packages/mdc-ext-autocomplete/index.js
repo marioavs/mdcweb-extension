@@ -147,7 +147,10 @@ export class MDCExtAutocomplete extends MDCComponent {
       notifyChange: () => this.emit(MDCExtAutocompleteFoundation.strings.CHANGE_EVENT, this),
       getWindowInnerHeight: () => window.innerHeight,
       getNativeOffsetHeight: () => this.root_.offsetHeight,
-      getNativeInput: () => this.text_.foundation_.getNativeInput_()
+      registerInputInteractionHandler: (type, handler) => this.text_.foundation_.getNativeInput_().addEventListener(type, handler),
+      deregisterInputInteractionHandler: (type, handler) => this.text_.foundation_.getNativeInput_().removeEventListener(type, handler),
+      getNativeInput: () => this.text_.foundation_.getNativeInput_(),
+      getNativeMenu: () => this.menuEl_
     });
   }
 
