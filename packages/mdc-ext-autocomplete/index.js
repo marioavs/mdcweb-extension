@@ -37,11 +37,11 @@ export class MDCExtAutocomplete extends MDCComponent {
     this.foundation_.setValue(value);
   }
 
-  get options() {
+  get items() {
     return this.menu_.items;
   }
 
-  get selectedOptions() {
+  get selectedItems() {
     return this.root_.querySelectorAll('[aria-selected]');
   }
 
@@ -62,24 +62,36 @@ export class MDCExtAutocomplete extends MDCComponent {
   }
 
   item(index) {
-    return this.options[index] || null;
+    return this.items[index] || null;
   }
 
-  nameditem(key) {
+  namedItem(key) {
     // NOTE: IE11 precludes us from using Array.prototype.find
-    for (let i = 0, options = this.options, option; (option = options[i]); i++) {
-      if (option.id === key || option.getAttribute('name') === key) {
-        return option;
+    for (let i = 0, items = this.items, item; (item = items[i]); i++) {
+      if (item.id === key || item.getAttribute('name') === key) {
+        return item;
       }
     }
     return null;
   }
 
-  initialize(menuFactory = (el) => new MDCSimpleMenu(el), textFactory = (el) => new MDCTextfield(el)) {
-    this.menuEl_ = this.root_.querySelector('.mdc-ext-autocomplete__menu');
+  initialize(settings = {}, menuFactory = (el) => new MDCSimpleMenu(el), textFactory = (el) => new MDCTextfield(el)) {
+    this.settings_ = settings;
+    this.menuEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.MENU);
     this.menu_ = menuFactory(this.menuEl_);
     this.textEl_ = this.root_.querySelector('.mdc-ext-autocomplete__textfield');
     this.text_ = textFactory(this.textEl_);
+    this.menuItemsEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.ITEMS);
+  }
+
+  destroy() {
+    if (this.menu_) {
+      this.menu_.destroy();
+    }
+    if (this.text_) {
+      this.text_.destroy();
+    }
+    super.destroy();
   }
 
   getDefaultFoundation() {
@@ -92,6 +104,18 @@ export class MDCExtAutocomplete extends MDCComponent {
       registerInteractionHandler: (type, handler) => this.root_.addEventListener(type, handler),
       deregisterInteractionHandler: (type, handler) => this.root_.removeEventListener(type, handler),
       focus: () => this.root_.focus(),
+      hasItemsLoader: () => {
+        return ((this.settings_ !== undefined) && (typeof this.settings_.itemsLoader === 'function'));
+      },
+      applyItemsLoader: (query) => {
+        this.applyItemsLoader_(query)
+      },
+      removeAllItems: () => {
+        this.removeAllItems_()
+      },
+      addItem: (value, description) => {
+        this.addItem_(value, description)
+      },
       makeTabbable: () => {
         this.root_.tabIndex = 0;
       },
@@ -110,30 +134,63 @@ export class MDCExtAutocomplete extends MDCComponent {
       setSelectedTextContent: (selectedTextContent) => {
         this.text_.foundation_.getNativeInput_().value = selectedTextContent;
       },
-      getNumberOfOptions: () => this.options.length,
-      getTextForOptionAtIndex: (index) => this.options[index].textContent,
-      getValueForOptionAtIndex: (index) => this.options[index].id || this.options[index].textContent,
-      setAttrForOptionAtIndex: (index, attr, value) => this.options[index].setAttribute(attr, value),
-      rmAttrForOptionAtIndex: (index, attr) => this.options[index].removeAttribute(attr),
-      getOffsetTopForOptionAtIndex: (index) => this.options[index].offsetTop,
+      getNumberOfItems: () => this.items.length,
+      getTextForItemAtIndex: (index) => this.items[index].textContent,
+      getValueForItemAtIndex: (index) => this.items[index].id || this.items[index].textContent,
+      addClassForItemAtIndex: (index, className) => this.items[index].classList.add(className),
+      rmClassForItemAtIndex: (index, className) => this.items[index].classList.remove(className),
+      setAttrForItemAtIndex: (index, attr, value) => this.items[index].setAttribute(attr, value),
+      rmAttrForItemAtIndex: (index, attr) => this.items[index].removeAttribute(attr),
+      getOffsetTopForItemAtIndex: (index) => this.items[index].offsetTop,
       registerMenuInteractionHandler: (type, handler) => this.menu_.listen(type, handler),
       deregisterMenuInteractionHandler: (type, handler) => this.menu_.unlisten(type, handler),
       notifyChange: () => this.emit(MDCExtAutocompleteFoundation.strings.CHANGE_EVENT, this),
       getWindowInnerHeight: () => window.innerHeight,
       getNativeOffsetHeight: () => this.root_.offsetHeight,
-      getNativeInput: () => this.text_.foundation_.getNativeInput_()
+      getNativeInput: () => this.text_.foundation_.getNativeInput_(),
     });
   }
 
   initialSyncWithDOM() {
-    const selectedOption = this.selectedOptions[0];
-    const idx = selectedOption ? this.options.indexOf(selectedOption) : -1;
+    const selectedItem = this.selectedItems[0];
+    const idx = selectedItem ? this.items.indexOf(selectedItem) : -1;
     if (idx >= 0) {
       this.selectedIndex = idx;
     }
 
     if (this.root_.getAttribute('aria-disabled') === 'true') {
-      this.disabled = true;
+      this
+      this.applyItemsLoader_('text');
+    }
+  }
+
+  applyItemsLoader_(query) {
+    var self = this;
+    console.log(`quering for: ${query}`);
+    this.settings_.itemsLoader.apply(self, [query, function(results) {
+            if (results && results.length) {
+                    self.foundation_.addItems(results);
+                    self.foundation_.refreshItems();
+            }
+    }]);
+  }
+
+  removeAllItems_() {
+    if (this.menuItemsEl_ !== undefined) {
+      while(this.menuItemsEl_.hasChildNodes()) this.menuItemsEl_.removeChild(this.menuItemsEl_.firstChild);
+    }
+  }
+
+  addItem_(value, description) {
+    const {LIST_ITEM} = MDCExtAutocompleteFoundation.cssClasses;
+    if (this.menuItemsEl_ !== undefined) {
+      var node = document.createElement('li');
+      node.classList.add(LIST_ITEM);
+      node.setAttribute('role', 'option');
+      node.setAttribute('value', value);
+      var textnode = document.createTextNode(description);
+      node.appendChild(textnode);
+      this.menuItemsEl_.appendChild(node);
     }
   }
 }

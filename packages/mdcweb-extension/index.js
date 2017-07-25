@@ -18,6 +18,10 @@ import * as autocomplete from '@mdcext/autocomplete';
 import * as dataTable from '@mdcext/data-table';
 import autoInit from '@material/auto-init';
 
+// let webpack to copy material-components-web js and css
+//require('material-components-web/dist/material-components-web')
+//require('material-components-web/dist/material-components-web.css')
+
 // Register all components
 autoInit.register('MDCExtAutocomplete', autocomplete.MDCExtAutocomplete);
 autoInit.register('MDCExtDataTable', dataTable.MDCExtDataTable);
