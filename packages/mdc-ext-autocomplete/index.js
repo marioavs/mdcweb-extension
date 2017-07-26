@@ -15,7 +15,6 @@
  */
 
 import {MDCComponent} from '@material/base';
-import {MDCSimpleMenu} from '@material/menu';
 import {MDCTextfield} from '@material/textfield';
 
 import MDCExtAutocompleteFoundation from './foundation';
@@ -37,22 +36,6 @@ export class MDCExtAutocomplete extends MDCComponent {
     this.foundation_.setValue(value);
   }
 
-  get items() {
-    return this.menu_.items;
-  }
-
-  get selectedItems() {
-    return this.root_.querySelectorAll('[aria-selected]');
-  }
-
-  get selectedIndex() {
-    return this.foundation_.getSelectedIndex();
-  }
-
-  set selectedIndex(selectedIndex) {
-    this.foundation_.setSelectedIndex(selectedIndex);
-  }
-
   get disabled() {
     return this.foundation_.isDisabled();
   }
@@ -61,33 +44,22 @@ export class MDCExtAutocomplete extends MDCComponent {
     this.foundation_.setDisabled(disabled);
   }
 
-  item(index) {
-    return this.items[index] || null;
+  get items() {
+    return this.listEl_.querySelectorAll('.'+MDCExtAutocompleteFoundation.cssClasses.LIST_ITEM);
   }
 
-  namedItem(key) {
-    // NOTE: IE11 precludes us from using Array.prototype.find
-    for (let i = 0, items = this.items, item; (item = items[i]); i++) {
-      if (item.id === key || item.getAttribute('name') === key) {
-        return item;
-      }
-    }
-    return null;
+  get availableItems() {
+    return this.listEl_.querySelectorAll(`.${MDCExtAutocompleteFoundation.cssClasses.LIST_ITEM}:not(.${MDCExtAutocompleteFoundation.cssClasses.ITEM_NOMATCH})`);
   }
 
-  initialize(settings = {}, menuFactory = (el) => new MDCSimpleMenu(el), textFactory = (el) => new MDCTextfield(el)) {
+  initialize(settings = {}, textFactory = (el) => new MDCTextfield(el)) {
     this.settings_ = settings;
-    this.menuEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.MENU);
-    this.menu_ = menuFactory(this.menuEl_);
-    this.textEl_ = this.root_.querySelector('.mdc-ext-autocomplete__textfield');
+    this.textEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.TEXTFIELD);
     this.text_ = textFactory(this.textEl_);
-    this.menuItemsEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.ITEMS);
+    this.listEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.LIST);
   }
 
   destroy() {
-    if (this.menu_) {
-      this.menu_.destroy();
-    }
     if (this.text_) {
       this.text_.destroy();
     }
@@ -100,10 +72,8 @@ export class MDCExtAutocomplete extends MDCComponent {
       removeClass: (className) => this.root_.classList.remove(className),
       setAttr: (attr, value) => this.root_.setAttribute(attr, value),
       rmAttr: (attr, value) => this.root_.removeAttribute(attr, value),
-      computeBoundingRect: () => this.root_.getBoundingClientRect(),
       registerInteractionHandler: (type, handler) => this.root_.addEventListener(type, handler),
       deregisterInteractionHandler: (type, handler) => this.root_.removeEventListener(type, handler),
-      focus: () => this.root_.focus(),
       hasItemsLoader: () => {
         return ((this.settings_ !== undefined) && (typeof this.settings_.itemsLoader === 'function'));
       },
@@ -116,54 +86,18 @@ export class MDCExtAutocomplete extends MDCComponent {
       addItem: (value, description) => {
         this.addItem_(value, description)
       },
-      makeTabbable: () => {
-        this.root_.tabIndex = 0;
-      },
-      makeUntabbable: () => {
-        this.root_.tabIndex = -1;
-      },
-      getComputedStyleValue: (prop) => window.getComputedStyle(this.root_).getPropertyValue(prop),
-      setStyle: (propertyName, value) => this.root_.style.setProperty(propertyName, value),
-      create2dRenderingContext: () => document.createElement('canvas').getContext('2d'),
-      setMenuElStyle: (propertyName, value) => this.menuEl_.style.setProperty(propertyName, value),
-      setMenuElAttr: (attr, value) => this.menuEl_.setAttribute(attr, value),
-      rmMenuElAttr: (attr) => this.menuEl_.removeAttribute(attr),
-      getMenuElOffsetHeight: () => this.menuEl_.offsetHeight,
-      openMenu: (focusIndex) => this.menu_.show({focusIndex}),
-      isMenuOpen: () => this.menu_.open,
-      setSelectedTextContent: (selectedTextContent) => {
-        this.text_.foundation_.getNativeInput_().value = selectedTextContent;
-      },
-      getNumberOfItems: () => this.items.length,
+      setListElStyle: (propertyName, value) => this.listEl_.style.setProperty(propertyName, value),
+      getNumberOfAvailableItems: () => this.availableItems.length,
       getTextForItemAtIndex: (index) => this.items[index].textContent,
       getValueForItemAtIndex: (index) => this.items[index].id || this.items[index].textContent,
       addClassForItemAtIndex: (index, className) => this.items[index].classList.add(className),
       rmClassForItemAtIndex: (index, className) => this.items[index].classList.remove(className),
       setAttrForItemAtIndex: (index, attr, value) => this.items[index].setAttribute(attr, value),
       rmAttrForItemAtIndex: (index, attr) => this.items[index].removeAttribute(attr),
-      getOffsetTopForItemAtIndex: (index) => this.items[index].offsetTop,
-      registerMenuInteractionHandler: (type, handler) => this.menu_.listen(type, handler),
-      deregisterMenuInteractionHandler: (type, handler) => this.menu_.unlisten(type, handler),
-      notifyChange: () => this.emit(MDCExtAutocompleteFoundation.strings.CHANGE_EVENT, this),
-      getWindowInnerHeight: () => window.innerHeight,
-      getNativeOffsetHeight: () => this.root_.offsetHeight,
       registerInputInteractionHandler: (type, handler) => this.text_.foundation_.getNativeInput_().addEventListener(type, handler),
       deregisterInputInteractionHandler: (type, handler) => this.text_.foundation_.getNativeInput_().removeEventListener(type, handler),
       getNativeInput: () => this.text_.foundation_.getNativeInput_(),
-      getNativeMenu: () => this.menuEl_
     });
-  }
-
-  initialSyncWithDOM() {
-    const selectedItem = this.selectedItems[0];
-    const idx = selectedItem ? this.items.indexOf(selectedItem) : -1;
-    if (idx >= 0) {
-      this.selectedIndex = idx;
-    }
-
-    if (this.root_.getAttribute('aria-disabled') === 'true') {
-      this.disabled = true;
-    }
   }
 
   applyItemsLoader_(query) {

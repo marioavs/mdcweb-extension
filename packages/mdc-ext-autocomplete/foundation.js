@@ -38,40 +38,23 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       removeClass: (/* className: string */) => {},
       setAttr: (/* attr: string, value: string */) => {},
       rmAttr: (/* attr: string */) => {},
-      computeBoundingRect: () => /* {left: number, top: number} */ ({left: 0, top: 0}),
       registerInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      focus: () => {},
-      makeTabbable: () => {},
-      makeUntabbable: () => {},
-      getComputedStyleValue: (/* propertyName: string */) => /* string */ '',
-      setStyle: (/* propertyName: string, value: string */) => {},
-      create2dRenderingContext: () => /* {font: string, measureText: (string) => {width: number}} */ ({
-        font: '',
-        measureText: () => ({width: 0}),
-      }),
-      setMenuElStyle: (/* propertyName: string, value: string */) => {},
-      setMenuElAttr: (/* attr: string, value: string */) => {},
-      rmMenuElAttr: (/* attr: string */) => {},
-      getMenuElOffsetHeight: () => /* number */ 0,
-      openMenu: (/* focusIndex: number */) => {},
-      isMenuOpen: () => /* boolean */ false,
-      setSelectedTextContent: (/* textContent: string */) => {},
-      getNumberOfItems: () => /* number */ 0,
+      hasItemsLoader: () => /* boolean */ false,
+      applyItemsLoader: (/* query: string */) => {},
+      removeAllItems: () => {},
+      addItem: (/* value: string, description: string */) => {},
+      setListElStyle: (/* propertyName: string, value: string */) => {},
+      getNumberOfAvailableItems: () => /* number */ 0,
       getTextForItemAtIndex: (/* index: number */) => /* string */ '',
       getValueForItemAtIndex: (/* index: number */) => /* string */ '',
+      addClassForItemAtIndex: (/* index: number, className: string */) => {},
+      rmClassForItemAtIndex: (/* index: number, className: string */) => {},
       setAttrForItemAtIndex: (/* index: number, attr: string, value: string */) => {},
       rmAttrForItemAtIndex: (/* index: number, attr: string */) => {},
-      getOffsetTopForItemAtIndex: (/* index: number */) => /* number */ 0,
-      registerMenuInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      deregisterMenuInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      notifyChange: () => {},
-      getWindowInnerHeight: () => /* number */ 0,
-      getNativeOffsetHeight: () => /* number */ 0,
       registerInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      getNativeInput: () => /* HTMLInputElement */ ({}),
-      getNativeMenu: () => /* HTMLInputElement */ ({})
+      getNativeInput: () => /* HTMLInputElement */ {}
     };
   }
 
@@ -85,35 +68,31 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       evt.preventDefault();
       this.handleInputValue_();
 
-      if ((this.adapter_.getNumberOfItems() > 0) && !this.adapter_.isMenuOpen()) {
+      // if ((this.adapter_.getNumberOfAvailableItems() > 0) && !this.adapter_.isMenuOpen()) {
         this.open_();
-      }
+      // }
     };
     this.displayViaKeyboardHandler_ = (evt) => this.handleDisplayViaKeyboard_(evt);
-    this.selectionHandler_ = ({detail}) => {
-      const {index} = detail;
-      this.close_();
-      if (index !== this.selectedIndex_) {
-        this.setSelectedIndex(index);
-        this.adapter_.notifyChange();
-      }
-    };
-    this.cancelHandler_ = () => {
-      this.close_();
-    };
+    // this.selectionHandler_ = ({detail}) => {
+    //   const {index} = detail;
+    //   this.close_();
+    //   if (index !== this.selectedIndex_) {
+    //     this.setSelectedIndex(index);
+    //     this.adapter_.notifyChange();
+    //   }
+    // };
+    // this.cancelHandler_ = () => {
+    //   this.close_();
+    // };
     /** @private {number} */
     this.changeValueTriggerTimerId_ = 0;
   }
 
   init() {
-    this.ctx_ = this.adapter_.create2dRenderingContext();
+    // this.ctx_ = this.adapter_.create2dRenderingContext();
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    this.adapter_.registerMenuInteractionHandler(
-      MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
-    this.adapter_.registerMenuInteractionHandler(
-      MDCSimpleMenuFoundation.strings.CANCEL_EVENT, this.cancelHandler_);
     this.resize();
   }
 
@@ -124,16 +103,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    this.adapter_.deregisterMenuInteractionHandler(
-      MDCSimpleMenuFoundation.strings.SELECTED_EVENT, this.selectionHandler_);
-    this.adapter_.deregisterMenuInteractionHandler(
-      MDCSimpleMenuFoundation.strings.CANCEL_EVENT, this.cancelHandler_);
   }
-
-  // /** @return {?string} */
-  // getInputValue() {
-  //   return this.getNativeInput_().value;
-  // }
 
   /** @param {?string} value */
   setInputValue(value) {
@@ -142,25 +112,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
   getValue() {
     return this.selectedIndex_ >= 0 ? this.adapter_.getValueForItemAtIndex(this.selectedIndex_) : '';
-  }
-
-  getSelectedIndex() {
-    return this.selectedIndex_;
-  }
-
-  setSelectedIndex(index) {
-    const prevSelectedIndex = this.selectedIndex_;
-    if (prevSelectedIndex >= 0) {
-      this.adapter_.rmAttrForItemAtIndex(this.selectedIndex_, 'aria-selected');
-    }
-
-    this.selectedIndex_ = index >= 0 && index < this.adapter_.getNumberOfItems() ? index : -1;
-    let selectedTextContent = '';
-    if (this.selectedIndex_ >= 0) {
-      selectedTextContent = this.adapter_.getTextForItemAtIndex(this.selectedIndex_).trim();
-      this.adapter_.setAttrForItemAtIndex(this.selectedIndex_, 'aria-selected', 'true');
-    }
-    this.adapter_.setSelectedTextContent(selectedTextContent);
   }
 
   isDisabled() {
@@ -173,11 +124,9 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     if (this.disabled_) {
       this.adapter_.addClass(DISABLED);
       this.adapter_.setAttr('aria-disabled', 'true');
-      this.adapter_.makeUntabbable();
     } else {
       this.adapter_.removeClass(DISABLED);
       this.adapter_.rmAttr('aria-disabled');
-      this.adapter_.makeTabbable();
     }
   }
 
@@ -189,93 +138,57 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   refreshItems() {
-    if ((this.adapter_.getNumberOfItems() > 0) && !this.adapter_.isMenuOpen()) {
+    // if ((this.adapter_.getNumberOfAvailableItems() > 0) && !this.adapter_.isMenuOpen()) {
       this.open_();
-    }
+    // }
   }
 
   resize() {
-    const font = this.adapter_.getComputedStyleValue('font');
-    const letterSpacing = parseFloat(this.adapter_.getComputedStyleValue('letter-spacing'));
-    if (font) {
-      this.ctx_.font = font;
-    } else {
-      const primaryFontFamily = this.adapter_.getComputedStyleValue('font-family').split(',')[0];
-      const fontSize = this.adapter_.getComputedStyleValue('font-size');
-      this.ctx_.font = `${fontSize} ${primaryFontFamily}`;
-    }
-
-    let maxTextLength = 0;
-    for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
-      const txt = this.adapter_.getTextForItemAtIndex(i).trim();
-      const {width} = this.ctx_.measureText(txt);
-      const addedSpace = letterSpacing * txt.length;
-      maxTextLength = Math.max(maxTextLength, Math.ceil(width + addedSpace));
-    }
-    this.adapter_.setStyle('width', `${maxTextLength}px`);
+    // const font = this.adapter_.getComputedStyleValue('font');
+    // const letterSpacing = parseFloat(this.adapter_.getComputedStyleValue('letter-spacing'));
+    // if (font) {
+    //   this.ctx_.font = font;
+    // } else {
+    //   const primaryFontFamily = this.adapter_.getComputedStyleValue('font-family').split(',')[0];
+    //   const fontSize = this.adapter_.getComputedStyleValue('font-size');
+    //   this.ctx_.font = `${fontSize} ${primaryFontFamily}`;
+    // }
+    //
+    // let maxTextLength = 0;
+    // for (let i = 0, l = this.adapter_.getNumberOfAvailableItems(); i < l; i++) {
+    //   const txt = this.adapter_.getTextForItemAtIndex(i).trim();
+    //   const {width} = this.ctx_.measureText(txt);
+    //   const addedSpace = letterSpacing * txt.length;
+    //   maxTextLength = Math.max(maxTextLength, Math.ceil(width + addedSpace));
+    // }
+    // this.adapter_.setStyle('width', `${maxTextLength}px`);
   }
 
   open_() {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
-    const focusIndex = this.selectedIndex_ < 0 ? null : this.selectedIndex_;
-    // const {left, top, transformOrigin} = this.computeMenuStylesForOpenAtIndex_(focusIndex);
-    const {left, top, transformOrigin} = this.computeMenuStylesForOpen_();
-
-    this.adapter_.setMenuElStyle('left', left);
-    this.adapter_.setMenuElStyle('top', top);
-    this.adapter_.setMenuElStyle('transform-origin', transformOrigin);
+    this.adapter_.setListElStyle('display', 'block');
     this.adapter_.addClass(OPEN);
-    this.adapter_.openMenu(focusIndex);
-  }
-
-  computeMenuStylesForOpen_() {
-    const {left, top} = this.adapter_.computeBoundingRect();
-
-    let adjustedTop = top + this.adapter_.getNativeOffsetHeight();
-    return {
-      left: left,
-      top: adjustedTop
-    }
-  }
-
-  computeMenuStylesForOpenAtIndex_(index) {
-    const innerHeight = this.adapter_.getWindowInnerHeight();
-    const {left, top} = this.adapter_.computeBoundingRect();
-
-    this.adapter_.setMenuElAttr('aria-hidden', 'true');
-    this.adapter_.setMenuElStyle('display', 'block');
-    const menuHeight = this.adapter_.getMenuElOffsetHeight();
-    const itemOffsetTop = this.adapter_.getOffsetTopForItemAtIndex(index);
-    this.adapter_.setMenuElStyle('display', '');
-    this.adapter_.rmMenuElAttr('aria-hidden');
-
-    let adjustedTop = top + itemOffsetTop;
-    const adjustedHeight = menuHeight - itemOffsetTop;
-    const overflowsTop = adjustedTop < 0;
-    const overflowsBottom = adjustedTop + adjustedHeight > innerHeight;
-    if (overflowsTop) {
-      adjustedTop = 0;
-    } else if (overflowsBottom) {
-      adjustedTop = Math.max(0, adjustedTop - adjustedHeight);
-    }
-
-    return {
-      left: `${left}px`,
-      top: `${adjustedTop}px`,
-      transformOrigin: `center ${itemOffsetTop}px`,
-    };
+    // const focusIndex = this.selectedIndex_ < 0 ? null : this.selectedIndex_;
+    // // const {left, top, transformOrigin} = this.computeMenuStylesForOpenAtIndex_(focusIndex);
+    // const {left, top, transformOrigin} = this.computeMenuStylesForOpen_();
+    //
+    // this.adapter_.setMenuElStyle('left', left);
+    // this.adapter_.setMenuElStyle('top', top);
+    // this.adapter_.setMenuElStyle('transform-origin', transformOrigin);
+    // this.adapter_.addClass(OPEN);
+    // this.adapter_.openMenu(focusIndex);
   }
 
   close_() {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
     this.adapter_.removeClass(OPEN);
-    this.adapter_.focus();
+    // this.adapter_.focus();
   }
 
   applyQuery_(value) {
     const {ARIA_HIDDEN} = MDCExtAutocompleteFoundation.strings;
     const {ITEM_NOMATCH} = MDCExtAutocompleteFoundation.cssClasses;
-    for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
+    for (let i = 0, l = this.adapter_.getNumberOfAvailableItems(); i < l; i++) {
       const txt = this.adapter_.getTextForItemAtIndex(i).trim();
       if (txt.toUpperCase().includes(value.toUpperCase())) {
         this.adapter_.rmClassForItemAtIndex(i, ITEM_NOMATCH);
@@ -304,25 +217,25 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       return;
     }
 
-    const {keyCode, key, shiftKey} = evt;
-    const isTab = key === 'Tab' || keyCode === 9;
-    const isArrowUp = key === 'ArrowUp' || keyCode === 38;
-    const isArrowDown = key === 'ArrowDown' || keyCode === 40;
-
-    if (isTab || isArrowUp || isArrowDown) {
-      if ((this.adapter_.getNumberOfItems() > 0) && (this.selectedIndex_ < 0)) {
-        this.setSelectedIndex(0);
-      }
-      let newKeyboardEvent = new evt.constructor(evt.type, evt);
-      this.getNativeMenu_().dispatchEvent(newKeyboardEvent);
-    }
-
-    const isOpenerKey = OPENER_KEYS.some(({key, keyCode, forType}) => {
-      return evt.type === forType && (evt.key === key || evt.keyCode === keyCode);
-    });
-    if (isOpenerKey) {
-      this.displayHandler_(evt);
-    }
+    // const {keyCode, key, shiftKey} = evt;
+    // const isTab = key === 'Tab' || keyCode === 9;
+    // const isArrowUp = key === 'ArrowUp' || keyCode === 38;
+    // const isArrowDown = key === 'ArrowDown' || keyCode === 40;
+    //
+    // if (isTab || isArrowUp || isArrowDown) {
+    //   if ((this.adapter_.getNumberOfAvailableItems() > 0) && (this.selectedIndex_ < 0)) {
+    //     this.setSelectedIndex(0);
+    //   }
+    //   let newKeyboardEvent = new evt.constructor(evt.type, evt);
+    //   this.getNativeMenu_().dispatchEvent(newKeyboardEvent);
+    // }
+    //
+    // const isOpenerKey = OPENER_KEYS.some(({key, keyCode, forType}) => {
+    //   return evt.type === forType && (evt.key === key || evt.keyCode === keyCode);
+    // });
+    // if (isOpenerKey) {
+    //   this.displayHandler_(evt);
+    // }
   }
 
   handleInputValue_() {
@@ -349,16 +262,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     return this.adapter_.getNativeInput() || {
       disabled: false,
       value: null,
-    };
-  }
-
-  /**
-   * @return {!MenuElementState}
-   * @private
-   */
-  getNativeMenu_() {
-    return this.adapter_.getNativeMenu() || {
-      disabled: false
     };
   }
 }

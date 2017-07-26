@@ -16,10 +16,10 @@
 export const cssClasses = {
   ROOT: 'mdc-ext-autocomplete',
   DISABLED: 'mdc-ext-autocomplete--disabled',
+  TEXTFIELD: 'mdc-ext-autocomplete__textfield',
+  LIST: 'mdc-ext-autocomplete__list',
   LIST_ITEM: 'mdc-list-item',
-  MENU: 'mdc-ext-autocomplete__menu',
   OPEN: 'mdc-ext-autocomplete--open',
-  ITEMS: 'mdc-ext-autocomplete__items',
   ITEM_NOMATCH: 'mdc-list-item__nomatch'
 };
 

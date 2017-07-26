@@ -45,7 +45,7 @@
     "webpack-dev-server": "^2.5.0"
   },
   "dependencies": {
-    "material-components-web": "^0.14.0"
+    "material-components-web": "^0.16.0"
   },
   "babel": {
     "presets": [
