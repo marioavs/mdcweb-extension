@@ -232,6 +232,12 @@
   }
 }
 
+.mdc-list{
+    position: absolute;
+    overflow-y: overlay;
+    z-index: 4;
+}
+
 // height for option elements cannot be controlled
 // with CSS. Use the font-size rule instead.
 
