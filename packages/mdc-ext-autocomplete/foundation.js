@@ -46,6 +46,9 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       addItem: (/* value: string, description: string */) => {},
       setListElStyle: (/* propertyName: string, value: string */) => {},
       getNumberOfAvailableItems: () => /* number */ 0,
+      getSelectedItem: () => /* HTMLElement */ {},
+      selectPreviousAvailableItem: () => {},
+      selectNextAvailableItem: () => {},
       getTextForItemAtIndex: (/* index: number */) => /* string */ '',
       getValueForItemAtIndex: (/* index: number */) => /* string */ '',
       addClassForItemAtIndex: (/* index: number, className: string */) => {},
@@ -60,10 +63,11 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
   constructor(adapter) {
     super(Object.assign(MDCExtAutocompleteFoundation.defaultAdapter, adapter));
-    this.ctx_ = null;
     this.selectedIndex_ = -1;
     this.disabled_ = false;
     this.lastValue_ = undefined;
+    this.inputFocusHandler_ = () => this.activateFocus_();
+    this.inputBlurHandler_ = () => this.deactivateFocus_();
     this.displayHandler_ = (evt) => {
       evt.preventDefault();
       this.handleInputValue_();
@@ -84,12 +88,16 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     // this.cancelHandler_ = () => {
     //   this.close_();
     // };
+    /** @private {boolean} */
+    this.isOpen_ = false;
     /** @private {number} */
     this.changeValueTriggerTimerId_ = 0;
   }
 
   init() {
     // this.ctx_ = this.adapter_.create2dRenderingContext();
+    this.adapter_.registerInputInteractionHandler('focus',this.inputFocusHandler_);
+    this.adapter_.registerInputInteractionHandler('blur',this.inputBlurHandler_);
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
@@ -98,8 +106,8 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
   destroy() {
     clearTimeout(this.changeValueTriggerTimerId_);
-    // Drop reference to context object to prevent potential leaks
-    this.ctx_ = null;
+    this.adapter_.deregisterInputInteractionHandler('focus',this.inputFocusHandler_);
+    this.adapter_.deregisterInputInteractionHandler('blur',this.inputBlurHandler_);
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
@@ -128,6 +136,11 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       this.adapter_.removeClass(DISABLED);
       this.adapter_.rmAttr('aria-disabled');
     }
+  }
+
+  /** @return {boolean} */
+  isOpen() {
+    return this.isOpen_;
   }
 
   addItems(items) {
@@ -164,10 +177,21 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     // this.adapter_.setStyle('width', `${maxTextLength}px`);
   }
 
+  activateFocus_() {
+    this.open_();
+  }
+
+  deactivateFocus_() {
+    this.close_();
+  }
+
   open_() {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
-    this.adapter_.setListElStyle('display', 'block');
     this.adapter_.addClass(OPEN);
+    this.adapter_.setListElStyle('display', 'block');
+    this.adapter_.selectPreviousAvailableItem();
+    this.isOpen_ = true;
+
     // const focusIndex = this.selectedIndex_ < 0 ? null : this.selectedIndex_;
     // // const {left, top, transformOrigin} = this.computeMenuStylesForOpenAtIndex_(focusIndex);
     // const {left, top, transformOrigin} = this.computeMenuStylesForOpen_();
@@ -181,14 +205,15 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
   close_() {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
+    this.adapter_.setListElStyle('display', 'none');
     this.adapter_.removeClass(OPEN);
-    // this.adapter_.focus();
+    this.isOpen_ = false;
   }
 
   applyQuery_(value) {
     const {ARIA_HIDDEN} = MDCExtAutocompleteFoundation.strings;
     const {ITEM_NOMATCH} = MDCExtAutocompleteFoundation.cssClasses;
-    for (let i = 0, l = this.adapter_.getNumberOfAvailableItems(); i < l; i++) {
+    for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
       const txt = this.adapter_.getTextForItemAtIndex(i).trim();
       if (txt.toUpperCase().includes(value.toUpperCase())) {
         this.adapter_.rmClassForItemAtIndex(i, ITEM_NOMATCH);
@@ -217,18 +242,33 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       return;
     }
 
-    // const {keyCode, key, shiftKey} = evt;
-    // const isTab = key === 'Tab' || keyCode === 9;
-    // const isArrowUp = key === 'ArrowUp' || keyCode === 38;
-    // const isArrowDown = key === 'ArrowDown' || keyCode === 40;
-    //
-    // if (isTab || isArrowUp || isArrowDown) {
-    //   if ((this.adapter_.getNumberOfAvailableItems() > 0) && (this.selectedIndex_ < 0)) {
-    //     this.setSelectedIndex(0);
-    //   }
-    //   let newKeyboardEvent = new evt.constructor(evt.type, evt);
-    //   this.getNativeMenu_().dispatchEvent(newKeyboardEvent);
+    const {keyCode, key, shiftKey} = evt;
+    const isTab = key === 'Tab' || keyCode === 9;
+    const isArrowUp = key === 'ArrowUp' || keyCode === 38;
+    const isArrowDown = key === 'ArrowDown' || keyCode === 40;
+
+    // if (shiftKey && isTab) {
+    //   this.adapter_.focusItemAtIndex(lastItemIndex);
+    //   evt.preventDefault();
+    //   return false;
     // }
+
+    if (evt.type === 'keydown') {
+      if (isArrowUp) {
+        this.adapter_.selectPreviousAvailableItem();
+      } else if (isArrowDown) {
+        this.adapter_.selectNextAvailableItem();
+      } else if (this.isOpen() && isTab) {
+        let currentItem = this.adapter_.getSelectedItem();
+        if (currentItem != null) {
+          evt.preventDefault();
+          this.lastValue_ = currentItem.textContent;
+          this.setInputValue(this.lastValue_);
+          this.close_();
+        }
+      }
+    }
+
     //
     // const isOpenerKey = OPENER_KEYS.some(({key, keyCode, forType}) => {
     //   return evt.type === forType && (evt.key === key || evt.keyCode === keyCode);

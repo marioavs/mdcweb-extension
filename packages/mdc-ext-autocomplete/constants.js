@@ -16,15 +16,17 @@
 export const cssClasses = {
   ROOT: 'mdc-ext-autocomplete',
   DISABLED: 'mdc-ext-autocomplete--disabled',
+  OPEN: 'mdc-ext-autocomplete--open',
   TEXTFIELD: 'mdc-ext-autocomplete__textfield',
   LIST: 'mdc-ext-autocomplete__list',
   LIST_ITEM: 'mdc-list-item',
-  OPEN: 'mdc-ext-autocomplete--open',
+  ITEM_ACTIVE: 'mdc-list-item--active',
   ITEM_NOMATCH: 'mdc-list-item__nomatch'
 };
 
 export const strings = {
   ARIA_HIDDEN: 'aria-hidden',
+  ARIA_SELECTED_ATTR: 'aria-selected',
   CHANGE_EVENT: 'MDCExtAutocomplete:change'
 };
 

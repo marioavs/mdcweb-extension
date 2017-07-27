@@ -45,11 +45,21 @@ export class MDCExtAutocomplete extends MDCComponent {
   }
 
   get items() {
-    return this.listEl_.querySelectorAll('.'+MDCExtAutocompleteFoundation.cssClasses.LIST_ITEM);
+    return this.listUl_.querySelectorAll('.'+MDCExtAutocompleteFoundation.cssClasses.LIST_ITEM);
   }
 
   get availableItems() {
-    return this.listEl_.querySelectorAll(`.${MDCExtAutocompleteFoundation.cssClasses.LIST_ITEM}:not(.${MDCExtAutocompleteFoundation.cssClasses.ITEM_NOMATCH})`);
+    return this.listUl_.querySelectorAll(`.${MDCExtAutocompleteFoundation.cssClasses.LIST_ITEM}:not(.${MDCExtAutocompleteFoundation.cssClasses.ITEM_NOMATCH})`);
+  }
+
+  get firstAvailableItem() {
+    if (this.availableItems.length > 0)
+      return this.availableItems[0];
+    return null;
+  }
+
+  get selectedItem() {
+    return this.listUl_.querySelector(`[${MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR}]`);
   }
 
   initialize(settings = {}, textFactory = (el) => new MDCTextfield(el)) {
@@ -57,6 +67,7 @@ export class MDCExtAutocomplete extends MDCComponent {
     this.textEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.TEXTFIELD);
     this.text_ = textFactory(this.textEl_);
     this.listEl_ = this.root_.querySelector('.' + MDCExtAutocompleteFoundation.cssClasses.LIST);
+    this.listUl_ = this.listEl_.querySelector('ul');
   }
 
   destroy() {
@@ -87,7 +98,49 @@ export class MDCExtAutocomplete extends MDCComponent {
         this.addItem_(value, description)
       },
       setListElStyle: (propertyName, value) => this.listEl_.style.setProperty(propertyName, value),
+      getNumberOfItems: () => this.items.length,
       getNumberOfAvailableItems: () => this.availableItems.length,
+      getSelectedItem: () => this.selectedItem,
+      selectPreviousAvailableItem: () => {
+        let currentItem = this.selectedItem;
+        if (currentItem == null) {
+          currentItem = this.firstAvailableItem;
+          if (currentItem != null)
+            currentItem.setAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR,'true');
+          return;
+        }
+        currentItem.removeAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR);
+        let el = currentItem.previousSibling;
+        while (el) {
+          if ((el.nodeType == currentItem.nodeType) && (!el.classList.contains(MDCExtAutocompleteFoundation.cssClasses.ITEM_NOMATCH))) {
+            el.setAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR,'true');
+            return;
+          }
+          el = el.previousSibling;
+        }
+        currentItem = this.firstAvailableItem;
+        if (currentItem != null)
+          currentItem.setAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR,'true');
+      },
+      selectNextAvailableItem: () => {
+        let currentItem = this.selectedItem;
+        if (currentItem == null) {
+          currentItem = this.firstAvailableItem;
+          if (currentItem != null)
+            currentItem.setAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR,'true');
+          return;
+        }
+        currentItem.removeAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR);
+        let el = currentItem.nextSibling;
+        while (el) {
+          if ((el.nodeType == currentItem.nodeType) && (!el.classList.contains(MDCExtAutocompleteFoundation.cssClasses.ITEM_NOMATCH))) {
+            el.setAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR,'true');
+            return;
+          }
+          el = el.nextSibling;
+        }
+        currentItem.setAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR,'true');
+      },
       getTextForItemAtIndex: (index) => this.items[index].textContent,
       getValueForItemAtIndex: (index) => this.items[index].id || this.items[index].textContent,
       addClassForItemAtIndex: (index, className) => this.items[index].classList.add(className),
@@ -112,21 +165,21 @@ export class MDCExtAutocomplete extends MDCComponent {
   }
 
   removeAllItems_() {
-    if (this.menuItemsEl_ !== undefined) {
-      while(this.menuItemsEl_.hasChildNodes()) this.menuItemsEl_.removeChild(this.menuItemsEl_.firstChild);
+    if (this.listUl_ !== undefined) {
+      while(this.listUl_.hasChildNodes()) this.listUl_.removeChild(this.listUl_.firstChild);
     }
   }
 
   addItem_(value, description) {
     const {LIST_ITEM} = MDCExtAutocompleteFoundation.cssClasses;
-    if (this.menuItemsEl_ !== undefined) {
+    if (this.listUl_ !== undefined) {
       var node = document.createElement('li');
       node.classList.add(LIST_ITEM);
       node.setAttribute('role', 'option');
       node.setAttribute('value', value);
       var textnode = document.createTextNode(description);
       node.appendChild(textnode);
-      this.menuItemsEl_.appendChild(node);
+      this.listUl_.appendChild(node);
     }
   }
 }
