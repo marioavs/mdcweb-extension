@@ -66,6 +66,8 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.selectedIndex_ = -1;
     this.disabled_ = false;
     this.lastValue_ = undefined;
+    this.valueField_ = 'value';
+    this.descriptionField_ = 'description';
     this.inputFocusHandler_ = () => this.activateFocus_();
     this.inputBlurHandler_ = () => this.deactivateFocus_();
     this.displayHandler_ = (evt) => {
@@ -146,8 +148,16 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   addItems(items) {
     this.adapter_.removeAllItems();
     for (let i = 0, l = items.length; i < l; i++) {
-      this.adapter_.addItem(items[i].value, items[i].description);
+      this.adapter_.addItem(items[i][this.valueField_], items[i][this.descriptionField_]);
     }
+  }
+
+  setValueField(value){
+    this.valueField_ = value;
+  }
+
+  setDescriptionField(value){
+    this.descriptionField_ = value;
   }
 
   refreshItems() {
