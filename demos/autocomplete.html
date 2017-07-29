@@ -430,14 +430,16 @@
 
         var loadItems = document.getElementById('js-load-items');
         autocompleteLoadItems =  new MDCExtAutocomplete(loadItems, undefined, {
+            itemValueProperty: 'id',
+            itemDescriptionProperty: 'desc',
             itemsLoader: function(query, callback) {
               callback([{
-                  value: '01',
-                  description: 'first'
+                  id: '01',
+                  desc: 'first'
                 },
                 {
-                  value: '02',
-                  description: 'second'
+                  id: '02',
+                  desc: 'second'
                 }
               ]);
             }

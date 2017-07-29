@@ -154,6 +154,7 @@ export class MDCExtAutocomplete extends MDCComponent {
   }
 
   applyItemsLoader_(query) {
+    this.setJsonAttributes();
     var self = this;
     console.log(`quering for: ${query}`);
     this.settings_.itemsLoader.apply(self, [query, function(results) {
@@ -162,6 +163,15 @@ export class MDCExtAutocomplete extends MDCComponent {
                     self.foundation_.refreshItems();
             }
     }]);
+  }
+
+  setJsonAttributes(){
+    if (this.settings_.itemValueProperty !== undefined){
+      this.foundation_.setValueField(this.settings_.itemValueProperty);
+    }
+    if (this.settings_.itemDescriptionProperty !== undefined){
+      this.foundation_.setDescriptionField(this.settings_.itemDescriptionProperty);
+    }
   }
 
   removeAllItems_() {
