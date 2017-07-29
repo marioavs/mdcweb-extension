@@ -54,10 +54,12 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       addClassForItemAtIndex: (/* index: number, className: string */) => {},
       rmClassForItemAtIndex: (/* index: number, className: string */) => {},
       setAttrForItemAtIndex: (/* index: number, attr: string, value: string */) => {},
-      rmAttrForItemAtIndex: (/* index: number, attr: string */) => {},
       registerInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      getNativeInput: () => /* HTMLInputElement */ {}
+      registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      getNativeInput: () => /* HTMLInputElement */ {},
+
     };
   }
 
@@ -68,15 +70,18 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.lastValue_ = undefined;
     this.valueField_ = 'value';
     this.descriptionField_ = 'description';
-    this.inputFocusHandler_ = () => this.activateFocus_();
-    this.inputBlurHandler_ = () => this.deactivateFocus_();
+    //this.inputFocusHandler_ = () => this.activateFocus_();
+    //this.inputBlurHandler_ = () => this.deactivateFocus_();
     this.displayHandler_ = (evt) => {
       evt.preventDefault();
       this.handleInputValue_();
 
       // if ((this.adapter_.getNumberOfAvailableItems() > 0) && !this.adapter_.isMenuOpen()) {
-        this.open_();
+      this.open_();
       // }
+    };
+    this.listHandler_ = (evt) => {
+      this.setInputValue(evt.target.innerText);
     };
     this.displayViaKeyboardHandler_ = (evt) => this.handleDisplayViaKeyboard_(evt);
     // this.selectionHandler_ = ({detail}) => {
@@ -84,6 +89,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     //   this.close_();
     //   if (index !== this.selectedIndex_) {
     //     this.setSelectedIndex(index);
+      rmAttrForItemAtIndex: (/* index: number, attr: string */) => {},
     //     this.adapter_.notifyChange();
     //   }
     // };
@@ -103,6 +109,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
+    this.adapter_.registerListInteractionHandler('click', this.listHandler_);
     this.resize();
   }
 
@@ -113,6 +120,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
+    this.adapter_.deregisterListInteractionHandler('click', this.listHandler_);
   }
 
   /** @param {?string} value */
@@ -314,4 +322,5 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       value: null,
     };
   }
+
 }
