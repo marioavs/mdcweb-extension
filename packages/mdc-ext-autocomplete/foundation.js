@@ -40,26 +40,28 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       rmAttr: (/* attr: string */) => {},
       registerInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      registerInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       hasItemsLoader: () => /* boolean */ false,
       applyItemsLoader: (/* query: string */) => {},
       removeAllItems: () => {},
-      addItem: (/* value: string, description: string */) => {},
+      addItem: (/* data: Object */) => {},
       setListElStyle: (/* propertyName: string, value: string */) => {},
       getNumberOfAvailableItems: () => /* number */ 0,
       getSelectedItem: () => /* HTMLElement */ {},
       selectPreviousAvailableItem: () => {},
       selectNextAvailableItem: () => {},
+      setSelectedItem: (/* item: HTMLElement */) => {},
       getTextForItemAtIndex: (/* index: number */) => /* string */ '',
       getValueForItemAtIndex: (/* index: number */) => /* string */ '',
       addClassForItemAtIndex: (/* index: number, className: string */) => {},
       rmClassForItemAtIndex: (/* index: number, className: string */) => {},
       setAttrForItemAtIndex: (/* index: number, attr: string, value: string */) => {},
-      registerInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      getNativeInput: () => /* HTMLInputElement */ {},
-
+      notifyChange: () => {},
+      getNativeElement: () => /* HTMLInputElement */ {},
+      getNativeInput: () => /* HTMLInputElement */ {}
     };
   }
 
@@ -67,9 +69,9 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     super(Object.assign(MDCExtAutocompleteFoundation.defaultAdapter, adapter));
     this.selectedIndex_ = -1;
     this.disabled_ = false;
-    this.lastValue_ = undefined;
-    this.valueField_ = 'value';
-    this.descriptionField_ = 'description';
+    this.lastInputValue_ = undefined;
+    this.valueProperty_ = 'value';
+    this.descriptionProperty_ = 'description';
     //this.inputFocusHandler_ = () => this.activateFocus_();
     //this.inputBlurHandler_ = () => this.deactivateFocus_();
     this.displayHandler_ = (evt) => {
@@ -80,16 +82,13 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       this.open_();
       // }
     };
-    this.listHandler_ = (evt) => {
-      this.setInputValue(evt.target.innerText);
-    };
+    this.listClickHandler_ = (evt) => this.handleListClick_(evt);
     this.displayViaKeyboardHandler_ = (evt) => this.handleDisplayViaKeyboard_(evt);
     // this.selectionHandler_ = ({detail}) => {
     //   const {index} = detail;
     //   this.close_();
     //   if (index !== this.selectedIndex_) {
     //     this.setSelectedIndex(index);
-      rmAttrForItemAtIndex: (/* index: number, attr: string */) => {},
     //     this.adapter_.notifyChange();
     //   }
     // };
@@ -109,7 +108,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    this.adapter_.registerListInteractionHandler('click', this.listHandler_);
+    this.adapter_.registerListInteractionHandler('click', this.listClickHandler_);
     this.resize();
   }
 
@@ -120,16 +119,22 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
-    this.adapter_.deregisterListInteractionHandler('click', this.listHandler_);
+    this.adapter_.deregisterListInteractionHandler('click', this.listClickHandler_);
+  }
+
+  /** @return {?string} */
+  getValue() {
+    return this.getNativeElement_().value;
+  }
+
+  /** @param {?string} value */
+  setValue(value) {
+    this.getNativeElement_().value = value;
   }
 
   /** @param {?string} value */
   setInputValue(value) {
     this.getNativeInput_().value = value;
-  }
-
-  getValue() {
-    return this.selectedIndex_ >= 0 ? this.adapter_.getValueForItemAtIndex(this.selectedIndex_) : '';
   }
 
   isDisabled() {
@@ -156,16 +161,24 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   addItems(items) {
     this.adapter_.removeAllItems();
     for (let i = 0, l = items.length; i < l; i++) {
-      this.adapter_.addItem(items[i][this.valueField_], items[i][this.descriptionField_]);
+      this.adapter_.addItem(items[i]);
     }
   }
 
-  setValueField(value){
-    this.valueField_ = value;
+  setValueProperty(value) {
+    this.valueProperty_ = value;
   }
 
-  setDescriptionField(value){
-    this.descriptionField_ = value;
+  getValueProperty() {
+    return this.valueProperty_;
+  }
+
+  setDescriptionProperty(value) {
+    this.descriptionProperty_ = value;
+  }
+
+  getDescriptionProperty() {
+    return this.descriptionProperty_;
   }
 
   refreshItems() {
@@ -245,6 +258,15 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.refreshItems();
   }
 
+  handleListClick_(evt) {
+    const {LIST_ITEM} = MDCExtAutocompleteFoundation.cssClasses;
+    if ((evt.target) && (evt.target.classList.contains(LIST_ITEM))) {
+      evt.preventDefault();
+      this.adapter_.setSelectedItem(evt.target);
+      this.applyValueFromSelectedItem_();
+    }
+  };
+
   handleDisplayViaKeyboard_(evt) {
     // We use a hard-coded 2 instead of Event.AT_TARGET to avoid having to reference a browser
     // global.
@@ -280,9 +302,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
         let currentItem = this.adapter_.getSelectedItem();
         if (currentItem != null) {
           evt.preventDefault();
-          this.lastValue_ = currentItem.textContent;
-          this.setInputValue(this.lastValue_);
-          this.close_();
+          this.applyValueFromSelectedItem_();
         }
       }
     }
@@ -298,8 +318,8 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
   handleInputValue_() {
     let currentValue = this.getNativeInput_().value;
-    if (currentValue !== this.lastValue_) {
-      this.lastValue_ = currentValue;
+    if (currentValue !== this.lastInputValue_) {
+      this.lastInputValue_ = currentValue;
       // Debounce multiple changed values
       clearTimeout(this.changeValueTriggerTimerId_);
       this.changeValueTriggerTimerId_ = setTimeout(() => {
@@ -312,6 +332,23 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     }
   }
 
+  applyValueFromSelectedItem_() {
+    let currentDescription = this.adapter_.getSelectedItemDescription();
+    this.setValue(this.adapter_.getSelectedItemValue());
+    this.lastInputValue_ = currentDescription;
+    this.setInputValue(this.lastInputValue_);
+    this.adapter_.notifyChange();
+    this.close_();
+  }
+
+  /**
+   * @return {!HTMLElementState}
+   * @private
+   */
+  getNativeElement_() {
+    return this.adapter_.getNativeElement();
+  }
+
   /**
    * @return {!InputElementState}
    * @private
@@ -319,7 +356,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   getNativeInput_() {
     return this.adapter_.getNativeInput() || {
       disabled: false,
-      value: null,
+      value: null
     };
   }
 

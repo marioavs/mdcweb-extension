@@ -27,7 +27,9 @@ export const cssClasses = {
 export const strings = {
   ARIA_HIDDEN: 'aria-hidden',
   ARIA_SELECTED_ATTR: 'aria-selected',
-  CHANGE_EVENT: 'MDCExtAutocomplete:change'
+  CHANGE_EVENT: 'MDCExtAutocomplete:change',
+  ITEM_DATA_VALUE_ATTR: 'data-value',
+  ITEM_DATA_DESC_ATTR: 'data-description'
 };
 
 /** @enum {number} */
