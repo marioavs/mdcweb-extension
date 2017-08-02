@@ -44,8 +44,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
       registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      registerBodyClickHandler: (/* handler: EventListener */) => {},
-      deregisterBodyClickHandler: (/* handler: EventListener */) => {},
       focus: () => {},
       hasItemsLoader: () => /* boolean */ false,
       applyItemsLoader: (/* query: string */) => {},
@@ -54,6 +52,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       setListElStyle: (/* propertyName: string, value: string */) => {},
       getNumberOfAvailableItems: () => /* number */ 0,
       getSelectedItem: () => /* HTMLElement */ {},
+      selectCurrentAvailableItem: () => {},
       selectPreviousAvailableItem: () => {},
       selectNextAvailableItem: () => {},
       setSelectedItem: (/* item: HTMLElement */) => {},
@@ -77,13 +76,13 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.descriptionProperty_ = 'description';
     this.focusHandler_ = () => this.activateFocus_();
     this.blurHandler_ = () => this.deactivateFocus_();
-    // this.displayHandler_ = (evt) => {
-    //   this.handleInputValue_();
-    //
-    //   if (!this.isOpen()) {
-    //     this.open_();
-    //   }
-    // };
+    this.displayHandler_ = (evt) => {
+      this.handleInputValue_();
+
+      if (!this.isOpen()) {
+        this.open_();
+      }
+    };
     this.listClickHandler_ = (evt) => this.handleListClick_(evt);
     this.listMousedownHandler_ = (evt) => {
       evt.preventDefault();
@@ -113,7 +112,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   init() {
     // this.ctx_ = this.adapter_.create2dRenderingContext();
     this.adapter_.registerInputInteractionHandler('focus',this.focusHandler_);
-    // this.adapter_.registerInteractionHandler('click', this.displayHandler_);
+    this.adapter_.registerInteractionHandler('click', this.displayHandler_);
     this.adapter_.registerInputInteractionHandler('blur',this.blurHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
@@ -125,13 +124,12 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   destroy() {
     clearTimeout(this.changeValueTriggerTimerId_);
     this.adapter_.deregisterInputInteractionHandler('focus',this.focusHandler_);
-    // this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
+    this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
     this.adapter_.deregisterInputInteractionHandler('blur',this.blurHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterListInteractionHandler('click', this.listClickHandler_);
     this.adapter_.deregisterListInteractionHandler('mousedown', this.listMousedownHandler_);
-    this.adapter_.deregisterBodyClickHandler(this.documentClickHandler_);
   }
 
   /** @return {?string} */
@@ -197,6 +195,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     if (!this.isOpen()) {
       this.open_();
     }
+    this.adapter_.selectCurrentAvailableItem();
   }
 
   resize() {
@@ -234,8 +233,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
     this.adapter_.addClass(OPEN);
     this.adapter_.setListElStyle('display', 'block');
-    this.adapter_.selectPreviousAvailableItem();
-    this.adapter_.registerBodyClickHandler(this.documentClickHandler_);
+    this.adapter_.selectCurrentAvailableItem();
     this.isOpen_ = true;
 
     // const focusIndex = this.selectedIndex_ < 0 ? null : this.selectedIndex_;
@@ -257,7 +255,6 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
     this.adapter_.setListElStyle('display', 'none');
     this.adapter_.removeClass(OPEN);
-    this.adapter_.deregisterBodyClickHandler(this.documentClickHandler_);
     this.isOpen_ = false;
   }
 

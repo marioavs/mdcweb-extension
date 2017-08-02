@@ -93,8 +93,6 @@ export class MDCExtAutocomplete extends MDCComponent {
       deregisterInputInteractionHandler: (type, handler) => this.text_.foundation_.getNativeInput_().removeEventListener(type, handler),
       registerListInteractionHandler: (type, handler) => this.listUl_.addEventListener(type, handler),
       deregisterListInteractionHandler: (type, handler) => this.listUl_.removeEventListener(type, handler),
-      registerBodyClickHandler: (handler) => document.body.addEventListener('click', handler),
-      deregisterBodyClickHandler: (handler) => document.body.removeEventListener('click', handler),
       focus: () => this.textEl_.focus(),
       hasItemsLoader: () => {
         return ((this.settings_ !== undefined) && (typeof this.settings_.itemsLoader === 'function'));
@@ -115,6 +113,18 @@ export class MDCExtAutocomplete extends MDCComponent {
       getSelectedItemValue: () => this.selectedItem.getAttribute(MDCExtAutocompleteFoundation.strings.ITEM_DATA_VALUE_ATTR),
       getSelectedItemDescription: () => {
         return this.selectedItem.getAttribute(MDCExtAutocompleteFoundation.strings.ITEM_DATA_DESC_ATTR) || this.selectedItem.textContent
+      },
+      selectCurrentAvailableItem: () => {
+        let currentItem = this.selectedItem;
+        if (currentItem) {
+          if (!currentItem.classList.contains(MDCExtAutocompleteFoundation.cssClasses.ITEM_NOMATCH))
+            return;
+          currentItem.removeAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR);
+        }
+        currentItem = this.firstAvailableItem;
+        if (currentItem != null)
+          currentItem.setAttribute(MDCExtAutocompleteFoundation.strings.ARIA_SELECTED_ATTR,'true');
+        return;
       },
       selectPreviousAvailableItem: () => {
         let currentItem = this.selectedItem;
