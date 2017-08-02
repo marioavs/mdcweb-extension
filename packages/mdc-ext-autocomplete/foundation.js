@@ -44,6 +44,9 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
       deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
       registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      registerBodyClickHandler: (/* handler: EventListener */) => {},
+      deregisterBodyClickHandler: (/* handler: EventListener */) => {},
+      focus: () => {},
       hasItemsLoader: () => /* boolean */ false,
       applyItemsLoader: (/* query: string */) => {},
       removeAllItems: () => {},
@@ -72,17 +75,19 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.lastInputValue_ = undefined;
     this.valueProperty_ = 'value';
     this.descriptionProperty_ = 'description';
-    //this.inputFocusHandler_ = () => this.activateFocus_();
-    //this.inputBlurHandler_ = () => this.deactivateFocus_();
-    this.displayHandler_ = (evt) => {
-      evt.preventDefault();
-      this.handleInputValue_();
-
-      // if ((this.adapter_.getNumberOfAvailableItems() > 0) && !this.adapter_.isMenuOpen()) {
-      this.open_();
-      // }
-    };
+    this.focusHandler_ = () => this.activateFocus_();
+    this.blurHandler_ = () => this.deactivateFocus_();
+    // this.displayHandler_ = (evt) => {
+    //   this.handleInputValue_();
+    //
+    //   if (!this.isOpen()) {
+    //     this.open_();
+    //   }
+    // };
     this.listClickHandler_ = (evt) => this.handleListClick_(evt);
+    this.listMousedownHandler_ = (evt) => {
+      evt.preventDefault();
+    }
     this.displayViaKeyboardHandler_ = (evt) => this.handleDisplayViaKeyboard_(evt);
     // this.selectionHandler_ = ({detail}) => {
     //   const {index} = detail;
@@ -95,6 +100,10 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     // this.cancelHandler_ = () => {
     //   this.close_();
     // };
+    /** @private {function(!Event)} */
+    this.documentClickHandler_ = (evt) => {
+      this.close_(evt);
+    };
     /** @private {boolean} */
     this.isOpen_ = false;
     /** @private {number} */
@@ -103,23 +112,26 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
   init() {
     // this.ctx_ = this.adapter_.create2dRenderingContext();
-    this.adapter_.registerInputInteractionHandler('focus',this.inputFocusHandler_);
-    this.adapter_.registerInputInteractionHandler('blur',this.inputBlurHandler_);
-    this.adapter_.registerInteractionHandler('click', this.displayHandler_);
+    this.adapter_.registerInputInteractionHandler('focus',this.focusHandler_);
+    // this.adapter_.registerInteractionHandler('click', this.displayHandler_);
+    this.adapter_.registerInputInteractionHandler('blur',this.blurHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.registerInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
     this.adapter_.registerListInteractionHandler('click', this.listClickHandler_);
+    this.adapter_.registerListInteractionHandler('mousedown', this.listMousedownHandler_);
     this.resize();
   }
 
   destroy() {
     clearTimeout(this.changeValueTriggerTimerId_);
-    this.adapter_.deregisterInputInteractionHandler('focus',this.inputFocusHandler_);
-    this.adapter_.deregisterInputInteractionHandler('blur',this.inputBlurHandler_);
-    this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
+    this.adapter_.deregisterInputInteractionHandler('focus',this.focusHandler_);
+    // this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
+    this.adapter_.deregisterInputInteractionHandler('blur',this.blurHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterInputInteractionHandler('keyup', this.displayViaKeyboardHandler_);
     this.adapter_.deregisterListInteractionHandler('click', this.listClickHandler_);
+    this.adapter_.deregisterListInteractionHandler('mousedown', this.listMousedownHandler_);
+    this.adapter_.deregisterBodyClickHandler(this.documentClickHandler_);
   }
 
   /** @return {?string} */
@@ -182,9 +194,9 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   refreshItems() {
-    // if ((this.adapter_.getNumberOfAvailableItems() > 0) && !this.adapter_.isMenuOpen()) {
+    if (!this.isOpen()) {
       this.open_();
-    // }
+    }
   }
 
   resize() {
@@ -209,7 +221,9 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   activateFocus_() {
-    this.open_();
+    if (!this.isOpen()) {
+      this.open_();
+    }
   }
 
   deactivateFocus_() {
@@ -221,6 +235,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     this.adapter_.addClass(OPEN);
     this.adapter_.setListElStyle('display', 'block');
     this.adapter_.selectPreviousAvailableItem();
+    this.adapter_.registerBodyClickHandler(this.documentClickHandler_);
     this.isOpen_ = true;
 
     // const focusIndex = this.selectedIndex_ < 0 ? null : this.selectedIndex_;
@@ -234,10 +249,15 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
     // this.adapter_.openMenu(focusIndex);
   }
 
-  close_() {
+  /**
+   * Closes the menu.
+   * @param {Event=} evt
+   */
+  close_(evt = null) {
     const {OPEN} = MDCExtAutocompleteFoundation.cssClasses;
     this.adapter_.setListElStyle('display', 'none');
     this.adapter_.removeClass(OPEN);
+    this.adapter_.deregisterBodyClickHandler(this.documentClickHandler_);
     this.isOpen_ = false;
   }
 
@@ -261,8 +281,10 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   handleListClick_(evt) {
     const {LIST_ITEM} = MDCExtAutocompleteFoundation.cssClasses;
     if ((evt.target) && (evt.target.classList.contains(LIST_ITEM))) {
+      evt.stopPropagation();
       evt.preventDefault();
       this.adapter_.setSelectedItem(evt.target);
+      this.adapter_.focus();
       this.applyValueFromSelectedItem_();
     }
   };
@@ -284,6 +306,7 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
     const {keyCode, key, shiftKey} = evt;
     const isTab = key === 'Tab' || keyCode === 9;
+    const isEnter = key === 'Enter' || keyCode === 13;
     const isArrowUp = key === 'ArrowUp' || keyCode === 38;
     const isArrowDown = key === 'ArrowDown' || keyCode === 40;
 
@@ -295,10 +318,12 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
 
     if (evt.type === 'keydown') {
       if (isArrowUp) {
+        evt.preventDefault();
         this.adapter_.selectPreviousAvailableItem();
       } else if (isArrowDown) {
+        evt.preventDefault();
         this.adapter_.selectNextAvailableItem();
-      } else if (this.isOpen() && isTab) {
+      } else if (this.isOpen() && (isTab) || (isEnter)) {
         let currentItem = this.adapter_.getSelectedItem();
         if (currentItem != null) {
           evt.preventDefault();

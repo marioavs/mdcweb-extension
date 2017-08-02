@@ -93,6 +93,9 @@ export class MDCExtAutocomplete extends MDCComponent {
       deregisterInputInteractionHandler: (type, handler) => this.text_.foundation_.getNativeInput_().removeEventListener(type, handler),
       registerListInteractionHandler: (type, handler) => this.listUl_.addEventListener(type, handler),
       deregisterListInteractionHandler: (type, handler) => this.listUl_.removeEventListener(type, handler),
+      registerBodyClickHandler: (handler) => document.body.addEventListener('click', handler),
+      deregisterBodyClickHandler: (handler) => document.body.removeEventListener('click', handler),
+      focus: () => this.textEl_.focus(),
       hasItemsLoader: () => {
         return ((this.settings_ !== undefined) && (typeof this.settings_.itemsLoader === 'function'));
       },
