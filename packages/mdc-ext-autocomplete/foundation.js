@@ -169,6 +169,8 @@ export default class MDCExtAutocompleteFoundation extends MDCFoundation {
   }
 
   addItems(items) {
+    if (!Array.isArray(items))
+      return;
     this.adapter_.removeAllItems();
     for (let i = 0, l = items.length; i < l; i++) {
       this.adapter_.addItem(items[i]);
