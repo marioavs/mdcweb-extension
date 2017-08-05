@@ -72,7 +72,7 @@ const CSS_LOADER_CONFIG = [
 module.exports = [{
   name: 'js-components',
   entry: {
-    'autocomplete': [path.resolve('./packages/mdc-ext-autocomplete/index.js')],
+    'multiselect': [path.resolve('./packages/mdc-ext-multiselect/index.js')],
     'data-table': [path.resolve('./packages/mdc-ext-data-table/index.js')]
   },
   output: {
@@ -142,7 +142,7 @@ module.exports = [{
   entry: {
     // 'mdcweb-extension': path.resolve(
     //     './packages/mdcweb-extension/mdcweb-extension.scss'),
-    'mdc-ext.autocomplete': path.resolve('./packages/mdc-ext-autocomplete/mdc-ext-autocomplete.scss'),
+    'mdc-ext.multiselect': path.resolve('./packages/mdc-ext-multiselect/mdc-ext-multiselect.scss'),
     'mdc-ext.data-table': path.resolve('./packages/mdc-ext-data-table/mdc-ext-data-table.scss')
   },
   output: {
