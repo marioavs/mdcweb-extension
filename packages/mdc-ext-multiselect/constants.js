@@ -27,6 +27,8 @@ export const cssClasses = {
   OPEN: `${ROOT}--open`,
   SELECTED_OPTION: `${ROOT}__option`,
   UPGRADED: `${ROOT}--upgraded`,
+  HELPTEXT_PERSISTENT: `${ROOT}-helptext--persistent`,
+  HELPTEXT_VALIDATION_MSG: `${ROOT}-helptext--validation-msg`,
   ITEM_ACTIVE: 'mdc-list-item--active',
   ITEM_NOMATCH: 'mdc-list-item__nomatch',
   LIST_ITEM: 'mdc-list-item'
@@ -40,11 +42,18 @@ export const strings = {
   LABEL_SELECTOR: `.${ROOT}__label`,
   LIST_SELECTOR: `.${ROOT}__list`,
   SELECT_SELECTOR: `.${ROOT}__select`,
+  ALERT_ROLE: 'alert',
+  ARIA_CONTROLS: 'aria-controls',
+  ARIA_DISABLED: 'aria-disabled',
   ARIA_HIDDEN: 'aria-hidden',
   ARIA_SELECTED_ATTR: 'aria-selected',
+  AUTOCOMPLETE: 'autocomplete',
   CHANGE_EVENT: 'MDCExtMultiselect:change',
   ITEM_DATA_VALUE_ATTR: 'data-value',
-  ITEM_DATA_DESC_ATTR: 'data-description'
+  ITEM_DATA_DESC_ATTR: 'data-description',
+  MAXLENGTH: 'maxlength',
+  ROLE: 'role',
+  SELECTED_ATTR: 'selected'
 };
 
 /** @enum {number} */

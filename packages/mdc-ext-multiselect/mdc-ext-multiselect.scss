@@ -23,7 +23,13 @@
 @import "@material/theme/mixins";
 @import "@material/typography/variables";
 @import "@material/typography/mixins";
-@import "@material/list/mdc-list";
+
+$mdc-ext-multiselect-error-on-light: #d50000;
+$mdc-ext-multiselect-error-on-dark: #ff6e6e;
+$mdc-ext-multiselect-divider-on-light: rgba(black, .12);
+$mdc-ext-multiselect-divider-on-dark: rgba(white, .12);
+$mdc-ext-multiselect-disabled-border-on-light: rgba(#231f20, .26);
+$mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
 @function mdc-ext-multiselect-transition($property) {
   @return #{$property} 180ms $mdc-animation-standard-curve-timing-function;
@@ -35,35 +41,60 @@
 
 // postcss-bem-linter: define multiselect
 .mdc-ext-multiselect {
-  $dd-arrow-padding: 24px;
-
-  @include mdc-typography(subheading2);
-  @include mdc-theme-prop(color, text-primary-on-light);
-  @include mdc-rtl-reflexive-box(padding, right, $dd-arrow-padding);
-
-  // Resets for <select> element
-  appearance: none;
-
-  position: relative;
-  overflow: visible;
-
-  &::-ms-expand {
-    display: none;
-  }
-
-  @include mdc-rtl {
-    background-position: left center;
-  }
+  display: inline-block;
+  margin-bottom: 8px;
+  will-change: opacity, transform, color;
 
   @include mdc-theme-dark {
-    @include mdc-theme-prop(color, text-primary-on-dark);
+    background-color: #424242;
+  }
 
-    border-bottom: 1px solid rgba(white, .12);
+  &__combobox {
+    @include mdc-theme-prop(color, text-primary-on-light);
+    @include mdc-typography-base;
+    // We use only a subset of the MDC typography values here as changing things such as line-height
+    // affects how the labels are transformed.
+    @each $prop in (font-size, letter-spacing) {
+      #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
+    }
+
+    width: 100%;
+    padding: 0 0 8px;
+    border: none;
+    background: none;
+    font-size: inherit;
+    appearance: none;
+
+    &::placeholder {
+      @include mdc-theme-prop(color, text-hint-on-light);
+
+      transition: mdc-ext-multiselect-transition(color);
+      opacity: 1;
+    }
 
     &:focus {
-      @include mdc-theme-prop(border-bottom-color, primary);
+      outline: none;
 
-      background-color: rgba(white, .09);
+      &::placeholder {
+        @include mdc-theme-prop(color, text-secondary-on-light);
+      }
+    }
+
+    // Remove red outline on firefox
+    &:invalid {
+      box-shadow: none;
+    }
+
+    @include mdc-theme-dark {
+      @include mdc-theme-prop(color, text-primary-on-dark);
+
+      &::placeholder {
+        @include mdc-theme-prop(color, text-hint-on-dark);
+      }
+
+      &:focus::placeholder {
+        @include mdc-theme-prop(color, text-secondary-on-dark);
+      }
     }
   }
 
@@ -75,8 +106,10 @@
     border-style: none;
     background-color: transparent;
     display: inline-block;
+    outline: 0px none;
     position: relative;
     padding-left: 1px;
+    width: auto;
   }
 
   &__label {
@@ -90,14 +123,14 @@
     cursor: text;
 
     // stylelint-disable plugin/selector-bem-pattern
-    @include mdc-rtl(".mdc-ext-multiselect") {
+    @include mdc-rtl {
       right: 0;
       left: auto;
       transform-origin: right top;
     }
     // stylelint-enable plugin/selector-bem-pattern
 
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
+    @include mdc-theme-dark {
       @include mdc-theme-prop(color, text-hint-on-dark);
     }
 
@@ -136,19 +169,50 @@
     }
   }
 
+  &--upgraded {
+    display: inline-flex;
+    position: relative;
+    box-sizing: border-box;
+    align-items: flex-end;
+    margin-top: 16px;
+
+    height: 48px;
+
+    &::after {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      transform: translateY(50%) scaleY(1);
+      transform-origin: center bottom;
+      transition: mdc-ext-multiselect-transition(background-color), mdc-ext-multiselect-transition(transform);
+      background-color: $mdc-ext-multiselect-divider-on-light;
+      content: "";
+
+      @include mdc-theme-dark(".mdc-ext-multiselect") {
+        background-color: $mdc-ext-multiselect-divider-on-dark;
+      }
+    }
+
+    .mdc-ext-multiselect__label {
+      pointer-events: none;
+    }
+  }
+
   &__list {
     display: none;
     position: absolute;
     top: 0;
     left: 0;
+    background-color: white;
+    border: 1px solid black;
     max-width: calc(100vw - 32px);
     max-height: calc(100vh - 32px);
-    transform-origin: left top;
     overflow-y: overlay;
+    padding: 0;
+    transform-origin: left top;
     z-index: 4; // Should pop up above everything else. temporary-drawer is next highest at 3.
-
-    border: 1px solid black;
-    background-color: white;
 
     @include mdc-elevation(2);
 
@@ -157,7 +221,15 @@
       opacity: 1;
     }
 
+    /* stylelint-disable plugin/selector-bem-pattern */
+    .mdc-list {
+      padding: 8px 0;
+    }
+
     .mdc-list-item {
+      padding: 0 16px;
+      outline: none;
+
       @include mdc-typography(subheading2);
       @include mdc-theme-prop(color, text-secondary-on-light);
 
@@ -170,7 +242,7 @@
         background-color: rgba(black, .06);
       }
 
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
+      @include mdc-theme-dark {
         @include mdc-theme-prop(color, text-secondary-on-dark);
 
         &--active {
@@ -194,7 +266,7 @@
       }
     }
 
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
+    @include mdc-theme-dark {
       .mdc-list-group {
         @include mdc-theme-prop(color, text-hint-on-dark);
 
@@ -225,6 +297,41 @@
       border-bottom: 1px dotted rgba(white, .38);
     }
   }
+}
+
+// postcss-bem-linter: end
+
+// postcss-bem-linter: define multiselect-helptext
+
+.mdc-ext-multiselect-helptext {
+  @include mdc-theme-prop(color, text-hint-on-light);
+
+  margin: 0;
+  transition: mdc-ext-multiselect-transition(opacity);
+  font-size: .75rem;
+  opacity: 0;
+  will-change: opacity;
+
+  @include mdc-theme-dark {
+    @include mdc-theme-prop(color, text-hint-on-dark);
+  }
+
+  // stylelint-disable plugin/selector-bem-pattern
+  .mdc-ext-multiselect + & {
+    margin-bottom: 8px;
+  }
+
+  .mdc-ext-multiselect--focused + &:not(#{&}--validation-msg) {
+    opacity: 1;
+  }
+
+  // stylelint-enable plugin/selector-bem-pattern
+}
+
+.mdc-ext-multiselect-helptext--persistent {
+  transition: none;
+  opacity: 1;
+  will-change: initial;
 }
 
 // postcss-bem-linter: end

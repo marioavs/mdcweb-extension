@@ -332,10 +332,13 @@
         <h2 class="mdc-typography--title">Fully-Featured Component</h2>
         <section id="demo-wrapper">
           <div id="js-select" class="mdc-ext-multiselect" role="listbox">
-            <label class="mdc-textfield mdc-ext-multiselect__textfield">
-              <input type="text" class="mdc-textfield__input">
-              <span class="mdc-textfield__label">Pick a food group</span>
-            </label>
+            <select class="mdc-ext-multiselect__select"></select>
+            <div id="fruit-combobox" class="mdc-ext-multiselect__combobox" role="combobox">
+              <div class="mdc-ext-multiselect__display" role="combobox">
+                <input type="text" class="mdc-ext-multiselect__input">
+              </div>
+            </div>
+            <label class="mdc-ext-multiselect__label" for="fruit-combobox">Pick a food group</label>
             <div class="mdc-ext-multiselect__list">
               <ul class="mdc-list">
                 <li class="mdc-list-item" role="option" data-value="grains" data-description="Bread">
@@ -379,10 +382,15 @@
         <h2 class="mdc-typography--title">Load-Items Component</h2>
         <section id="demo-wrapper">
           <div id="js-load-items" class="mdc-ext-multiselect" role="listbox">
-            <label class="mdc-textfield mdc-ext-multiselect__textfield">
-              <input type="text" class="mdc-textfield__input">
-              <span class="mdc-textfield__label">Pick an item</span>
-            </label>
+            <select class="mdc-ext-multiselect__select">
+              <option class="mdc-ext-multiselect__option" value="03">Third</option>
+            </select>
+            <div id="load-items-combobox" class="mdc-ext-multiselect__combobox" role="combobox">
+              <div class="mdc-ext-multiselect__display" role="combobox">
+                <input type="text" class="mdc-ext-multiselect__input">
+              </div>
+            </div>
+            <label class="mdc-ext-multiselect__label" for="load-items-combobox">Pick an item</label>
             <div class="mdc-ext-multiselect__list">
               <ul class="mdc-list">
               </ul>
@@ -398,52 +406,52 @@
         var countrySelect = document.getElementById('country-js-select');
         mdcext.multiselect.MDCExtMultiselect.attachTo(countrySelect);
 
-        // var MDCExtMultiselect = mdcext.multiselect.MDCExtMultiselect;
-        // var root = document.getElementById('js-select');
-        // var currentlySelected = document.getElementById('currently-selected');
-        // var multiselect = MDCExtMultiselect.attachTo(root);
-        // root.addEventListener('MDCExtMultiselect:change', function() {
-        //   var item = multiselect.selectedItems[0];
-        //   currentlySelected.textContent = '"' + item.textContent +
-        //    ' with value "' + multiselect.value + '"';
-        // });
-        //
-        // var demoWrapper = document.getElementById('demo-wrapper');
-        // var darkThemeCb = document.getElementById('dark-theme');
-        // var rtlCb = document.getElementById('rtl');
-        // var disabledCb = document.getElementById('disabled');
-        //
-        // darkThemeCb.addEventListener('change', function() {
-        //   demoWrapper.classList[darkThemeCb.checked ? 'add' : 'remove']('mdc-theme--dark');
-        // });
-        // rtlCb.addEventListener('change', function() {
-        //   if (rtlCb.checked) {
-        //     demoWrapper.setAttribute('dir', 'rtl');
-        //   } else {
-        //     demoWrapper.removeAttribute('dir');
-        //   }
-        // });
-        // disabledCb.addEventListener('change', function() {
-        //   multiselect.disabled = disabledCb.checked;
-        // });
-        //
-        // var loadItems = document.getElementById('js-load-items');
-        // multiselectLoadItems =  new MDCExtMultiselect(loadItems, undefined, {
-        //     itemValueProperty: 'id',
-        //     itemDescriptionProperty: 'desc',
-        //     itemsLoader: function(query, callback) {
-        //       callback([{
-        //           id: '01',
-        //           desc: 'first'
-        //         },
-        //         {
-        //           id: '02',
-        //           desc: 'second'
-        //         }
-        //       ]);
-        //     }
-        //   }
-        // );
+        var MDCExtMultiselect = mdcext.multiselect.MDCExtMultiselect;
+        var root = document.getElementById('js-select');
+        var currentlySelected = document.getElementById('currently-selected');
+        var multiselect = MDCExtMultiselect.attachTo(root);
+        root.addEventListener('MDCExtMultiselect:change', function() {
+          var option = multiselect.selectedOptions[0];
+          currentlySelected.textContent = '"' + option.textContent +
+           '" with value "' + multiselect.value + '"';
+        });
+
+        var demoWrapper = document.getElementById('demo-wrapper');
+        var darkThemeCb = document.getElementById('dark-theme');
+        var rtlCb = document.getElementById('rtl');
+        var disabledCb = document.getElementById('disabled');
+
+        darkThemeCb.addEventListener('change', function() {
+          demoWrapper.classList[darkThemeCb.checked ? 'add' : 'remove']('mdc-theme--dark');
+        });
+        rtlCb.addEventListener('change', function() {
+          if (rtlCb.checked) {
+            demoWrapper.setAttribute('dir', 'rtl');
+          } else {
+            demoWrapper.removeAttribute('dir');
+          }
+        });
+        disabledCb.addEventListener('change', function() {
+          multiselect.disabled = disabledCb.checked;
+        });
+
+        var loadItems = document.getElementById('js-load-items');
+        multiselectLoadItems =  new MDCExtMultiselect(loadItems, undefined, {
+            itemValueProperty: 'id',
+            itemDescriptionProperty: 'desc',
+            itemsLoader: function(query, callback) {
+              callback([{
+                  id: '01',
+                  desc: 'first'
+                },
+                {
+                  id: '02',
+                  desc: 'second'
+                }
+              ]);
+            }
+          }
+        );
       })();
     </script>
   </body>
