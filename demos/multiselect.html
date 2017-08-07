@@ -332,7 +332,9 @@
         <h2 class="mdc-typography--title">Fully-Featured Component</h2>
         <section id="demo-wrapper">
           <div id="js-select" class="mdc-ext-multiselect" role="listbox">
-            <select class="mdc-ext-multiselect__select"></select>
+            <select class="mdc-ext-multiselect__select">
+              <option class="mdc-ext-multiselect__option" value="fruit" selected="selected">Fruit</option>
+            </select>
             <div id="fruit-combobox" class="mdc-ext-multiselect__combobox" role="combobox">
               <div class="mdc-ext-multiselect__display" role="combobox">
                 <input type="text" class="mdc-ext-multiselect__input">
@@ -382,9 +384,7 @@
         <h2 class="mdc-typography--title">Load-Items Component</h2>
         <section id="demo-wrapper">
           <div id="js-load-items" class="mdc-ext-multiselect" role="listbox">
-            <select class="mdc-ext-multiselect__select">
-              <option class="mdc-ext-multiselect__option" value="03">Third</option>
-            </select>
+            <select class="mdc-ext-multiselect__select"></select>
             <div id="load-items-combobox" class="mdc-ext-multiselect__combobox" role="combobox">
               <div class="mdc-ext-multiselect__display" role="combobox">
                 <input type="text" class="mdc-ext-multiselect__input">
@@ -440,18 +440,26 @@
             itemValueProperty: 'id',
             itemDescriptionProperty: 'desc',
             itemsLoader: function(query, callback) {
-              callback([{
-                  id: '01',
-                  desc: 'first'
-                },
-                {
-                  id: '02',
-                  desc: 'second'
-                }
-              ]);
+              setTimeout(delayedLoader(query, callback) , 800);
             }
           }
         );
+
+        function delayedLoader(query, callback) {
+          callback([{
+              id: '01',
+              desc: 'first'
+            },
+            {
+              id: '02',
+              desc: 'second'
+            },
+            {
+              id: '03',
+              desc: 'third'
+            }
+          ]);
+        }
       })();
     </script>
   </body>

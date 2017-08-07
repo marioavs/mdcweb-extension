@@ -13,7 +13,7 @@
     "url": "https://github.com/marioavs/mdcweb-extension.git"
   },
   "dependencies": {
-    "@mdcext/autocomplete": "^0.0.1",
-    "@mdcext/data-table": "^0.0.1"
+    "@mdcext/data-table": "^0.0.1",
+    "@mdcext/multiselect": "^0.0.1"
   }
 }

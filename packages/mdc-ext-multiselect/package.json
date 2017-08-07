@@ -16,10 +16,10 @@
   "dependencies": {
     "@material/animation": "^0.3.0",
     "@material/base": "^0.2.3",
-    "@material/list": "^0.2.13",
+    "@material/elevation": "^0.1.10",
+    "@material/ripple": "^0.8.1",
     "@material/rtl": "^0.1.7",
     "@material/theme": "^0.1.6",
-    "@material/textfield": "^0.3.2",
     "@material/typography": "^0.2.3"
   }
 }

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as autocomplete from '@mdcext/autocomplete';
 import * as dataTable from '@mdcext/data-table';
+import * as multiselect from '@mdcext/multiselect';
 import autoInit from '@material/auto-init';
 
 // let webpack to copy material-components-web js and css
@@ -23,11 +23,12 @@ import autoInit from '@material/auto-init';
 //require('material-components-web/dist/material-components-web.css')
 
 // Register all components
-autoInit.register('MDCExtAutocomplete', autocomplete.MDCExtAutocomplete);
 autoInit.register('MDCExtDataTable', dataTable.MDCExtDataTable);
+autoInit.register('MDCExtMultiselect', multiselect.MDCExtMultiselect);
 
 // Export all components.
 export {
-  autocomplete,
-  dataTable
+  dataTable,
+  multiselect
 };
+

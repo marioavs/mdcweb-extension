@@ -250,7 +250,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       }
       if (this.cachedNumberOfAvailableItems_ == 0)
         this.updateAvailableItems_();
-      this.open_();
+      else
+        this.open_();
     }
   }
 
@@ -282,7 +283,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     }
 
     // Do nothing if Alt, Ctrl or Meta are pressed.
-    if (evt.altKey || evt.ctrlKey || evt.metaKey) {
+    if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
       return;
     }
 
