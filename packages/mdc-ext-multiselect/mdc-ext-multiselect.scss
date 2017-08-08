@@ -60,6 +60,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     flex-direction: column;
     font-size: inherit;
     height: auto;
+    position: relative;
     width: calc(100% - #{$dd-arrow-padding});
 
     background: none;
@@ -202,7 +203,6 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
   &--upgraded {
     display: inline-flex;
-    position: relative;
     box-sizing: border-box;
     align-items: flex-end;
     margin-top: 16px;
