@@ -118,6 +118,7 @@ export class MDCExtMultiselect extends MDCComponent {
       registerListInteractionHandler: (type, handler) => this.listEl_.addEventListener(type, handler),
       deregisterListInteractionHandler: (type, handler) => this.listEl_.removeEventListener(type, handler),
       focus: () => this.inputEl_.focus(),
+      isFocused: () => document.activeElement === this.inputEl_,
       hasItemsLoader: () => ((this.settings_ !== undefined) && (typeof this.settings_.itemsLoader === 'function')),
       applyItemsLoader: (query) => this.applyItemsLoader_(query),
       addItem: (data) => this.addItem_(data),

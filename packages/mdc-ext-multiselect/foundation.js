@@ -58,6 +58,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       focus: () => {},
+      isFocused: () => {},
       hasItemsLoader: () => /* boolean */ false,
       applyItemsLoader: (/* query: string */) => {},
       addItem: (/* data: Object */) => {},
@@ -226,7 +227,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
         this.cachedActiveItem_ = undefined;
       }
     }
-    if (!this.isOpen()) {
+    if (!this.isOpen() && (this.adapter_.isFocused())) {
       this.open_();
     }
   }
@@ -405,7 +406,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
   setListStyles_() {
     const comboboxHeight = this.adapter_.getComboboxElOffsetHeight();
-    this.adapter_.setListElStyle('top', `${comboboxHeight*2}px`);
+    this.adapter_.setListElStyle('top', `${comboboxHeight}px`);
   }
 
   applyQuery_(value) {

@@ -41,8 +41,10 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
 // postcss-bem-linter: define multiselect
 .mdc-ext-multiselect {
-  display: inline-block;
+  display: inline-flex;
+  height: auto;
   margin-bottom: 8px;
+  position: relative;
   will-change: opacity, transform, color;
 
   @include mdc-theme-dark {
@@ -50,20 +52,30 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
   }
 
   &__combobox {
+    $dd-arrow-padding: 18px;
+
+    padding: 0 #{$dd-arrow-padding} 8px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    font-size: inherit;
+    height: auto;
+    width: calc(100% - #{$dd-arrow-padding});
+
+    background: none;
+    background-repeat: no-repeat;
+    background-position: right center;
+
+    @include mdc-ext-multiselect-dd-arrow-svg-bg_;
+
     @include mdc-theme-prop(color, text-primary-on-light);
     @include mdc-typography-base;
+    @include mdc-rtl-reflexive-box(padding, right, $dd-arrow-padding);
     // We use only a subset of the MDC typography values here as changing things such as line-height
     // affects how the labels are transformed.
     @each $prop in (font-size, letter-spacing) {
       #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
     }
-
-    width: 100%;
-    padding: 0 0 8px;
-    border: none;
-    background: none;
-    font-size: inherit;
-    appearance: none;
 
     &::placeholder {
       @include mdc-theme-prop(color, text-hint-on-light);
@@ -87,6 +99,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
     @include mdc-theme-dark {
       @include mdc-theme-prop(color, text-primary-on-dark);
+      @include mdc-ext-multiselect-dd-arrow-svg-bg_(ffffff);
 
       &::placeholder {
         @include mdc-theme-prop(color, text-hint-on-dark);
@@ -102,22 +115,40 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     display: none;
   }
 
-  &__input {
-    border-style: none;
-    background-color: transparent;
-    display: inline-block;
-    outline: 0px none;
-    position: relative;
-    padding-left: 1px;
-    width: auto;
+  &__display {
+    display: flex;
+    flex: 1;
+    flex-wrap: nowrap;
+    height: auto;
+    width: 100%;
+
+    .mdc-ext-multiselect__input {
+      border-style: none;
+      background-color: transparent;
+      display: inline-block;
+      flex-basis: 5px;
+      flex-grow: 1;
+      min-width: 20px;
+      outline: 0px none;
+      overflow-x: hidden;
+      padding-left: 1px;
+      width: auto;
+    }
+
+    .mdc-ext-multiselect__option {
+      flex-grow: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
   }
 
   &__label {
     @include mdc-theme-prop(color, text-hint-on-light);
 
     position: absolute;
-    bottom: 8px;
+    bottom: initial;
     left: 0;
+    top: 6px;
     transform-origin: left top;
     transition: mdc-ext-multiselect-transition(transform), mdc-ext-multiselect-transition(color);
     cursor: text;
@@ -176,8 +207,6 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     align-items: flex-end;
     margin-top: 16px;
 
-    height: 48px;
-
     &::after {
       position: absolute;
       bottom: 0;
@@ -212,7 +241,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     overflow-y: overlay;
     padding: 0;
     transform-origin: left top;
-    z-index: 4; // Should pop up above everything else. temporary-drawer is next highest at 3.
+    z-index: 4;
 
     @include mdc-elevation(2);
 
@@ -223,7 +252,8 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
     /* stylelint-disable plugin/selector-bem-pattern */
     .mdc-list {
-      padding: 8px 0;
+      margin: 0px 0px;
+      padding: 4px 0;
     }
 
     .mdc-list-item {
@@ -253,7 +283,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
     .mdc-list-group,
     .mdc-list-group > .mdc-list-item:first-child {
-      margin-top: 12px;
+      margin-top: 4px;
     }
 
     .mdc-list-group {
