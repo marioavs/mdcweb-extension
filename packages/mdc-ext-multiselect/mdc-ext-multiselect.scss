@@ -41,15 +41,11 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
 // postcss-bem-linter: define multiselect
 .mdc-ext-multiselect {
-  display: inline-flex;
+  display: inline-block;
   height: auto;
   margin-bottom: 8px;
   position: relative;
-  will-change: opacity, transform, color;
-
-  @include mdc-theme-dark {
-    background-color: #424242;
-  }
+  will-change: color;
 
   &__combobox {
     $dd-arrow-padding: 18px;
@@ -62,6 +58,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     height: auto;
     position: relative;
     width: calc(100% - #{$dd-arrow-padding});
+    will-change: transform;
 
     background: none;
     background-repeat: no-repeat;
@@ -98,6 +95,10 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
       box-shadow: none;
     }
 
+    @include mdc-rtl {
+      background-position: left center;
+    }
+
     @include mdc-theme-dark {
       @include mdc-theme-prop(color, text-primary-on-dark);
       @include mdc-ext-multiselect-dd-arrow-svg-bg_(ffffff);
@@ -130,10 +131,22 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
       flex-basis: 5px;
       flex-grow: 1;
       min-width: 20px;
-      outline: 0px none;
+      outline: none;
       overflow-x: hidden;
-      padding-left: 1px;
+      padding-left: 2px;
       width: auto;
+
+      @include mdc-theme-dark {
+        @include mdc-theme-prop(color, text-primary-on-dark);
+
+        &::placeholder {
+          @include mdc-theme-prop(color, text-hint-on-dark);
+        }
+
+        &:focus::placeholder {
+          @include mdc-theme-prop(color, text-secondary-on-dark);
+        }
+      }
     }
 
     .mdc-ext-multiselect__option {
@@ -155,20 +168,50 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     cursor: text;
 
     // stylelint-disable plugin/selector-bem-pattern
-    @include mdc-rtl {
+    @include mdc-rtl(".mdc-ext-multiselect") {
       right: 0;
       left: auto;
       transform-origin: right top;
     }
     // stylelint-enable plugin/selector-bem-pattern
 
-    @include mdc-theme-dark {
+    @include mdc-theme-dark(".mdc-ext-multiselect") {
       @include mdc-theme-prop(color, text-hint-on-dark);
     }
 
     &--float-above {
       transform: translateY(-100%) scale(.75, .75);
       cursor: auto;
+    }
+  }
+
+  &--upgraded {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: flex-end;
+    height: 48px;
+    margin-top: 16px;
+
+    .mdc-ext-multiselect__label {
+      top: 22px;
+      pointer-events: none;
+    }
+
+    .mdc-ext-multiselect__combobox::after {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      transform: translateY(50%) scaleY(1);
+      transform-origin: center bottom;
+      transition: mdc-ext-multiselect-transition(background-color), mdc-ext-multiselect-transition(transform);
+      background-color: $mdc-ext-multiselect-divider-on-light;
+      content: "";
+
+      @include mdc-theme-dark(".mdc-ext-multiselect") {
+        background-color: $mdc-ext-multiselect-divider-on-dark;
+      }
     }
   }
 
@@ -184,7 +227,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
       @include mdc-theme-prop(color, primary);
     }
 
-    &.mdc-ext-multiselect--upgraded::after {
+    .mdc-ext-multiselect__combobox::after {
       @include mdc-ext-multiselect-after-styles;
 
       @include mdc-theme-dark(".mdc-ext-multiselect", true) {
@@ -201,52 +244,40 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     }
   }
 
-  &--upgraded {
-    display: inline-flex;
-    box-sizing: border-box;
-    align-items: flex-end;
-    margin-top: 16px;
-
-    &::after {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      transform: translateY(50%) scaleY(1);
-      transform-origin: center bottom;
-      transition: mdc-ext-multiselect-transition(background-color), mdc-ext-multiselect-transition(transform);
-      background-color: $mdc-ext-multiselect-divider-on-light;
-      content: "";
-
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
-        background-color: $mdc-ext-multiselect-divider-on-dark;
-      }
-    }
-
-    .mdc-ext-multiselect__label {
-      pointer-events: none;
-    }
-  }
-
   &__list {
     display: none;
     position: absolute;
     top: 0;
-    left: 0;
     background-color: white;
     border: 1px solid black;
+    box-sizing: border-box;
+    min-width: 100%;
     max-width: calc(100vw - 32px);
     max-height: calc(100vh - 32px);
+    overflow-x: hidden;
     overflow-y: overlay;
     padding: 0;
     transform-origin: left top;
+    white-space: nowrap;
     z-index: 4;
+    will-change: transform, opacity;
+
+    // stylelint-disable plugin/selector-bem-pattern
+    @include mdc-rtl(".mdc-ext-multiselect") {
+      right: 0;
+      transform-origin: right top;
+    }
+    // stylelint-enable plugin/selector-bem-pattern
 
     @include mdc-elevation(2);
 
+    @include mdc-theme-dark {
+      background-color: #424242;
+    }
+
     &--open {
       display: inline-block;
+      transform: scale(1);
       opacity: 1;
     }
 
@@ -257,8 +288,12 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     }
 
     .mdc-list-item {
-      padding: 0 16px;
+      cursor: pointer;
+      color: inherit;
       outline: none;
+      padding: 0 16px;
+      position: relative;
+      text-decoration: none;
 
       @include mdc-typography(subheading2);
       @include mdc-theme-prop(color, text-secondary-on-light);
@@ -269,16 +304,33 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
       }
 
       &--active {
-        background-color: rgba(black, .06);
+        @include mdc-theme-prop(color, text-primary-on-light);
       }
 
-      @include mdc-theme-dark {
+      @include mdc-theme-dark(".mdc-ext-multiselect") {
         @include mdc-theme-prop(color, text-secondary-on-dark);
 
         &--active {
-          background-color: rgba(white, .09);
+          @include mdc-theme-prop(color, text-primary-on-dark);
         }
       }
+    }
+
+    .mdc-list-item::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transition: opacity 120ms $mdc-animation-deceleration-curve-timing-function;
+      border-radius: inherit;
+      background: currentColor;
+      content: "";
+      opacity: 0;
+    }
+
+    .mdc-list-item--active::before {
+      opacity: .12;
     }
 
     .mdc-list-group,
@@ -296,7 +348,9 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
       }
     }
 
-    @include mdc-theme-dark {
+    @include mdc-theme-dark(".mdc-ext-multiselect") {
+      background-color: #424242;
+
       .mdc-list-group {
         @include mdc-theme-prop(color, text-hint-on-dark);
 
@@ -312,19 +366,35 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 .mdc-ext-multiselect[disabled] {
   @include mdc-theme-prop(color, text-disabled-on-light);
 
-  border-bottom-style: dotted;
+  border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-light;
   cursor: default;
   pointer-events: none;
-  // Imitate native disabled functionality
-  user-select: none;
+
+  @include mdc-theme-dark(".mdc-textfield", true) {
+    border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-dark;
+  }
+
+  .mdc-ext-multiselect__combobox::after {
+    display: none;
+  }
+
+  // stylelint-disable plugin/selector-bem-pattern
+  .mdc-ext-multiselect__combobox,
+  .mdc-ext-multiselect__input,
+  .mdc-ext-multiselect__label {
+    @include mdc-theme-prop(color, text-disabled-on-light);
+
+    @include mdc-theme-dark(".mdc-ext-multiselect") {
+      @include mdc-theme-prop(color, text-disabled-on-dark);
+    }
+  }
+  // stylelint-enable plugin/selector-bem-pattern
 }
 
 @each $sel in ("mdc-ext-multiselect--disabled", "mdc-ext-multiselect[disabled]") {
   .#{$sel} {
     @include mdc-theme-dark(".mdc-ext-multiselect", true) {
       @include mdc-theme-prop(color, text-disabled-on-dark);
-
-      border-bottom: 1px dotted rgba(white, .38);
     }
   }
 }

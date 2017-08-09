@@ -53,12 +53,6 @@ export class MDCExtMultiselect extends MDCComponent {
     return this.listUl_.querySelectorAll(`${strings.ITEM_SELECTOR}:not(.${cssClasses.ITEM_NOMATCH})`);
   }
 
-  get firstAvailableItem() {
-    if (this.availableItems.length > 0)
-      return this.availableItems[0];
-    return null;
-  }
-
   get activeItem() {
     return this.listUl_.querySelector(`.${cssClasses.ITEM_ACTIVE}`);
   }
@@ -111,6 +105,7 @@ export class MDCExtMultiselect extends MDCComponent {
       hasNecessaryDom: () => Boolean(this.comboboxEl_) && Boolean(this.displayEl_) && Boolean(this.inputEl_) &&
         Boolean(this.listEl_) && Boolean(this.listUl_) && Boolean(this.selectEl_),
       getComboboxElOffsetHeight: () => this.comboboxEl_.offsetHeight,
+      getComboboxElOffsetTop: () => this.comboboxEl_.offsetTop,
       registerInteractionHandler: (type, handler) => this.root_.addEventListener(type, handler),
       deregisterInteractionHandler: (type, handler) => this.root_.removeEventListener(type, handler),
       registerInputInteractionHandler: (type, handler) => this.inputEl_.addEventListener(type, handler),
@@ -131,8 +126,9 @@ export class MDCExtMultiselect extends MDCComponent {
       getNumberOfAvailableItems: () => this.availableItems.length,
       getSelectedOptions: () => this.selectedOptions,
       getActiveItem: () => this.activeItem,
-      getActiveItemValue: () => this.activeItem.getAttribute(strings.ITEM_DATA_VALUE_ATTR),
       getActiveItemDescription: () => this.activeItem.getAttribute(strings.ITEM_DATA_DESC_ATTR) || this.activeItem.textContent,
+      getActiveItemIndex: () => this.getActiveItemIndex_(),
+      getActiveItemValue: () => this.activeItem.getAttribute(strings.ITEM_DATA_VALUE_ATTR),
       setActiveItem: (item) => item.classList.add(cssClasses.ITEM_ACTIVE),
       setActiveForItemAtIndex: (index) => this.availableItems[index].classList.add(cssClasses.ITEM_ACTIVE),
       removeActiveItem: () => { if (this.activeItem) this.activeItem.classList.remove(cssClasses.ITEM_ACTIVE); },
@@ -247,5 +243,18 @@ export class MDCExtMultiselect extends MDCComponent {
       this.selectEl_.removeChild(this.selectedOptions[index]);
       this.displayEl_.removeChild(this.displayedOptions[index]);
     }
+  }
+
+  getActiveItemIndex_() {
+    let currentItem = this.activeItem;
+    if (!currentItem)
+      return undefined;
+    let el = currentItem;
+    let count = 0;
+    while (el = el.previousSibling) {
+      if ((el.nodeType == currentItem.nodeType) && (!el.classList.contains(cssClasses.ITEM_NOMATCH)))
+        count++;
+    }
+    return count;
   }
 }

@@ -51,6 +51,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       hasClass: () => /* boolean */ false,
       hasNecessaryDom: () => /* boolean */ false,
       getComboboxElOffsetHeight: () => /* number */ 0,
+      getComboboxElOffsetTop: () => /* number */ 0,
       registerInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterInteractionHandler: (/* type: string, handler: EventListener */) => {},
       registerInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
@@ -71,8 +72,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       getNumberOfAvailableItems: () => /* number */ 0,
       getSelectedOptions: () => /* HTMLElement */ {},
       getActiveItem: () => /* HTMLElement */ {},
-      getActiveItemValue: () => /* string */ '',
       getActiveItemDescription: () => /* string */ '',
+      getActiveItemIndex: () => /* number */ 0,
+      getActiveItemValue: () => /* string */ '',
       setActiveItem: (/* item: HTMLElement */) => {},
       setActiveForItemAtIndex: (/* index: number */) => {},
       removeActiveItem: () => {},
@@ -348,6 +350,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       if (evt.target !== this.adapter_.getActiveItem()) {
         this.adapter_.removeActiveItem();
         this.adapter_.setActiveItem(evt.target);
+        this.cachedActiveItem_ = this.adapter_.getActiveItemIndex();
       }
       this.applyValueFromActiveItem_();
     }
@@ -406,7 +409,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
   setListStyles_() {
     const comboboxHeight = this.adapter_.getComboboxElOffsetHeight();
-    this.adapter_.setListElStyle('top', `${comboboxHeight}px`);
+    const comboboxTop = this.adapter_.getComboboxElOffsetTop();
+
+    this.adapter_.setListElStyle('top', `${comboboxHeight + comboboxTop}px`);
   }
 
   applyQuery_(value) {
