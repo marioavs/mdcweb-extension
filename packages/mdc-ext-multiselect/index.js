@@ -65,6 +65,14 @@ export class MDCExtMultiselect extends MDCComponent {
     return this.displayEl_.querySelectorAll(`.${cssClasses.SELECTED_OPTION}`);
   }
 
+  addItems(itemArray) {
+    this.foundation_.addItems(itemArray);
+  }
+
+  removeItems() {
+    this.foundation_.removeItems();
+  }
+
   initialize(settings = {}, textFactory = (el) => new MDCTextfield(el)) {
     this.settings_ = settings;
     this.comboboxEl_ = this.root_.querySelector(strings.COMBOBOX_SELECTOR);
@@ -117,7 +125,7 @@ export class MDCExtMultiselect extends MDCComponent {
       hasItemsLoader: () => ((this.settings_ !== undefined) && (typeof this.settings_.itemsLoader === 'function')),
       applyItemsLoader: (query) => this.applyItemsLoader_(query),
       addItem: (data) => this.addItem_(data),
-      removeAllItems: () => this.removeAllItems_(),
+      removeItems: () => this.removeItems_(),
       addSelectedOption: (value, description) => this.addSelectedOption_(value, description),
       removeSelectedOption: (index) => this.removeSelectedOption_(index),
       setListElStyle: (propertyName, value) => this.listEl_.style.setProperty(propertyName, value),
@@ -169,10 +177,11 @@ export class MDCExtMultiselect extends MDCComponent {
     this.setJsonAttributes();
     var self = this;
     this.settings_.itemsLoader.apply(self, [query, function(results) {
-            if (results && results.length) {
-                    self.foundation_.addItems(results);
-                    self.foundation_.refreshItems();
-            }
+      if (results && results.length) {
+        self.foundation_.removeItems();
+        self.foundation_.addItems(results);
+        self.foundation_.refreshItems();
+      }
     }]);
   }
 
@@ -230,7 +239,7 @@ export class MDCExtMultiselect extends MDCComponent {
     }
   }
 
-  removeAllItems_() {
+  removeItems_() {
     if (this.listUl_ !== undefined) {
       while(this.listUl_.hasChildNodes()) this.listUl_.removeChild(this.listUl_.firstChild);
     }

@@ -63,7 +63,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       hasItemsLoader: () => /* boolean */ false,
       applyItemsLoader: (/* query: string */) => {},
       addItem: (/* data: Object */) => {},
-      removeAllItems: () => {},
+      removeItems: () => {},
       addSelectedOption: (/* value: string, description: string */) => {},
       removeSelectedOption: (/* index: number */) => {},
       setListElStyle: (/* propertyName: string, value: string */) => {},
@@ -196,10 +196,13 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   addItems(items) {
     if (!Array.isArray(items))
       return;
-    this.adapter_.removeAllItems();
     for (let i = 0, l = items.length; i < l; i++) {
       this.adapter_.addItem(items[i]);
     }
+  }
+
+  removeItems() {
+    this.adapter_.removeItems();
   }
 
   setValueProperty(value) {
