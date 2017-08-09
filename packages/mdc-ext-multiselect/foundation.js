@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-import {MDCFoundation} from '@material/base';
+import MDCFoundation from '@material/base/foundation';
+import MDCExtMultiselectAdapter from './adapter';
 import {cssClasses, strings, numbers} from './constants';
 
+/** @const {!Array<@dict>} */
 const OPENER_KEYS = [
   {key: 'ArrowUp', keyCode: 38, forType: 'keydown'},
   {key: 'ArrowDown', keyCode: 40, forType: 'keydown'}
 ];
 
+/**
+ * @final @extends {MDCFoundation<!MDCExtMultiselectAdapter>}
+ */
 export default class MDCExtMultiselectFoundation extends MDCFoundation {
   static get cssClasses() {
     return cssClasses;
@@ -95,8 +100,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     super(Object.assign(MDCExtMultiselectFoundation.defaultAdapter, adapter));
     this.disabled_ = false;
     this.maxSelectedItems_ = 1;
-    this.valueProperty_ = 'value';
-    this.descriptionProperty_ = 'description';
     this.lastInputValue_ = undefined;
     this.cachedNumberOfAvailableItems_ = 0;
     this.cachedActiveItem_ = undefined;
@@ -203,22 +206,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
   removeItems() {
     this.adapter_.removeItems();
-  }
-
-  setValueProperty(value) {
-    this.valueProperty_ = value;
-  }
-
-  getValueProperty() {
-    return this.valueProperty_;
-  }
-
-  setDescriptionProperty(value) {
-    this.descriptionProperty_ = value;
-  }
-
-  getDescriptionProperty() {
-    return this.descriptionProperty_;
   }
 
   refreshItems() {

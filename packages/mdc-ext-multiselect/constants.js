@@ -17,6 +17,7 @@
  /** @const {string} */
 const ROOT = 'mdc-ext-multiselect';
 
+/** @enum {string} */
 export const cssClasses = {
   ROOT: ROOT,
   DISABLED: `${ROOT}--disabled`,
@@ -34,6 +35,7 @@ export const cssClasses = {
   LIST_ITEM: 'mdc-list-item'
 };
 
+/** @enum {string} */
 export const strings = {
   COMBOBOX_SELECTOR: `.${ROOT}__combobox`,
   DISPLAY_SELECTOR: `.${ROOT}__display`,

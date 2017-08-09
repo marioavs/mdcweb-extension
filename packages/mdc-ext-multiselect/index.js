@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import {MDCComponent} from '@material/base';
-import {MDCTextfield} from '@material/textfield';
-
-import {cssClasses, strings} from './constants';
+import MDCComponent from '@material/base/component';
 import MDCExtMultiselectFoundation from './foundation';
+import {cssClasses, strings} from './constants';
 
 export {MDCExtMultiselectFoundation};
 
+/** @final @extends {MDCComponent<!MDCExtMultiselectFoundation>} */
 export class MDCExtMultiselect extends MDCComponent {
   static attachTo(root) {
     return new MDCExtMultiselect(root);
@@ -35,6 +34,14 @@ export class MDCExtMultiselect extends MDCComponent {
   /** @param {?string} value */
   set value(value) {
     this.foundation_.setValue(value);
+  }
+
+  get settings() {
+    return this.settings_ ;
+  }
+
+  set settings(settings) {
+    Object.assign(this.settings_, settings);
   }
 
   get disabled() {
@@ -73,8 +80,9 @@ export class MDCExtMultiselect extends MDCComponent {
     this.foundation_.removeItems();
   }
 
-  initialize(settings = {}, textFactory = (el) => new MDCTextfield(el)) {
-    this.settings_ = settings;
+  initialize(settings = {}) {
+    this.settings_ = this.getDefaultSettings_();
+    this.settings = settings;
     this.comboboxEl_ = this.root_.querySelector(strings.COMBOBOX_SELECTOR);
     this.displayEl_ = this.root_.querySelector(strings.DISPLAY_SELECTOR);
     this.inputEl_ = this.root_.querySelector(strings.INPUT_SELECTOR);
@@ -122,7 +130,7 @@ export class MDCExtMultiselect extends MDCComponent {
       deregisterListInteractionHandler: (type, handler) => this.listEl_.removeEventListener(type, handler),
       focus: () => this.inputEl_.focus(),
       isFocused: () => document.activeElement === this.inputEl_,
-      hasItemsLoader: () => ((this.settings_ !== undefined) && (typeof this.settings_.itemsLoader === 'function')),
+      hasItemsLoader: () => (typeof this.settings_.itemsLoader === 'function'),
       applyItemsLoader: (query) => this.applyItemsLoader_(query),
       addItem: (data) => this.addItem_(data),
       removeItems: () => this.removeItems_(),
@@ -168,13 +176,20 @@ export class MDCExtMultiselect extends MDCComponent {
     }
   }
 
+  getDefaultSettings_() {
+    return {
+      itemValueProperty: 'value',
+      itemDescriptionProperty: 'description',
+      itemsLoader: undefined
+    };
+  }
+
   addClassToLabel_(className) {
     if (this.labelEl_)
       this.labelEl_.classList.add(className);
   }
 
   applyItemsLoader_(query) {
-    this.setJsonAttributes();
     var self = this;
     this.settings_.itemsLoader.apply(self, [query, function(results) {
       if (results && results.length) {
@@ -185,21 +200,12 @@ export class MDCExtMultiselect extends MDCComponent {
     }]);
   }
 
-  setJsonAttributes(){
-    if (this.settings_.itemValueProperty !== undefined){
-      this.foundation_.setValueProperty(this.settings_.itemValueProperty);
-    }
-    if (this.settings_.itemDescriptionProperty !== undefined){
-      this.foundation_.setDescriptionProperty(this.settings_.itemDescriptionProperty);
-    }
-  }
-
   addItem_(data) {
     if (this.listUl_ !== undefined) {
       const {LIST_ITEM} = cssClasses;
       const {ITEM_DATA_VALUE_ATTR, ITEM_DATA_DESC_ATTR} = strings;
-      let value = data[this.foundation_.getValueProperty()];
-      let description = data[this.foundation_.getDescriptionProperty()];
+      let value = data[this.settings_.itemValueProperty];
+      let description = data[this.settings_.itemDescriptionProperty];
       var node = document.createElement('li');
       node.classList.add(LIST_ITEM);
       node.setAttribute('role', 'option');
