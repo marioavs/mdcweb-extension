@@ -93,7 +93,7 @@ module.exports = [{
     rules: [{
       test: /\.js$/,
       // include: glob.sync('packages/*/node_modules/@material/*').map((d) => path.join(__dirname, d)),
-      exclude: /node_modules(?!\/@material)/,
+      exclude: /node_modules\/(?!(@material)\/).*/,
       loader: 'babel-loader',
       options: {
         cacheDirectory: true
