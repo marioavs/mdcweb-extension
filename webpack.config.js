@@ -104,44 +104,40 @@ module.exports = [{
     createBannerPlugin()
   ]
 },
-// {
-//   name: 'js-all',
-//   entry: {
-//     'mdcweb-extension': [path.resolve('./packages/mdcweb-extension/index.js')]
-//   },
-//   output: {
-//     path: OUT_PATH,
-//     publicPath: PUBLIC_PATH,
-//     filename: '[name].' + (IS_PROD ? 'min.' : '') + 'js',
-//     libraryTarget: 'umd',
-//     library: 'mdcext'
-//   },
-//   devServer: {
-//     disableHostCheck: true
-//   },
-//   devtool: IS_DEV ? 'source-map' : false,
-//   module: {
-//     rules: [{
-//       test: /\.js$/,
-//       exclude: /node_modules(?!\/@material)/,
-//       loader: 'babel-loader',
-//       options: {
-//         cacheDirectory: true
-//       }
-//     }, {
-//       test: /material-components-web\.(js|css)$/,
-//       loader: 'file-loader?name=[name].[ext]'
-//     }]
-//   },
-//   plugins: [
-//     createBannerPlugin()
-//   ]
-// },
+{
+  name: 'js-all',
+  entry: {
+    'mdcweb-extension': [path.resolve('./packages/mdcweb-extension/index.js')]
+  },
+  output: {
+    path: OUT_PATH,
+    publicPath: PUBLIC_PATH,
+    filename: '[name].' + (IS_PROD ? 'min.' : '') + 'js',
+    libraryTarget: 'umd',
+    library: 'mdcext'
+  },
+  devServer: {
+    disableHostCheck: true
+  },
+  devtool: IS_DEV ? 'source-map' : false,
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules\/(?!(@material)\/).*/,
+      loader: 'babel-loader',
+      options: {
+        cacheDirectory: true
+      }
+    }]
+  },
+  plugins: [
+    createBannerPlugin()
+  ]
+},
 {
   name: 'css',
   entry: {
-    // 'mdcweb-extension': path.resolve(
-    //     './packages/mdcweb-extension/mdcweb-extension.scss'),
+    'mdcweb-extension': path.resolve('./packages/mdcweb-extension/mdcweb-extension.scss'),
     'mdc-ext.multiselect': path.resolve('./packages/mdc-ext-multiselect/mdc-ext-multiselect.scss'),
     'mdc-ext.data-table': path.resolve('./packages/mdc-ext-data-table/mdc-ext-data-table.scss')
   },
