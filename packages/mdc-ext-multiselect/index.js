@@ -136,6 +136,7 @@ export class MDCExtMultiselect extends MDCComponent {
       removeItems: () => this.removeItems_(),
       addSelectedOption: (value, description) => this.addSelectedOption_(value, description),
       removeSelectedOption: (index) => this.removeSelectedOption_(index),
+      updateSelectedOption: (index, value, description) => this.updateSelectedOption_(index, value, description),
       setListElStyle: (propertyName, value) => this.listEl_.style.setProperty(propertyName, value),
       getNumberOfSelectedOptions: () => this.selectedOptions.length,
       getNumberOfItems: () => this.items.length,
@@ -163,13 +164,17 @@ export class MDCExtMultiselect extends MDCComponent {
 
   initialSyncWithDOM() {
     const {ARIA_DISABLED} = strings;
+    let hasValue = false;
     let l = this.selectedOptions.length;
     if (l > 0) {
       for (let i = 0; i < l; i++) {
+        if (this.selectedOptions[i].value)
+          hasValue = true;
         this.addDisplayOption_(this.selectedOptions[i].value, this.selectedOptions[i].textContent);
       }
-      this.addClassToLabel_(cssClasses.LABEL_FLOAT_ABOVE);
     }
+    if (hasValue)
+      this.addClassToLabel_(cssClasses.LABEL_FLOAT_ABOVE);
 
     if (this.root_.getAttribute(ARIA_DISABLED) === 'true') {
       this.disabled = true;
@@ -217,6 +222,12 @@ export class MDCExtMultiselect extends MDCComponent {
     }
   }
 
+  removeItems_() {
+    if (this.listUl_ !== undefined) {
+      while(this.listUl_.hasChildNodes()) this.listUl_.removeChild(this.listUl_.firstChild);
+    }
+  }
+
   addSelectedOption_(value, description) {
     const {SELECTED_OPTION} = cssClasses;
     const {SELECTED_ATTR} = strings;
@@ -245,18 +256,46 @@ export class MDCExtMultiselect extends MDCComponent {
     }
   }
 
-  removeItems_() {
-    if (this.listUl_ !== undefined) {
-      while(this.listUl_.hasChildNodes()) this.listUl_.removeChild(this.listUl_.firstChild);
-    }
-  }
-
   removeSelectedOption_(index) {
     if ((this.selectEl_ === undefined) || (this.displayEl_ === undefined))
       return;
     if (index < this.selectedOptions.length) {
       this.selectEl_.removeChild(this.selectedOptions[index]);
       this.displayEl_.removeChild(this.displayedOptions[index]);
+    }
+  }
+
+  updateSelectedOption_(index, value, description) {
+    const {SELECTED_OPTION} = cssClasses;
+    const {SELECTED_ATTR} = strings;
+    if ((this.selectEl_ === undefined) || (this.displayEl_ === undefined) ||
+      (index >= this.selectedOptions.length))
+      return;
+    let element = this.selectedOptions[index];
+    element.value = value;
+    let textnode = element.childNodes[0];
+    if (textnode) {
+      textnode.nodeValue = description;
+    } else {
+      textnode = document.createTextNode(description);
+      element.appendChild(textnode);
+    }
+    this.updateDisplayOption_(index, value, description);
+  }
+
+  updateDisplayOption_(index, value, description) {
+    const {SELECTED_OPTION} = cssClasses;
+    const {ITEM_DATA_VALUE_ATTR} = strings;
+    if (this.displayEl_ == undefined)
+      return;
+    let element = this.displayedOptions[index];
+    element.setAttribute(ITEM_DATA_VALUE_ATTR, value);
+    let textnode = element.childNodes[0];
+    if (textnode) {
+      textnode.nodeValue = description;
+    } else {
+      textnode = document.createTextNode(description);
+      element.appendChild(textnode);
     }
   }
 

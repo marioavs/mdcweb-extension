@@ -137,6 +137,8 @@ export default class MDCExtMultiselectAdapter {
 
   removeSelectedOption(index) {}
 
+  updateSelectedOption(index, value, description) {}
+
   setListElStyle(propertyName, value) {}
 
   /** @return {number} */
