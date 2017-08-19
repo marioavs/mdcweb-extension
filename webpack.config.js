@@ -72,8 +72,9 @@ const CSS_LOADER_CONFIG = [
 module.exports = [{
   name: 'js-components',
   entry: {
+    'data-table': [path.resolve('./packages/mdc-ext-data-table/index.js')],
     'multiselect': [path.resolve('./packages/mdc-ext-multiselect/index.js')],
-    'data-table': [path.resolve('./packages/mdc-ext-data-table/index.js')]
+    'pagination': [path.resolve('./packages/mdc-ext-pagination/index.js')]
   },
   output: {
     path: OUT_PATH,
@@ -138,8 +139,9 @@ module.exports = [{
   name: 'css',
   entry: {
     'mdcweb-extension': path.resolve('./packages/mdcweb-extension/mdcweb-extension.scss'),
+    'mdc-ext.data-table': path.resolve('./packages/mdc-ext-data-table/mdc-ext-data-table.scss'),
     'mdc-ext.multiselect': path.resolve('./packages/mdc-ext-multiselect/mdc-ext-multiselect.scss'),
-    'mdc-ext.data-table': path.resolve('./packages/mdc-ext-data-table/mdc-ext-data-table.scss')
+    'mdc-ext.pagination': path.resolve('./packages/mdc-ext-pagination/mdc-ext-pagination.scss')
   },
   output: {
     path: OUT_PATH,

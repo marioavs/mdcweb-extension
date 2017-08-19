@@ -26,60 +26,6 @@ export class MDCExtMultiselect extends MDCComponent {
     return new MDCExtMultiselect(root);
   }
 
-  /** @return {?string} */
-  get value() {
-    return this.foundation_.getValue();
-  }
-
-  /** @param {?string} value */
-  set value(value) {
-    this.foundation_.setValue(value);
-  }
-
-  get settings() {
-    return this.settings_ ;
-  }
-
-  set settings(settings) {
-    Object.assign(this.settings_, settings);
-  }
-
-  get disabled() {
-    return this.foundation_.isDisabled();
-  }
-
-  set disabled(disabled) {
-    this.foundation_.setDisabled(disabled);
-  }
-
-  get items() {
-    return this.listUl_.querySelectorAll(strings.ITEM_SELECTOR);
-  }
-
-  get availableItems() {
-    return this.listUl_.querySelectorAll(`${strings.ITEM_SELECTOR}:not(.${cssClasses.ITEM_NOMATCH})`);
-  }
-
-  get activeItem() {
-    return this.listUl_.querySelector(`.${cssClasses.ITEM_ACTIVE}`);
-  }
-
-  get selectedOptions() {
-    return this.selectEl_.querySelectorAll(`.${cssClasses.SELECTED_OPTION}`);
-  }
-
-  get displayedOptions() {
-    return this.displayEl_.querySelectorAll(`.${cssClasses.SELECTED_OPTION}`);
-  }
-
-  addItems(itemArray) {
-    this.foundation_.addItems(itemArray);
-  }
-
-  removeItems() {
-    this.foundation_.removeItems();
-  }
-
   initialize(settings = {}) {
     this.settings_ = this.getDefaultSettings_();
     this.settings = settings;
@@ -94,10 +40,6 @@ export class MDCExtMultiselect extends MDCComponent {
     if (this.inputEl_.hasAttribute(strings.ARIA_CONTROLS)) {
       this.helptextEl_ = document.getElementById(this.input_.getAttribute(strings.ARIA_CONTROLS));
     }
-  }
-
-  destroy() {
-    super.destroy();
   }
 
   getDefaultFoundation() {
@@ -179,6 +121,60 @@ export class MDCExtMultiselect extends MDCComponent {
     if (this.root_.getAttribute(ARIA_DISABLED) === 'true') {
       this.disabled = true;
     }
+  }
+
+  /** @return {?string} */
+  get value() {
+    return this.foundation_.getValue();
+  }
+
+  /** @param {?string} value */
+  set value(value) {
+    this.foundation_.setValue(value);
+  }
+
+  get settings() {
+    return this.settings_ ;
+  }
+
+  set settings(settings) {
+    Object.assign(this.settings_, settings);
+  }
+
+  get disabled() {
+    return this.foundation_.isDisabled();
+  }
+
+  set disabled(disabled) {
+    this.foundation_.setDisabled(disabled);
+  }
+
+  get items() {
+    return this.listUl_.querySelectorAll(strings.ITEM_SELECTOR);
+  }
+
+  get availableItems() {
+    return this.listUl_.querySelectorAll(`${strings.ITEM_SELECTOR}:not(.${cssClasses.ITEM_NOMATCH})`);
+  }
+
+  get activeItem() {
+    return this.listUl_.querySelector(`.${cssClasses.ITEM_ACTIVE}`);
+  }
+
+  get selectedOptions() {
+    return this.selectEl_.querySelectorAll(`.${cssClasses.SELECTED_OPTION}`);
+  }
+
+  get displayedOptions() {
+    return this.displayEl_.querySelectorAll(`.${cssClasses.SELECTED_OPTION}`);
+  }
+
+  addItems(itemArray) {
+    this.foundation_.addItems(itemArray);
+  }
+
+  removeItems() {
+    this.foundation_.removeItems();
   }
 
   getDefaultSettings_() {

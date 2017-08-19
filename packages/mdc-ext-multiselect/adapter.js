@@ -65,8 +65,11 @@ export default class MDCExtMultiselectAdapter {
 
   removeInputAttr(attr) {}
 
-  /** @return {boolean} */
-  hasClass() {}
+  /**
+   * @param {string} className
+   * @return {boolean}
+   */
+  hasClass(className) {}
 
   /** @return {boolean} */
   hasNecessaryDom() {}

@@ -53,7 +53,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       removeAttr: (/* attr: string */) => {},
       setInputAttr: (/* attr: string, value: string */) => {},
       removeInputAttr: (/* attr: string */) => {},
-      hasClass: () => /* boolean */ false,
+      hasClass: (/* className: string */) => /* boolean */ false,
       hasNecessaryDom: () => /* boolean */ false,
       getComboboxElOffsetHeight: () => /* number */ 0,
       getComboboxElOffsetTop: () => /* number */ 0,
@@ -135,8 +135,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.addClass(UPGRADED);
     this.adapter_.setInputAttr(AUTOCOMPLETE, 'off');
     this.adapter_.registerInteractionHandler('click', this.clickHandler_);
-    this.adapter_.registerInputInteractionHandler('focus',this.focusHandler_);
-    this.adapter_.registerInputInteractionHandler('blur',this.blurHandler_);
+    this.adapter_.registerInputInteractionHandler('focus', this.focusHandler_);
+    this.adapter_.registerInputInteractionHandler('blur', this.blurHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.inputKeydownHandler_);
     this.adapter_.registerInputInteractionHandler('input', this.inputInputHandler_);
     this.adapter_.registerListInteractionHandler('mousedown', this.listMousedownHandler_);
@@ -152,8 +152,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     clearTimeout(this.changeValueTriggerTimerId_);
     this.adapter_.removeClass(UPGRADED);
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
-    this.adapter_.deregisterInputInteractionHandler('focus',this.focusHandler_);
-    this.adapter_.deregisterInputInteractionHandler('blur',this.blurHandler_);
+    this.adapter_.deregisterInputInteractionHandler('focus', this.focusHandler_);
+    this.adapter_.deregisterInputInteractionHandler('blur', this.blurHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.keydownHandler_);
     this.adapter_.deregisterInputInteractionHandler('input', this.inputInputHandler_);
     this.adapter_.deregisterListInteractionHandler('mousedown', this.listMousedownHandler_);
@@ -520,5 +520,4 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       value: null
     };
   }
-
 }

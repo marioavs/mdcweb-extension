@@ -16,6 +16,7 @@
 
 import * as dataTable from '@mdcext/data-table';
 import * as multiselect from '@mdcext/multiselect';
+import * as pagination from '@mdcext/pagination';
 import autoInit from '@material/auto-init';
 
 // let webpack to copy material-components-web js and css
@@ -25,10 +26,11 @@ import autoInit from '@material/auto-init';
 // Register all components
 autoInit.register('MDCExtDataTable', dataTable.MDCExtDataTable);
 autoInit.register('MDCExtMultiselect', multiselect.MDCExtMultiselect);
+autoInit.register('MDCExtPagination', pagination.MDCExtPagination);
 
 // Export all components.
 export {
   dataTable,
-  multiselect
+  multiselect,
+  pagination
 };
-

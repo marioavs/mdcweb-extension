@@ -230,7 +230,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     .mdc-ext-multiselect__combobox::after {
       @include mdc-ext-multiselect-after-styles;
 
-      @include mdc-theme-dark(".mdc-ext-multiselect", true) {
+      @include mdc-theme-dark(".mdc-ext-multiselect") {
         @include mdc-ext-multiselect-after-styles;
       }
     }
@@ -370,7 +370,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
   cursor: default;
   pointer-events: none;
 
-  @include mdc-theme-dark(".mdc-textfield", true) {
+  @include mdc-theme-dark(".mdc-multiselect", true) {
     border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-dark;
   }
 
@@ -389,14 +389,6 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     }
   }
   // stylelint-enable plugin/selector-bem-pattern
-}
-
-@each $sel in ("mdc-ext-multiselect--disabled", "mdc-ext-multiselect[disabled]") {
-  .#{$sel} {
-    @include mdc-theme-dark(".mdc-ext-multiselect", true) {
-      @include mdc-theme-prop(color, text-disabled-on-dark);
-    }
-  }
 }
 
 // postcss-bem-linter: end
