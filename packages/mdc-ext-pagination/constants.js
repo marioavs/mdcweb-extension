@@ -27,10 +27,14 @@ export const cssClasses = {
 
 /** @enum {string} */
 export const strings = {
-  PREV_SELECTOR: `.${ROOT}__prev`,
+  FIRST_SELECTOR: `.${ROOT}__txtfirst`,
+  LAST_SELECTOR: `.${ROOT}__txtlast`,
   NEXT_SELECTOR: `.${ROOT}__next`,
+  PREV_SELECTOR: `.${ROOT}__prev`,
+  TOTAL_SELECTOR: `.${ROOT}__txttotal`,
   ARIA_DISABLED: 'aria-disabled',
   CHANGE_EVENT: 'MDCExtPagination:change',
+  DATA_PAGE_SIZE: 'data-page-size',
   TYPE_NEXT: 'next',
   TYPE_PREV: 'previous'
 };

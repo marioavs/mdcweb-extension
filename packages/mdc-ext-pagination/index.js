@@ -30,6 +30,9 @@ export class MDCExtPagination extends MDCComponent {
   initialize(rippleFactory = this.initRipple_) {
     this.prevEl_ = this.root_.querySelector(strings.PREV_SELECTOR);
     this.nextEl_ = this.root_.querySelector(strings.NEXT_SELECTOR);
+    this.firstEl_ = this.root_.querySelector(strings.FIRST_SELECTOR);
+    this.lastEl_ = this.root_.querySelector(strings.LAST_SELECTOR);
+    this.totalEl_ = this.root_.querySelector(strings.TOTAL_SELECTOR);
 
     if (this.prevEl_) {
       this.prevRipple_ = rippleFactory(this.prevEl_);
@@ -78,7 +81,7 @@ export class MDCExtPagination extends MDCComponent {
       removeClass: (className) => this.root_.classList.remove(className),
       addPrevClass: (className) => this.prevEl_.classList.add(className),
       removePrevClass: (className) => this.prevEl_.classList.remove(className),
-      addNetClass: (className) => this.nextEl_.classList.add(className),
+      addNextClass: (className) => this.nextEl_.classList.add(className),
       removeNextClass: (className) => this.nextEl_.classList.remove(className),
       hasClass: (className) => this.root_.classList.contains(className),
       hasNecessaryDom: () => Boolean(this.prevEl_) && Boolean(this.nextEl_),
@@ -88,6 +91,7 @@ export class MDCExtPagination extends MDCComponent {
       deregisterNextInteractionHandler: (type, handler) => this.nextEl_.removeEventListener(type, handler),
       getTabIndex: () => this.root_.tabIndex,
       setTabIndex: (tabIndex) => this.root_.tabIndex = tabIndex,
+      getAttr: (name) => this.root_.getAttribute(name),
       setAttr: (name, value) => this.root_.setAttribute(name, value),
       rmAttr: (name) => this.root_.removeAttribute(name),
       getPrevNativeControl: () => this.prevEl_,
@@ -96,12 +100,33 @@ export class MDCExtPagination extends MDCComponent {
       rmPrevAttr: (name) => this.prevEl_.removeAttribute(name),
       setNextAttr: (name, value) => this.nextEl_.setAttribute(name, value),
       rmNextAttr: (name) => this.nextEl_.removeAttribute(name),
+      getFirstContent: () => (this.firstEl_) ? this.firstEl_.textContent : null,
+      setFirstContent: (value) => {
+        if (this.firstEl_)
+          this.firstEl_.textContent = value;
+      },
+      getLastContent: () => (this.lastEl_) ? this.lastEl_.textContent : null,
+      setLastContent: (value) => {
+        if (this.lastEl_)
+          this.lastEl_.textContent = value;
+      },
+      getTotalContent: () => (this.totalEl_) ? this.totalEl_.textContent : null,
+      setTotalContent: (value) => {
+        if (this.totalEl_)
+          this.totalEl_.textContent = value;
+      },
       notifyChange: (evtData) => this.emit(strings.CHANGE_EVENT, {type: evtData.type})
     });
   }
 
   initialSyncWithDOM() {
     this.disabled = this.root_.getAttribute(strings.ARIA_DISABLED) === 'true';
+    if (this.firstEl_)
+      this.first = +this.firstEl_.textContent;
+    if (this.lastEl_)
+      this.last = +this.lastEl_.textContent;
+    if (this.totalEl_)
+      this.total = +this.totalEl_.textContent;
   }
 
   /** @return {boolean} */
@@ -112,6 +137,46 @@ export class MDCExtPagination extends MDCComponent {
   /** @param {boolean} isDisabled */
   set disabled(isDisabled) {
     this.foundation_.setDisabled(isDisabled);
+  }
+
+  /** @return {boolean} */
+  get pageSize() {
+    return this.foundation_.getPageSize();
+  }
+
+  /** @param {number} value */
+  set pageSize(value) {
+    this.foundation_.setPageSize(value);
+  }
+
+  /** @return {boolean} */
+  get first() {
+    return this.foundation_.getFirst();
+  }
+
+  /** @param {number} value */
+  set first(value) {
+    this.foundation_.setFirst(value);
+  }
+
+  /** @return {boolean} */
+  get last() {
+    return this.foundation_.getLast();
+  }
+
+  /** @param {number} value */
+  set last(value) {
+    this.foundation_.setLast(value);
+  }
+
+  /** @return {boolean} */
+  get total() {
+    return this.foundation_.getTotal();
+  }
+
+  /** @param {number} value */
+  set total(value) {
+    this.foundation_.setTotal(value);
   }
 
   /** @param {boolean} isDisabled */

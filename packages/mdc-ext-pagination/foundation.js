@@ -45,12 +45,19 @@ export default class MDCExtPaginationFoundation extends MDCFoundation {
       deregisterNextInteractionHandler: (/* type: string, handler: EventListener */) => {},
       getTabIndex: () => /* number */ 0,
       setTabIndex: (/* tabIndex: number */) => {},
+      getAttr: (/* name: string */) => /* string */ '',
       setAttr: (/* name: string, value: string */) => {},
       rmAttr: (/* name: string */) => {},
       setPrevAttr: (/* name: string, value: string */) => {},
       rmPrevAttr: (/* name: string */) => {},
       setNextAttr: (/* name: string, value: string */) => {},
       rmNextAttr: (/* name: string */) => {},
+      getFirstContent: () => {},
+      setFirstContent: (/* value: string */) => {},
+      getLastContent: () => {},
+      setLastContent: (/* value: string */) => {},
+      getTotalContent: () => {},
+      setTotalContent: (/* value: string */) => {},
       notifyChange: (/* evtData: {type: string} */) => {}
     };
   }
@@ -63,6 +70,18 @@ export default class MDCExtPaginationFoundation extends MDCFoundation {
 
     /** @private {number} */
     this.savedTabIndex_ = -1;
+
+    /** @private {number} */
+    this.pageSize_ = 0;
+
+    /** @private {number} */
+    this.first_ = 0;
+
+    /** @private {number} */
+    this.last_ = 0;
+
+    /** @private {number} */
+    this.total_ = 0;
 
     this.prevClickHandler_ = /** @private {!EventListener} */ (() => {
       if (!this.disabled_)
@@ -77,6 +96,7 @@ export default class MDCExtPaginationFoundation extends MDCFoundation {
 
   init() {
     const {ROOT, UPGRADED} = cssClasses;
+    const {DATA_PAGE_SIZE} = strings;
 
     if (!this.adapter_.hasClass(ROOT)) {
       throw new Error(`${ROOT} class required in root element.`);
@@ -84,6 +104,11 @@ export default class MDCExtPaginationFoundation extends MDCFoundation {
 
     if (!this.adapter_.hasNecessaryDom()) {
       throw new Error(`Required DOM nodes missing in ${ROOT} component.`);
+    }
+
+    let pageSizeAttr = this.adapter_.getAttr(DATA_PAGE_SIZE);
+    if (pageSizeAttr) {
+      this.pageSize_ = +pageSizeAttr;
     }
 
     this.adapter_.addClass(UPGRADED);
@@ -154,5 +179,65 @@ export default class MDCExtPaginationFoundation extends MDCFoundation {
         this.adapter_.removeNextClass(BUTTON_DISABLED);
       }
     }
+  }
+
+  /** @return {boolean} */
+  getPageSize() {
+    return this.pageSize_;
+  }
+
+  /** @param {number} value */
+  setPageSize(value) {
+    const {TYPE_NEXT, TYPE_PREV} = strings;
+    this.pageSize_ = value;
+    if (value > 0) {
+      this.last_ = Math.min(this.first_ + value - 1, this.total_);
+      this.adapter_.setLastContent(this.last_.toString());
+      this.setButtonDisabled(TYPE_NEXT, (this.last_ >= this.total_));
+    }
+  }
+
+  /** @return {boolean} */
+  getFirst() {
+    return this.first_;
+  }
+
+  /** @param {number} value */
+  setFirst(value) {
+    const {TYPE_NEXT, TYPE_PREV} = strings;
+    this.first_ = value;
+    this.adapter_.setFirstContent(value.toString());
+    this.setButtonDisabled(TYPE_PREV, (value <= 1));
+    if (this.pageSize_ > 0) {
+      this.last_ = Math.min(value + this.pageSize_ - 1, this.total_);
+      this.adapter_.setLastContent(this.last_.toString());
+      this.setButtonDisabled(TYPE_NEXT, (this.last_ >= this.total_));
+    }
+  }
+
+  /** @return {boolean} */
+  getLast() {
+    return this.last_;
+  }
+
+  /** @param {number} value */
+  setLast(value) {
+    const {TYPE_NEXT} = strings;
+    this.last_ = value;
+    this.adapter_.setLastContent(value.toString());
+    this.setButtonDisabled(TYPE_NEXT, (value >= this.total_));
+  }
+
+  /** @return {boolean} */
+  getTotal() {
+    return this.total_;
+  }
+
+  /** @param {number} value */
+  setTotal(value) {
+    const {TYPE_NEXT} = strings;
+    this.total_ = value;
+    this.adapter_.setTotalContent(value.toString());
+    this.setButtonDisabled(TYPE_NEXT, (this.last_ >= value));
   }
 }

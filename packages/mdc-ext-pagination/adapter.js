@@ -83,6 +83,12 @@ export default class MDCExtMultiselectAdapter {
 
   /**
    * @param {string} name
+   * @return {string}
+   */
+  getAttr(name) {}
+
+  /**
+   * @param {string} name
    * @param {string} value
    */
   setAttr(name, value) {}
@@ -107,6 +113,24 @@ export default class MDCExtMultiselectAdapter {
 
   /** @param {string} name */
   rmNextAttr(name) {}
+
+  /** @return {string} */
+  getFirstContent() {}
+
+  /** @param {string} value */
+  setFirstContent(value) {}
+
+  /** @return {string} */
+  getLastContent() {}
+
+  /** @param {string} value */
+  setLastContent(value) {}
+
+  /** @return {string} */
+  getTotalContent() {}
+
+  /** @param {string} value */
+  setTotalContent(value) {}
 
   /** @param {{type: string}} evtData */
   notifyChange(evtData) {}
