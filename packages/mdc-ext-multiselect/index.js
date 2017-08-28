@@ -30,6 +30,7 @@ export class MDCExtMultiselect extends MDCComponent {
     this.settings_ = this.getDefaultSettings_();
     this.settings = settings;
     this.comboboxEl_ = this.root_.querySelector(strings.COMBOBOX_SELECTOR);
+    this.comboboxBackgroundEl_ = this.root_.querySelector(strings.COMBOBOX_BACKGROUND_SELECTOR);
     this.displayEl_ = this.root_.querySelector(strings.DISPLAY_SELECTOR);
     this.inputEl_ = this.root_.querySelector(strings.INPUT_SELECTOR);
     this.labelEl_ = this.root_.querySelector(strings.LABEL_SELECTOR);
@@ -60,10 +61,11 @@ export class MDCExtMultiselect extends MDCComponent {
       setInputAttr: (attr, value) => this.inputEl_.setAttribute(attr, value),
       removeInputAttr: (attr) => this.inputEl_.removeAttribute(attr),
       hasClass: (className) => this.root_.classList.contains(className),
-      hasNecessaryDom: () => Boolean(this.comboboxEl_) && Boolean(this.displayEl_) && Boolean(this.inputEl_) &&
-        Boolean(this.listEl_) && Boolean(this.listUl_) && Boolean(this.selectEl_),
+      hasNecessaryDom: () => Boolean(this.comboboxEl_) && Boolean(this.comboboxBackgroundEl_) && Boolean(this.displayEl_) &&
+        Boolean(this.inputEl_) && Boolean(this.listEl_) && Boolean(this.listUl_) && Boolean(this.selectEl_),
       getComboboxElOffsetHeight: () => this.comboboxEl_.offsetHeight,
       getComboboxElOffsetTop: () => this.comboboxEl_.offsetTop,
+      getComboboxElOffsetWidth: () => this.comboboxEl_.offsetWidth,
       registerInteractionHandler: (type, handler) => this.root_.addEventListener(type, handler),
       deregisterInteractionHandler: (type, handler) => this.root_.removeEventListener(type, handler),
       registerInputInteractionHandler: (type, handler) => this.inputEl_.addEventListener(type, handler),

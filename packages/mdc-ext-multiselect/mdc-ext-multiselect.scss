@@ -44,71 +44,102 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
   display: inline-block;
   height: auto;
   margin-bottom: 8px;
-  position: relative;
   will-change: color;
 
   &__combobox {
-    $dd-arrow-padding: 18px;
-
-    padding: 0 #{$dd-arrow-padding} 8px;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    font-size: inherit;
-    height: auto;
     position: relative;
-    width: calc(100% - #{$dd-arrow-padding});
-    will-change: transform;
 
-    background: none;
-    background-repeat: no-repeat;
-    background-position: right center;
+    &-background {
+      $dd-arrow-padding: 18px;
 
-    @include mdc-ext-multiselect-dd-arrow-svg-bg_;
+      padding: 0 #{$dd-arrow-padding} 8px;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      font-size: inherit;
+      height: auto;
+      position: relative;
+      width: calc(100% - #{$dd-arrow-padding});
+      will-change: transform;
 
-    @include mdc-theme-prop(color, text-primary-on-light);
-    @include mdc-typography-base;
-    @include mdc-rtl-reflexive-box(padding, right, $dd-arrow-padding);
-    // We use only a subset of the MDC typography values here as changing things such as line-height
-    // affects how the labels are transformed.
-    @each $prop in (font-size, letter-spacing) {
-      #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
-    }
+      background: none;
+      background-repeat: no-repeat;
+      background-position: right center;
 
-    &::placeholder {
-      @include mdc-theme-prop(color, text-hint-on-light);
+      @include mdc-ext-multiselect-dd-arrow-svg-bg_;
 
-      transition: mdc-ext-multiselect-transition(color);
-      opacity: 1;
-    }
-
-    &:focus {
-      outline: none;
+      @include mdc-theme-prop(color, text-primary-on-light);
+      @include mdc-typography-base;
+      @include mdc-rtl-reflexive-box(padding, right, $dd-arrow-padding);
+      // We use only a subset of the MDC typography values here as changing things such as line-height
+      // affects how the labels are transformed.
+      @each $prop in (font-size, letter-spacing) {
+        #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
+      }
 
       &::placeholder {
-        @include mdc-theme-prop(color, text-secondary-on-light);
+        @include mdc-theme-prop(color, text-hint-on-light);
+
+        transition: mdc-ext-multiselect-transition(color);
+        opacity: 1;
+      }
+
+      &:focus {
+        outline: none;
+
+        &::placeholder {
+          @include mdc-theme-prop(color, text-secondary-on-light);
+        }
+      }
+
+      // Remove red outline on firefox
+      &:invalid {
+        box-shadow: none;
+      }
+
+      @include mdc-rtl {
+        background-position: left center;
+      }
+
+      @include mdc-theme-dark {
+        @include mdc-theme-prop(color, text-primary-on-dark);
+        @include mdc-ext-multiselect-dd-arrow-svg-bg_(ffffff);
+
+        &::placeholder {
+          @include mdc-theme-prop(color, text-hint-on-dark);
+        }
+
+        &:focus::placeholder {
+          @include mdc-theme-prop(color, text-secondary-on-dark);
+        }
       }
     }
 
-    // Remove red outline on firefox
-    &:invalid {
-      box-shadow: none;
-    }
+    .mdc-ext-multiselect__label {
+      @include mdc-theme-prop(color, text-hint-on-light);
 
-    @include mdc-rtl {
-      background-position: left center;
-    }
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      transform-origin: left top;
+      transition: mdc-ext-multiselect-transition(transform), mdc-ext-multiselect-transition(color);
+      cursor: text;
 
-    @include mdc-theme-dark {
-      @include mdc-theme-prop(color, text-primary-on-dark);
-      @include mdc-ext-multiselect-dd-arrow-svg-bg_(ffffff);
+      // stylelint-disable plugin/selector-bem-pattern
+      @include mdc-rtl(".mdc-ext-multiselect") {
+        right: 0;
+        left: auto;
+        transform-origin: right top;
+      }
+      // stylelint-enable plugin/selector-bem-pattern
 
-      &::placeholder {
+      @include mdc-theme-dark(".mdc-ext-multiselect") {
         @include mdc-theme-prop(color, text-hint-on-dark);
       }
 
-      &:focus::placeholder {
-        @include mdc-theme-prop(color, text-secondary-on-dark);
+      &--float-above {
+        transform: translateY(-100%) scale(.75, .75);
+        cursor: auto;
       }
     }
   }
@@ -156,35 +187,6 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     }
   }
 
-  &__label {
-    @include mdc-theme-prop(color, text-hint-on-light);
-
-    position: absolute;
-    bottom: initial;
-    left: 0;
-    top: 6px;
-    transform-origin: left top;
-    transition: mdc-ext-multiselect-transition(transform), mdc-ext-multiselect-transition(color);
-    cursor: text;
-
-    // stylelint-disable plugin/selector-bem-pattern
-    @include mdc-rtl(".mdc-ext-multiselect") {
-      right: 0;
-      left: auto;
-      transform-origin: right top;
-    }
-    // stylelint-enable plugin/selector-bem-pattern
-
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
-      @include mdc-theme-prop(color, text-hint-on-dark);
-    }
-
-    &--float-above {
-      transform: translateY(-100%) scale(.75, .75);
-      cursor: auto;
-    }
-  }
-
   &--upgraded {
     display: inline-flex;
     box-sizing: border-box;
@@ -193,7 +195,6 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     margin-top: 16px;
 
     .mdc-ext-multiselect__label {
-      top: 22px;
       pointer-events: none;
     }
 
@@ -251,7 +252,6 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     background-color: white;
     border: 1px solid black;
     box-sizing: border-box;
-    min-width: 100%;
     max-width: calc(100vw - 32px);
     max-height: calc(100vh - 32px);
     overflow-x: hidden;
@@ -259,7 +259,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     padding: 0;
     transform-origin: left top;
     white-space: nowrap;
-    z-index: 4;
+    z-index: 3;
     will-change: transform, opacity;
 
     // stylelint-disable plugin/selector-bem-pattern

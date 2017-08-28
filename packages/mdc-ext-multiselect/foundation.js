@@ -57,6 +57,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       hasNecessaryDom: () => /* boolean */ false,
       getComboboxElOffsetHeight: () => /* number */ 0,
       getComboboxElOffsetTop: () => /* number */ 0,
+      getComboboxElOffsetWidth: () => /* number */ 0,
       registerInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterInteractionHandler: (/* type: string, handler: EventListener */) => {},
       registerInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
@@ -249,6 +250,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   resize() {
+    const comboboxWidth = this.adapter_.getComboboxElOffsetWidth();
+
+    this.adapter_.setListElStyle('min-width', `${comboboxWidth}px`);
   }
 
   activateFocus_() {

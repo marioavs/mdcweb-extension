@@ -80,6 +80,9 @@ export default class MDCExtMultiselectAdapter {
   /** @return {number} */
   getComboboxElOffsetTop() {}
 
+  /** @return {number} */
+  getComboboxElOffsetWidth() {}
+
   /**
    * Registers an event listener `handler` for event type `type` on the root element.
    * @param {string} type

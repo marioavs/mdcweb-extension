@@ -38,6 +38,7 @@ export const cssClasses = {
 /** @enum {string} */
 export const strings = {
   COMBOBOX_SELECTOR: `.${ROOT}__combobox`,
+  COMBOBOX_BACKGROUND_SELECTOR: `.${ROOT}__combobox-background`,
   DISPLAY_SELECTOR: `.${ROOT}__display`,
   INPUT_SELECTOR: `.${ROOT}__input`,
   ITEM_SELECTOR: '.mdc-list-item',
