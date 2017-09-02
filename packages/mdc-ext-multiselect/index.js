@@ -112,9 +112,10 @@ export class MDCExtMultiselect extends MDCComponent {
     let l = this.selectedOptions.length;
     if (l > 0) {
       for (let i = 0; i < l; i++) {
-        if (this.selectedOptions[i].value)
+        if (this.selectedOptions[i].value) {
           hasValue = true;
-        this.addDisplayOption_(this.selectedOptions[i].value, this.selectedOptions[i].textContent);
+          this.addDisplayOption_(this.selectedOptions[i].value, this.selectedOptions[i].textContent);
+        }
       }
     }
     if (hasValue)

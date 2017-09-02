@@ -109,7 +109,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.isFull_ = false;
     this.focusHandler_ = () => this.activateFocus_();
     this.blurHandler_ = () => this.deactivateFocus_();
-    this.clickHandler_ = (evt) => this.adapter_.focus();
+    this.clickHandler_ = (evt) => this.handleClick_(evt);
     this.listClickHandler_ = (evt) => this.handleListClick_(evt);
     this.listMousedownHandler_ = (evt) => /* avoid component blur event */ evt.preventDefault();
     this.inputKeydownHandler_ = (evt) => this.handleKeydown_(evt);
@@ -293,6 +293,16 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.updateHelptextOnDeactivation_(isValid);
     this.clearInput_();
     this.close_();
+  }
+
+  handleClick_(evt) {
+    if (!this.adapter_.isFocused()) {
+      this.adapter_.focus()
+    } else {
+      if (!this.isOpen()) {
+        this.open_();
+      }
+    }
   }
 
   handleKeydown_(evt) {
