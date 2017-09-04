@@ -347,7 +347,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       if (this.adapter_.getNumberOfSelectedOptions() > 0) {
         this.removeLastSelection_();
       }
-    } else if (this.isOpen() && (isTab) || (isEnter)) {
+    } else if (this.isOpen() && ((isTab) || (isEnter))) {
       let currentItem = this.adapter_.getActiveItem();
       if (currentItem != null) {
         evt.preventDefault();
@@ -388,6 +388,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
    */
   open_() {
     const {LIST_OPEN,OPEN} = cssClasses;
+    this.resize();
     this.setListStyles_();
     this.adapter_.addClass(OPEN);
     this.adapter_.addClassToList(LIST_OPEN);
