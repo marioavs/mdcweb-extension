@@ -52,8 +52,9 @@ export const strings = {
   ARIA_SELECTED_ATTR: 'aria-selected',
   AUTOCOMPLETE: 'autocomplete',
   CHANGE_EVENT: 'MDCExtMultiselect:change',
-  ITEM_DATA_VALUE_ATTR: 'data-value',
   ITEM_DATA_DESC_ATTR: 'data-description',
+  ITEM_DATA_RAWDATA_ATTR: 'data-rawdata',
+  ITEM_DATA_VALUE_ATTR: 'data-value',
   MAXLENGTH: 'maxlength',
   ROLE: 'role',
   SELECTED_ATTR: 'selected'

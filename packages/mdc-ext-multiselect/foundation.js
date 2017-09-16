@@ -70,23 +70,27 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       applyItemsLoader: (/* query: string */) => {},
       addItem: (/* data: Object */) => {},
       removeItems: () => {},
-      addSelectedOption: (/* value: string, description: string */) => {},
+      addSelectedOption: (/* value: string, description: string, rawdata: string */) => {},
       removeSelectedOption: (/* index: number */) => {},
-      updateSelectedOption: (/* index: number, value: string, description: string */) => {},
+      updateSelectedOption: (/* index: number, value: string, description: string, rawdata: string */) => {},
       setListElStyle: (/* propertyName: string, value: string */) => {},
       getNumberOfSelectedOptions: () => /* number */ 0,
       getNumberOfItems: () => /* number */ 0,
       getNumberOfAvailableItems: () => /* number */ 0,
       getSelectedOptions: () => /* HTMLElement */ {},
+      getSelectedOptionValue: (/* index: number */) => /* string */ '',
+      getSelectedOptionRawdata: (/* index: number */) => /* string */ null,
       getActiveItem: () => /* HTMLElement */ {},
       getActiveItemDescription: () => /* string */ '',
       getActiveItemIndex: () => /* number */ 0,
+      getActiveItemRawdata: () => /* string */ null,
       getActiveItemValue: () => /* string */ '',
       setActiveItem: (/* item: HTMLElement */) => {},
       setActiveForItemAtIndex: (/* index: number */) => {},
       removeActiveItem: () => {},
       isActiveItemAvailable: () => /* boolean */ false,
       getTextForItemAtIndex: (/* index: number */) => /* string */ '',
+      getRawdataForItemAtIndex: (/* index: number */) => /* string */ null,
       getValueForItemAtIndex: (/* index: number */) => /* string */ '',
       addClassForItemAtIndex: (/* index: number, className: string */) => {},
       rmClassForItemAtIndex: (/* index: number, className: string */) => {},
@@ -164,12 +168,13 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   /** @return {?string} */
   getValue() {
     if (this.adapter_.getNumberOfSelectedOptions() > 0)
-      return this.adapter_.getSelectedOptions()[0].value;
+      return this.adapter_.getSelectedOptionValue(0);
     return '';
   }
 
   /** @param {?string} value */
   setValue(value) {
+    const {INVALID, LABEL_FLOAT_ABOVE} = cssClasses;
     if (this.isFull_)
       this.removeLastSelection_();
     if (value) {
@@ -177,22 +182,47 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
          itemValue = this.adapter_.getValueForItemAtIndex(i);
          if (itemValue === value) {
-           let itemDescription = this.adapter_.getTextForItemAtIndex(i)
+           let itemDescription = this.adapter_.getTextForItemAtIndex(i);
+           let itemRawdata = this.adapter_.getRawdataForItemAtIndex(i);
            if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
-             this.adapter_.updateSelectedOption(0, itemValue, itemDescription);
+             this.adapter_.updateSelectedOption(0, itemValue, itemDescription, itemRawdata);
            else
-             this.adapter_.addSelectedOption(itemValue, itemDescription);
+             this.adapter_.addSelectedOption(itemValue, itemDescription, itemRawdata);
            this.clearInput_();
            this.updateStatus_();
            break;
          }
       }
     }
+    const input = this.getNativeInput_();
+    const isValid = input.checkValidity();
+
+    if ((this.isEmpty_) && (!this.adapter_.isFocused())) {
+      this.adapter_.removeClassFromLabel(LABEL_FLOAT_ABOVE);
+    }
+    else
+      this.adapter_.addClassToLabel(LABEL_FLOAT_ABOVE);
+
+    if (isValid) {
+      this.adapter_.removeClass(INVALID);
+    } else {
+      this.adapter_.addClass(INVALID);
+    }
+    this.updateHelptextOnDeactivation_(isValid);
+    this.clearInput_();
+    this.adapter_.notifyChange();
   }
 
   /** @param {?string} value */
   setInputValue(value) {
     this.getNativeInput_().value = value;
+  }
+
+  /** @return {?string} */
+  getRawData() {
+    if (this.adapter_.getNumberOfSelectedOptions() > 0)
+      return this.adapter_.getSelectedOptionRawdata(0);
+    return null;
   }
 
   isDisabled() {
@@ -449,7 +479,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       else
         this.adapter_.removeSelectedOption(this.adapter_.getNumberOfSelectedOptions() - 1);
       this.updateStatus_();
-      this.adapter_.notifyChange();
     }
   }
 
@@ -484,10 +513,10 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
   updateStatus_() {
     this.isFull_ = ((this.maxSelectedItems_ !== null) &&
-      (((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() === 1) && (this.adapter_.getSelectedOptions()[0].value)) ||
+      (((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() === 1) && (this.adapter_.getSelectedOptionValue(0))) ||
       ((this.maxSelectedItems_ > 1) && (this.adapter_.getNumberOfSelectedOptions() >= this.maxSelectedItems_))));
     this.isEmpty_ = ((this.adapter_.getNumberOfSelectedOptions() === 0) ||
-      ((this.maxSelectedItems_ === 1) && (!this.adapter_.getSelectedOptions()[0].value)));
+      ((this.maxSelectedItems_ === 1) && (!this.adapter_.getSelectedOptionValue(0))));
     this.updateInputStatus_();
   }
 
@@ -502,10 +531,11 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   applyValueFromActiveItem_() {
     let currentDescription = this.adapter_.getActiveItemDescription();
     let currentValue = this.adapter_.getActiveItemValue();
+    let currentRawdata = this.adapter_.getActiveItemRawdata();
     if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
-      this.adapter_.updateSelectedOption(0, currentValue, currentDescription);
+      this.adapter_.updateSelectedOption(0, currentValue, currentDescription, currentRawdata);
     else
-      this.adapter_.addSelectedOption(currentValue, currentDescription);
+      this.adapter_.addSelectedOption(currentValue, currentDescription, currentRawdata);
     this.clearInput_();
     this.updateStatus_();
     this.adapter_.notifyChange();

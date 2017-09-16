@@ -139,11 +139,11 @@ export default class MDCExtMultiselectAdapter {
 
   removeItems() {}
 
-  addSelectedOption(value, description) {}
+  addSelectedOption(value, description, rawdata) {}
 
   removeSelectedOption(index) {}
 
-  updateSelectedOption(index, value, description) {}
+  updateSelectedOption(index, value, description, rawdata) {}
 
   setListElStyle(propertyName, value) {}
 
@@ -159,6 +159,12 @@ export default class MDCExtMultiselectAdapter {
   /** @return {!Array<!Element>} */
   getSelectedOptions() {}
 
+  /** @return {string} */
+  getSelectedOptionValue(index) {}
+
+  /** @return {string} */
+  getSelectedOptionRawdata(index) {}
+
   getActiveItem() {}
 
   /** @return {string} */
@@ -166,6 +172,9 @@ export default class MDCExtMultiselectAdapter {
 
   /** @return {number} */
   getActiveItemIndex() {}
+
+  /** @return {string} */
+  getActiveItemRawdata() {}
 
   /** @return {string} */
   getActiveItemValue() {}
@@ -181,6 +190,9 @@ export default class MDCExtMultiselectAdapter {
 
   /** @return {string} */
   getTextForItemAtIndex(index) {}
+
+  /** @return {string} */
+  getRawdataForItemAtIndex(index) {}
 
   /** @return {string} */
   getValueForItemAtIndex(index) {}

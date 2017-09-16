@@ -78,22 +78,26 @@ export class MDCExtMultiselect extends MDCComponent {
       applyItemsLoader: (query) => this.applyItemsLoader_(query),
       addItem: (data) => this.addItem_(data),
       removeItems: () => this.removeItems_(),
-      addSelectedOption: (value, description) => this.addSelectedOption_(value, description),
+      addSelectedOption: (value, description, rawdata = null) => this.addSelectedOption_(value, description, rawdata),
       removeSelectedOption: (index) => this.removeSelectedOption_(index),
-      updateSelectedOption: (index, value, description) => this.updateSelectedOption_(index, value, description),
+      updateSelectedOption: (index, value, description, rawdata = null) => this.updateSelectedOption_(index, value, description, rawdata),
       setListElStyle: (propertyName, value) => this.listEl_.style.setProperty(propertyName, value),
       getNumberOfSelectedOptions: () => this.selectedOptions.length,
       getNumberOfItems: () => this.items.length,
       getNumberOfAvailableItems: () => this.availableItems.length,
       getSelectedOptions: () => this.selectedOptions,
+      getSelectedOptionValue: (index) => this.selectedOptions[index].value,
+      getSelectedOptionRawdata: (index) => this.selectedOptions[index].getAttribute(strings.ITEM_DATA_RAWDATA_ATTR),
       getActiveItem: () => this.activeItem,
       getActiveItemDescription: () => this.activeItem.getAttribute(strings.ITEM_DATA_DESC_ATTR) || this.activeItem.textContent,
       getActiveItemIndex: () => this.getActiveItemIndex_(),
-      getActiveItemValue: () => this.activeItem.getAttribute(strings.ITEM_DATA_VALUE_ATTR),
+      getActiveItemRawdata: () => this.activeItem.getAttribute(strings.ITEM_DATA_RAWDATA_ATTR) || null,
+      getActiveItemValue: () => this.activeItem.getAttribute(strings.ITEM_DATA_VALUE_ATTR) || this.activeItem.id,
       setActiveItem: (item) => item.classList.add(cssClasses.ITEM_ACTIVE),
       setActiveForItemAtIndex: (index) => this.availableItems[index].classList.add(cssClasses.ITEM_ACTIVE),
       removeActiveItem: () => { if (this.activeItem) this.activeItem.classList.remove(cssClasses.ITEM_ACTIVE); },
       isActiveItemAvailable: () => (this.activeItem && (!this.activeItem.classList.contains(cssClasses.ITEM_NOMATCH))),
+      getRawdataForItemAtIndex: (index) => this.items[index].getAttribute(strings.ITEM_DATA_RAWDATA_ATTR) || null,
       getTextForItemAtIndex: (index) => this.items[index].getAttribute(strings.ITEM_DATA_DESC_ATTR) || this.items[index].textContent,
       getValueForItemAtIndex: (index) => this.items[index].getAttribute(strings.ITEM_DATA_VALUE_ATTR) || this.items[index].id,
       addClassForItemAtIndex: (index, className) => this.items[index].classList.add(className),
@@ -134,6 +138,11 @@ export class MDCExtMultiselect extends MDCComponent {
   /** @param {?string} value */
   set value(value) {
     this.foundation_.setValue(value);
+  }
+
+  /** @return {?string} */
+  get rawData() {
+    return this.foundation_.getRawData();
   }
 
   get settings() {
@@ -207,7 +216,7 @@ export class MDCExtMultiselect extends MDCComponent {
   addItem_(data) {
     if (this.listUl_ !== undefined) {
       const {LIST_ITEM} = cssClasses;
-      const {ITEM_DATA_VALUE_ATTR, ITEM_DATA_DESC_ATTR} = strings;
+      const {ITEM_DATA_VALUE_ATTR, ITEM_DATA_DESC_ATTR, ITEM_DATA_RAWDATA_ATTR} = strings;
       let value = data[this.settings_.itemValueProperty];
       let description = data[this.settings_.itemDescriptionProperty];
       var node = document.createElement('li');
@@ -215,8 +224,8 @@ export class MDCExtMultiselect extends MDCComponent {
       node.setAttribute('role', 'option');
       node.setAttribute(ITEM_DATA_VALUE_ATTR, value);
       node.setAttribute(ITEM_DATA_DESC_ATTR, description);
-      var textnode = document.createTextNode(description);
-      node.appendChild(textnode);
+      node.setAttribute(ITEM_DATA_RAWDATA_ATTR, JSON.stringify(data));
+      node.textContent = description;
       this.listUl_.appendChild(node);
     }
   }
@@ -227,16 +236,17 @@ export class MDCExtMultiselect extends MDCComponent {
     }
   }
 
-  addSelectedOption_(value, description) {
+  addSelectedOption_(value, description, rawdata) {
     const {SELECTED_OPTION} = cssClasses;
-    const {SELECTED_ATTR} = strings;
+    const {SELECTED_ATTR, ITEM_DATA_RAWDATA_ATTR} = strings;
     if (this.selectEl_ !== undefined) {
       var node = document.createElement('option');
       node.classList.add(SELECTED_OPTION);
       node.setAttribute(SELECTED_ATTR, 'selected');
+      if (rawdata)
+        node.setAttribute(ITEM_DATA_RAWDATA_ATTR, rawdata);
       node.value = value;
-      var textnode = document.createTextNode(description);
-      node.appendChild(textnode);
+      node.textContent = description;
       this.selectEl_.appendChild(node);
     }
     this.addDisplayOption_(value, description);
@@ -249,8 +259,7 @@ export class MDCExtMultiselect extends MDCComponent {
       var node = document.createElement('span');
       node.classList.add(SELECTED_OPTION);
       node.setAttribute(ITEM_DATA_VALUE_ATTR, value);
-      var textnode = document.createTextNode(description);
-      node.appendChild(textnode);
+      node.textContent = description;
       this.displayEl_.insertBefore(node, this.inputEl_);
     }
   }
@@ -264,21 +273,19 @@ export class MDCExtMultiselect extends MDCComponent {
     }
   }
 
-  updateSelectedOption_(index, value, description) {
+  updateSelectedOption_(index, value, description, rawdata) {
     const {SELECTED_OPTION} = cssClasses;
-    const {SELECTED_ATTR} = strings;
+    const {SELECTED_ATTR, ITEM_DATA_RAWDATA_ATTR} = strings;
     if ((this.selectEl_ === undefined) || (this.displayEl_ === undefined) ||
       (index >= this.selectedOptions.length))
       return;
     let element = this.selectedOptions[index];
+    if (rawdata)
+      element.setAttribute(ITEM_DATA_RAWDATA_ATTR, rawdata);
+    else
+      element.removeAttribute(ITEM_DATA_RAWDATA_ATTR);
     element.value = value;
-    let textnode = element.childNodes[0];
-    if (textnode) {
-      textnode.nodeValue = description;
-    } else {
-      textnode = document.createTextNode(description);
-      element.appendChild(textnode);
-    }
+    element.textContent = description;
     this.updateDisplayOption_(index, value, description);
   }
 
@@ -289,13 +296,7 @@ export class MDCExtMultiselect extends MDCComponent {
       return;
     let element = this.displayedOptions[index];
     element.setAttribute(ITEM_DATA_VALUE_ATTR, value);
-    let textnode = element.childNodes[0];
-    if (textnode) {
-      textnode.nodeValue = description;
-    } else {
-      textnode = document.createTextNode(description);
-      element.appendChild(textnode);
-    }
+    element.textContent = description;
   }
 
   getActiveItemIndex_() {
