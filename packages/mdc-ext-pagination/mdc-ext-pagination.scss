@@ -33,7 +33,7 @@
   @include mdc-theme-prop(color, text-secondary-on-background);
 
   // Adjust text color for dark theme.
-  @include mdc-theme-dark(".mdc-card") {
+  @include mdc-theme-dark {
     @include mdc-theme-prop(color, text-secondary-on-dark);
   }
 
