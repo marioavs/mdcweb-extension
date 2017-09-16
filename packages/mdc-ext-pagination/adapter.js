@@ -1,7 +1,5 @@
-import MDCSimpleMenuAdapter from './adapter';
-
 /** @record */
-export default class MDCExtMultiselectAdapter {
+export default class MDCExtPaginationAdapter {
   /**
    * Adds a class to the root element.
    * @param {string} className

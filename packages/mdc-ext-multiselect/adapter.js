@@ -1,5 +1,3 @@
-import MDCSimpleMenuAdapter from './adapter';
-
 /** @record */
 export default class MDCExtMultiselectAdapter {
   /**
