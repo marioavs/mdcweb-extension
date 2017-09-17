@@ -148,7 +148,10 @@ export default class MDCExtPaginationFoundation extends MDCFoundation {
     }
   }
 
-  /** @param {boolean} isDisabled */
+  /**
+   * @param {string} buttonType
+   * @param {boolean} isDisabled
+   */
   setButtonDisabled(buttonType, isDisabled) {
     const {BUTTON_DISABLED} = cssClasses;
     const {ARIA_DISABLED, TYPE_NEXT, TYPE_PREV} = strings;
