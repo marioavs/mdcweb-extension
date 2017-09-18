@@ -1,0 +1,14 @@
+$mdc-ext-treeview-checkbox-mark-color: white !default;
+$mdc-ext-treeview-checkbox-border-color: rgba(black, .54) !default;
+$mdc-ext-treeview-checkbox-border-color-dark: white !default;
+$mdc-ext-treeview-checkbox-disabled-color: rgba(black, .26) !default;
+$mdc-ext-treeview-checkbox-disabled-color-dark: rgba(white, .3) !default;
+
+$mdc-ext-treeview-node-padding: 24px;
+$mdc-ext-treeview-checkbox-border-width: 2px;
+$mdc-ext-treeview-checkbox-size: 18px;
+$mdc-ext-treeview-checkbox-touch-area: 32px;
+$mdc-ext-treeview-checkbox-mark-stroke-size: 2/15 * $mdc-ext-treeview-checkbox-size;
+$mdc-ext-treeview-checkbox-ui-pct: percentage($mdc-ext-treeview-checkbox-size / $mdc-ext-treeview-checkbox-touch-area);
+$mdc-ext-treeview-icon-toggle-size: 24px;
+$mdc-ext-treeview-item-text-margin: 2px;

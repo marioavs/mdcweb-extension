@@ -15,6 +15,7 @@
   "dependencies": {
     "@mdcext/data-table": "^0.0.1",
     "@mdcext/multiselect": "^0.0.1",
-    "@mdcext/pagination": "^0.0.1"
+    "@mdcext/pagination": "^0.0.1",
+    "@mdcext/treeview": "^0.0.1"
   }
 }

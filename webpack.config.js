@@ -74,7 +74,8 @@ module.exports = [{
   entry: {
     'data-table': [path.resolve('./packages/mdc-ext-data-table/index.js')],
     'multiselect': [path.resolve('./packages/mdc-ext-multiselect/index.js')],
-    'pagination': [path.resolve('./packages/mdc-ext-pagination/index.js')]
+    'pagination': [path.resolve('./packages/mdc-ext-pagination/index.js')],
+    'treeview': [path.resolve('./packages/mdc-ext-treeview/index.js')]
   },
   output: {
     path: OUT_PATH,
@@ -141,7 +142,8 @@ module.exports = [{
     'mdcweb-extension': path.resolve('./packages/mdcweb-extension/mdcweb-extension.scss'),
     'mdc-ext.data-table': path.resolve('./packages/mdc-ext-data-table/mdc-ext-data-table.scss'),
     'mdc-ext.multiselect': path.resolve('./packages/mdc-ext-multiselect/mdc-ext-multiselect.scss'),
-    'mdc-ext.pagination': path.resolve('./packages/mdc-ext-pagination/mdc-ext-pagination.scss')
+    'mdc-ext.pagination': path.resolve('./packages/mdc-ext-pagination/mdc-ext-pagination.scss'),
+    'mdc-ext.treeview': path.resolve('./packages/mdc-ext-treeview/mdc-ext-treeview.scss')
   },
   output: {
     path: OUT_PATH,

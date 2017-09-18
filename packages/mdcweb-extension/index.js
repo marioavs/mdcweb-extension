@@ -17,20 +17,19 @@
 import * as dataTable from '@mdcext/data-table';
 import * as multiselect from '@mdcext/multiselect';
 import * as pagination from '@mdcext/pagination';
+import * as treeview from '@mdcext/treeview';
 import autoInit from '@material/auto-init';
-
-// let webpack to copy material-components-web js and css
-//require('material-components-web/dist/material-components-web')
-//require('material-components-web/dist/material-components-web.css')
 
 // Register all components
 autoInit.register('MDCExtDataTable', dataTable.MDCExtDataTable);
 autoInit.register('MDCExtMultiselect', multiselect.MDCExtMultiselect);
 autoInit.register('MDCExtPagination', pagination.MDCExtPagination);
+autoInit.register('MDCExtTreeview', treeview.MDCExtTreeview);
 
 // Export all components.
 export {
   dataTable,
   multiselect,
-  pagination
+  pagination,
+  treeview
 };
