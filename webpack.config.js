@@ -72,7 +72,6 @@ const CSS_LOADER_CONFIG = [
 module.exports = [{
   name: 'js-components',
   entry: {
-    'data-table': [path.resolve('./packages/mdc-ext-data-table/index.js')],
     'multiselect': [path.resolve('./packages/mdc-ext-multiselect/index.js')],
     'pagination': [path.resolve('./packages/mdc-ext-pagination/index.js')],
     'treeview': [path.resolve('./packages/mdc-ext-treeview/index.js')]

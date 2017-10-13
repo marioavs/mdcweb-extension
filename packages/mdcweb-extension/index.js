@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-import * as dataTable from '@mdcext/data-table';
 import * as multiselect from '@mdcext/multiselect';
 import * as pagination from '@mdcext/pagination';
 import * as treeview from '@mdcext/treeview';
 import autoInit from '@material/auto-init';
 
 // Register all components
-autoInit.register('MDCExtDataTable', dataTable.MDCExtDataTable);
 autoInit.register('MDCExtMultiselect', multiselect.MDCExtMultiselect);
 autoInit.register('MDCExtPagination', pagination.MDCExtPagination);
 autoInit.register('MDCExtTreeview', treeview.MDCExtTreeview);
 
 // Export all components.
 export {
-  dataTable,
   multiselect,
   pagination,
   treeview
