@@ -445,14 +445,15 @@
         });
 
         var loadItems = document.getElementById('js-load-items');
-        multiselectLoadItems = new MDCExtMultiselect(loadItems, undefined, {
-            itemValueProperty: 'id',
-            itemDescriptionProperty: 'desc',
-            itemsLoader: function(query, callback) {
-              setTimeout(delayedLoader(query, callback) , 800);
-            }
+        demoNS = {};
+        demoNS.multiselectLoadItems = new MDCExtMultiselect(loadItems);
+        demoNS.multiselectLoadItems.settings = {
+          itemValueProperty: 'id',
+          itemDescriptionProperty: 'desc',
+          itemsLoader: function(query, callback) {
+            setTimeout(delayedLoader(query, callback) , 800);
           }
-        );
+        };
 
         function delayedLoader(query, callback) {
           callback([{

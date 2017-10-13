@@ -66,9 +66,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       focus: () => {},
       isFocused: () => {},
-      hasItemsLoader: () => /* boolean */ false,
-      applyItemsLoader: (/* query: string */) => {},
-      addItem: (/* data: Object */) => {},
+      addItem: (/* value: string, description: string, rawdata: Object */) => {},
       removeItems: () => {},
       addSelectedOption: (/* value: string, description: string, rawdata: string */) => {},
       removeSelectedOption: (/* index: number */) => {},
@@ -105,6 +103,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   constructor(adapter) {
     super(Object.assign(MDCExtMultiselectFoundation.defaultAdapter, adapter));
     this.disabled_ = false;
+    this.settings_ = this.getDefaultSettings_();
     this.maxSelectedItems_ = 1;
     this.lastInputValue_ = undefined;
     this.cachedNumberOfAvailableItems_ = 0;
@@ -177,6 +176,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const {INVALID, LABEL_FLOAT_ABOVE} = cssClasses;
     if (this.isFull_)
       this.removeLastSelection_();
+    this.clearInput_();
     if (value) {
       let itemValue = '';
       for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
@@ -188,7 +188,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
              this.adapter_.updateSelectedOption(0, itemValue, itemDescription, itemRawdata);
            else
              this.adapter_.addSelectedOption(itemValue, itemDescription, itemRawdata);
-           this.clearInput_();
            this.updateStatus_();
            break;
          }
@@ -209,7 +208,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       this.adapter_.addClass(INVALID);
     }
     this.updateHelptextOnDeactivation_(isValid);
-    this.clearInput_();
     this.adapter_.notifyChange();
   }
 
@@ -219,10 +217,51 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   /** @return {?string} */
-  getRawData() {
+  getRawdata() {
     if (this.adapter_.getNumberOfSelectedOptions() > 0)
       return this.adapter_.getSelectedOptionRawdata(0);
     return null;
+  }
+
+  /** @param {?string} value */
+  setRawdata(rawdata) {
+    const {INVALID, LABEL_FLOAT_ABOVE} = cssClasses;
+    if (!rawdata) {
+      this.setValue('');
+      return;
+    }
+    const settings =  this.getSettings();
+    if (this.isFull_)
+      this.removeLastSelection_();
+    this.clearInput_();
+    let value = rawdata[settings.itemValueProperty];
+    let description = rawdata[settings.itemDescriptionProperty];
+    if ((!value) || (!description)){
+      this.setValue('');
+      return;
+    }
+    if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
+      this.adapter_.updateSelectedOption(0, value, description, JSON.stringify(rawdata));
+    else
+      this.adapter_.addSelectedOption(value, description, JSON.stringify(rawdata));
+    this.updateStatus_();
+
+    const input = this.getNativeInput_();
+    const isValid = input.checkValidity();
+
+    if ((this.isEmpty_) && (!this.adapter_.isFocused())) {
+      this.adapter_.removeClassFromLabel(LABEL_FLOAT_ABOVE);
+    }
+    else
+      this.adapter_.addClassToLabel(LABEL_FLOAT_ABOVE);
+
+    if (isValid) {
+      this.adapter_.removeClass(INVALID);
+    } else {
+      this.adapter_.addClass(INVALID);
+    }
+    this.updateHelptextOnDeactivation_(isValid);
+    this.adapter_.notifyChange();
   }
 
   isDisabled() {
@@ -242,6 +281,14 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     }
   }
 
+  getSettings() {
+    return this.settings_ ;
+  }
+
+  setSettings(settings) {
+    Object.assign(this.settings_, settings);
+  }
+
   getNumberOfSelectedOptions() {
     return this.adapter_.getNumberOfSelectedOptions();
   }
@@ -254,8 +301,14 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   addItems(items) {
     if (!Array.isArray(items))
       return;
+    const settings =  this.getSettings();
+    let value = '';
+    let description = ''
     for (let i = 0, l = items.length; i < l; i++) {
-      this.adapter_.addItem(items[i]);
+      value = items[i][settings.itemValueProperty];
+      description = items[i][settings.itemDescriptionProperty];
+      if ((value) && (description))
+        this.adapter_.addItem(value, description, items[i]);
     }
   }
 
@@ -285,6 +338,14 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.setListElStyle('min-width', `${comboboxWidth}px`);
   }
 
+  getDefaultSettings_() {
+    return {
+      itemValueProperty: 'value',
+      itemDescriptionProperty: 'description',
+      itemsLoader: undefined
+    };
+  }
+
   activateFocus_() {
     const {FOCUSED, LABEL_FLOAT_ABOVE} = cssClasses;
 
@@ -301,7 +362,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       }
       if (this.cachedNumberOfAvailableItems_ == 0)
         this.updateAvailableItems_();
-      else
+      else if (this.isEmpty_)
         this.open_();
     }
   }
@@ -384,6 +445,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
         this.applyValueFromActiveItem_();
       }
     } else if (this.isOpen() && (isEscape)) {
+      evt.stopPropagation();
       this.close_();
     }
 
@@ -482,6 +544,17 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     }
   }
 
+  applyItemsLoader_(query) {
+    var self = this;
+    this.getSettings().itemsLoader.apply(self, [query, function(results) {
+      if (results && results.length) {
+        self.removeItems();
+        self.addItems(results);
+        self.refreshItems();
+      }
+    }]);
+  }
+
   applyQuery_(value) {
     const {ARIA_HIDDEN} = strings;
     const {ITEM_NOMATCH} = cssClasses;
@@ -503,8 +576,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     // Debounce multiple changed values
     clearTimeout(this.changeValueTriggerTimerId_);
     this.changeValueTriggerTimerId_ = setTimeout(() => {
-      if (this.adapter_.hasItemsLoader())
-        this.adapter_.applyItemsLoader(this.lastInputValue_);
+      if (typeof this.getSettings().itemsLoader === 'function')
+        this.applyItemsLoader_(this.lastInputValue_);
       else {
         this.applyQuery_(this.lastInputValue_);
       }

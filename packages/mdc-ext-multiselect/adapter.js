@@ -128,12 +128,12 @@ export default class MDCExtMultiselectAdapter {
   /** @return {boolean} */
   isFocused() {}
 
-  /** @return {boolean} */
-  hasItemsLoader() {}
-
-  applyItemsLoader(query) {}
-
-  addItem(data) {}
+  /**
+   * @param {string} value
+   * @param {string} description
+   * @param {!Object} rawdata
+   */
+  addItem(value, description, rawdata) {}
 
   removeItems() {}
 

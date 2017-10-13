@@ -26,9 +26,7 @@ export class MDCExtMultiselect extends MDCComponent {
     return new MDCExtMultiselect(root);
   }
 
-  initialize(settings = {}) {
-    this.settings_ = this.getDefaultSettings_();
-    this.settings = settings;
+  initialize() {
     this.comboboxEl_ = this.root_.querySelector(strings.COMBOBOX_SELECTOR);
     this.comboboxBackgroundEl_ = this.root_.querySelector(strings.COMBOBOX_BACKGROUND_SELECTOR);
     this.displayEl_ = this.root_.querySelector(strings.DISPLAY_SELECTOR);
@@ -74,9 +72,7 @@ export class MDCExtMultiselect extends MDCComponent {
       deregisterListInteractionHandler: (type, handler) => this.listEl_.removeEventListener(type, handler),
       focus: () => this.inputEl_.focus(),
       isFocused: () => document.activeElement === this.inputEl_,
-      hasItemsLoader: () => (typeof this.settings_.itemsLoader === 'function'),
-      applyItemsLoader: (query) => this.applyItemsLoader_(query),
-      addItem: (data) => this.addItem_(data),
+      addItem: (value, description, rawdata) => this.addItem_(value, description, rawdata),
       removeItems: () => this.removeItems_(),
       addSelectedOption: (value, description, rawdata = null) => this.addSelectedOption_(value, description, rawdata),
       removeSelectedOption: (index) => this.removeSelectedOption_(index),
@@ -141,16 +137,21 @@ export class MDCExtMultiselect extends MDCComponent {
   }
 
   /** @return {?string} */
-  get rawData() {
-    return this.foundation_.getRawData();
+  get rawdata() {
+    return this.foundation_.getRawdata();
+  }
+
+  /** @return {?string} */
+  set rawdata(rawdata) {
+    this.foundation_.setRawdata(rawdata);
   }
 
   get settings() {
-    return this.settings_ ;
+    return this.foundation_.getSettings();
   }
 
   set settings(settings) {
-    Object.assign(this.settings_, settings);
+    return this.foundation_.setSettings(settings);
   }
 
   get disabled() {
@@ -181,20 +182,8 @@ export class MDCExtMultiselect extends MDCComponent {
     return this.displayEl_.querySelectorAll(`.${cssClasses.SELECTED_OPTION}`);
   }
 
-  addItems(itemArray) {
-    this.foundation_.addItems(itemArray);
-  }
-
   removeItems() {
     this.foundation_.removeItems();
-  }
-
-  getDefaultSettings_() {
-    return {
-      itemValueProperty: 'value',
-      itemDescriptionProperty: 'description',
-      itemsLoader: undefined
-    };
   }
 
   addClassToLabel_(className) {
@@ -202,29 +191,17 @@ export class MDCExtMultiselect extends MDCComponent {
       this.labelEl_.classList.add(className);
   }
 
-  applyItemsLoader_(query) {
-    var self = this;
-    this.settings_.itemsLoader.apply(self, [query, function(results) {
-      if (results && results.length) {
-        self.foundation_.removeItems();
-        self.foundation_.addItems(results);
-        self.foundation_.refreshItems();
-      }
-    }]);
-  }
-
-  addItem_(data) {
+  addItem_(value, description, rawdata) {
     if (this.listUl_ !== undefined) {
       const {LIST_ITEM} = cssClasses;
       const {ITEM_DATA_VALUE_ATTR, ITEM_DATA_DESC_ATTR, ITEM_DATA_RAWDATA_ATTR} = strings;
-      let value = data[this.settings_.itemValueProperty];
-      let description = data[this.settings_.itemDescriptionProperty];
       var node = document.createElement('li');
       node.classList.add(LIST_ITEM);
       node.setAttribute('role', 'option');
       node.setAttribute(ITEM_DATA_VALUE_ATTR, value);
       node.setAttribute(ITEM_DATA_DESC_ATTR, description);
-      node.setAttribute(ITEM_DATA_RAWDATA_ATTR, JSON.stringify(data));
+      if (rawdata)
+        node.setAttribute(ITEM_DATA_RAWDATA_ATTR, JSON.stringify(rawdata));
       node.textContent = description;
       this.listUl_.appendChild(node);
     }
