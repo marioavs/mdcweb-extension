@@ -40,6 +40,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     return {
       addClass: (/* className: string */) => {},
       removeClass: (/* className: string */) => {},
+      addClassToBottomLine: (/* className: string */) => {},
+      removeClassFromBottomLine: (/* className: string */) => {},
+      setBottomLineAttr: (/* attr: string, value: string */) => {},
       addClassToLabel: (/* className: string */) => {},
       removeClassFromLabel: (/* className: string */) => {},
       addClassToHelptext: (/* className: string */) => {},
@@ -64,6 +67,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
       registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      registerTransitionEndHandler: (/* handler: EventListener */) => {},
+      deregisterTransitionEndHandler: (/* handler: EventListener */) => {},
       focus: () => {},
       isFocused: () => {},
       addItem: (/* value: string, description: string, rawdata: Object */) => {},
@@ -116,8 +121,11 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.listClickHandler_ = (evt) => this.handleListClick_(evt);
     this.listMousedownHandler_ = (evt) => /* avoid component blur event */ evt.preventDefault();
     this.inputKeydownHandler_ = (evt) => this.handleKeydown_(evt);
+    this.setPointerXOffset_ = (evt) => this.setBottomLineTransformOrigin_(evt);
     /** @private {function(!Event)} */
     this.inputInputHandler_ = (evt) => this.handleInputInput_(evt);
+    /** @private {function(!Event): undefined} */
+        this.transitionEndHandler_ = (evt) => this.transitionEnd_(evt);
     /** @private {boolean} */
     this.isOpen_ = false;
     /** @private {number} */
@@ -145,6 +153,10 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.registerInputInteractionHandler('input', this.inputInputHandler_);
     this.adapter_.registerListInteractionHandler('mousedown', this.listMousedownHandler_);
     this.adapter_.registerListInteractionHandler('click', this.listClickHandler_);
+    ['mousedown', 'touchstart'].forEach((evtType) => {
+      this.adapter_.registerInteractionHandler(evtType, this.setPointerXOffset_);
+    });
+    this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
     if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() === 0))
       this.adapter_.addSelectedOption('', '');
     this.resize();
@@ -162,6 +174,10 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.deregisterInputInteractionHandler('input', this.inputInputHandler_);
     this.adapter_.deregisterListInteractionHandler('mousedown', this.listMousedownHandler_);
     this.adapter_.deregisterListInteractionHandler('click', this.listClickHandler_);
+    ['mousedown', 'touchstart'].forEach((evtType) => {
+      this.adapter_.deregisterInteractionHandler(evtType, this.setPointerXOffset_);
+    });
+    this.adapter_.deregisterTransitionEndHandler(this.transitionEndHandler_);
   }
 
   /** @return {?string} */
@@ -272,6 +288,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const {DISABLED} = cssClasses;
     const {ARIA_DISABLED} = strings;
     this.disabled_ = disabled;
+    this.getNativeInput_().disabled = disabled;
     if (this.disabled_) {
       this.adapter_.addClass(DISABLED);
       this.adapter_.setAttr(ARIA_DISABLED, 'true');
@@ -347,9 +364,13 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   activateFocus_() {
-    const {FOCUSED, LABEL_FLOAT_ABOVE} = cssClasses;
+    const {BOTTOM_LINE_ACTIVE, FOCUSED, LABEL_FLOAT_ABOVE} = cssClasses;
 
+    if (this.disabled_) {
+      return;
+    }
     this.adapter_.addClass(FOCUSED);
+    this.adapter_.addClassToBottomLine(BOTTOM_LINE_ACTIVE);
     this.adapter_.addClassToLabel(LABEL_FLOAT_ABOVE);
     this.updateStatus_();
     this.showHelptext_();
@@ -372,6 +393,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const input = this.getNativeInput_();
     const isValid = input.checkValidity();
 
+    if (this.disabled_) {
+      return;
+    }
     this.adapter_.removeClass(FOCUSED);
     if (this.isEmpty_) {
       this.adapter_.removeClassFromLabel(LABEL_FLOAT_ABOVE);
@@ -409,6 +433,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       return;
     }
 
+    if (this.disabled_) {
+      return;
+    }
     let tryOpen = false;
     const {keyCode, key, shiftKey} = evt;
     const isBackspace = key === 'Backspace' || keyCode === 8;
@@ -463,9 +490,13 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
   handleListClick_(evt) {
     const {LIST_ITEM} = cssClasses;
+
     if ((evt.target) && (evt.target.classList.contains(LIST_ITEM))) {
       evt.stopPropagation();
       evt.preventDefault();
+      if (this.disabled_) {
+        return;
+      }
       if (evt.target !== this.adapter_.getActiveItem()) {
         this.adapter_.removeActiveItem();
         this.adapter_.setActiveItem(evt.target);
@@ -480,6 +511,10 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
    */
   open_() {
     const {LIST_OPEN,OPEN} = cssClasses;
+
+    if (this.disabled_) {
+      return;
+    }
     this.resize();
     this.setListStyles_();
     this.adapter_.addClass(OPEN);
@@ -493,14 +528,47 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
    */
   close_() {
     const {LIST_OPEN,OPEN} = cssClasses;
+
     this.adapter_.removeClass(OPEN);
     this.adapter_.removeClassFromList(LIST_OPEN);
     this.isOpen_ = false;
   }
 
+  /**
+   * Sets the transform-origin of the bottom line, causing it to animate out
+   * from the user's click location.
+   * @param {!Event} evt
+   * @private
+   */
+  setBottomLineTransformOrigin_(evt) {
+    const targetClientRect = evt.target.getBoundingClientRect();
+    const evtCoords = {x: evt.clientX, y: evt.clientY};
+    const normalizedX = evtCoords.x - targetClientRect.left;
+    const attributeString = `transform-origin: ${normalizedX}px center`;
+
+    this.adapter_.setBottomLineAttr('style', attributeString);
+  }
+
   showHelptext_() {
     const {ARIA_HIDDEN} = strings;
     this.adapter_.removeHelptextAttr(ARIA_HIDDEN);
+  }
+
+  /**
+   * Fires when animation transition ends, performing actions that must wait
+   * for animations to finish.
+   * @param {!Event} evt
+   * @private
+   */
+  transitionEnd_(evt) {
+    const {BOTTOM_LINE_ACTIVE} = cssClasses;
+
+    // We need to wait for the bottom line to be entirely transparent
+    // before removing the class. If we do not, we see the line start to
+    // scale down before disappearing
+    if ((evt.propertyName === 'opacity') && (!this.adapter_.isFocused())) {
+      this.adapter_.removeClassFromBottomLine(BOTTOM_LINE_ACTIVE);
+    }
   }
 
   updateHelptextOnDeactivation_(isValid) {
@@ -573,6 +641,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   updateAvailableItems_() {
+    if (this.disabled_) {
+      return;
+    }
     // Debounce multiple changed values
     clearTimeout(this.changeValueTriggerTimerId_);
     this.changeValueTriggerTimerId_ = setTimeout(() => {

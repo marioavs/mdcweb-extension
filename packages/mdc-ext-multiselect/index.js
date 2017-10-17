@@ -29,6 +29,7 @@ export class MDCExtMultiselect extends MDCComponent {
   initialize() {
     this.comboboxEl_ = this.root_.querySelector(strings.COMBOBOX_SELECTOR);
     this.comboboxBackgroundEl_ = this.root_.querySelector(strings.COMBOBOX_BACKGROUND_SELECTOR);
+    this.bottomLineEl_ = this.root_.querySelector(strings.BOTTOM_LINE_SELECTOR);
     this.displayEl_ = this.root_.querySelector(strings.DISPLAY_SELECTOR);
     this.inputEl_ = this.root_.querySelector(strings.INPUT_SELECTOR);
     this.labelEl_ = this.root_.querySelector(strings.LABEL_SELECTOR);
@@ -45,6 +46,9 @@ export class MDCExtMultiselect extends MDCComponent {
     return new MDCExtMultiselectFoundation({
       addClass: (className) => this.root_.classList.add(className),
       removeClass: (className) => this.root_.classList.remove(className),
+      addClassToBottomLine: (className) => { if (this.bottomLineEl_) this.bottomLineEl_.classList.add(className); },
+      removeClassFromBottomLine: (className) => { if (this.bottomLineEl_) this.bottomLineEl_.classList.remove(className); },
+      setBottomLineAttr: (attr, value) => { if (this.bottomLineEl_) this.bottomLineEl_.setAttribute(attr, value); },
       addClassToLabel: (className) => this.addClassToLabel_(className),
       removeClassFromLabel: (className) => { if (this.labelEl_) this.labelEl_.classList.remove(className); },
       addClassToHelptext: (className) => { if (this.helptextEl_) this.helptextEl_.classList.add(className); },
@@ -70,6 +74,8 @@ export class MDCExtMultiselect extends MDCComponent {
       deregisterInputInteractionHandler: (type, handler) => this.inputEl_.removeEventListener(type, handler),
       registerListInteractionHandler: (type, handler) => this.listEl_.addEventListener(type, handler),
       deregisterListInteractionHandler: (type, handler) => this.listEl_.removeEventListener(type, handler),
+      registerTransitionEndHandler: (handler) => { if (this.bottomLineEl_) this.bottomLineEl_.addEventListener('transitionend', handler); },
+      deregisterTransitionEndHandler: (handler) => { if (this.bottomLineEl_) this.bottomLineEl_.removeEventListener('transitionend', handler); },
       focus: () => this.inputEl_.focus(),
       isFocused: () => document.activeElement === this.inputEl_,
       addItem: (value, description, rawdata) => this.addItem_(value, description, rawdata),

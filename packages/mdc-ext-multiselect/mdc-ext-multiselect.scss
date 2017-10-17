@@ -14,6 +14,7 @@
 // limitations under the License.
 //
 
+@import "./variables";
 @import "@material/animation/variables";
 @import "@material/animation/functions";
 @import "@material/elevation/mixins";
@@ -23,13 +24,6 @@
 @import "@material/theme/mixins";
 @import "@material/typography/variables";
 @import "@material/typography/mixins";
-
-$mdc-ext-multiselect-error-on-light: #d50000;
-$mdc-ext-multiselect-error-on-dark: #ff6e6e;
-$mdc-ext-multiselect-divider-on-light: rgba(black, .12);
-$mdc-ext-multiselect-divider-on-dark: rgba(white, .12);
-$mdc-ext-multiselect-disabled-border-on-light: rgba(#231f20, .26);
-$mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
 @function mdc-ext-multiselect-transition($property) {
   @return #{$property} 180ms $mdc-animation-standard-curve-timing-function;
@@ -56,6 +50,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
     &-background {
       border: none;
+      border-bottom: 1px solid $mdc-ext-multiselect-underline-on-light-idle;
       display: block;
       font-size: inherit;
       padding: 0 #{$dd-arrow-padding} 8px;
@@ -77,40 +72,22 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
         #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
       }
 
-      &::placeholder {
-        @include mdc-theme-prop(color, text-hint-on-light);
-
-        transition: mdc-ext-multiselect-transition(color);
-        opacity: 1;
-      }
-
-      &:focus {
-        outline: none;
-
-        &::placeholder {
-          @include mdc-theme-prop(color, text-secondary-on-light);
-        }
-      }
-
-      // Remove red outline on firefox
-      &:invalid {
-        box-shadow: none;
-      }
-
       @include mdc-rtl {
         background-position: left center;
       }
 
-      @include mdc-theme-dark {
+      &:hover {
+        border-color: $mdc-ext-multiselect-underline-on-light;
+      }
+
+      @include mdc-theme-dark(".mdc-ext-multiselect") {
         @include mdc-theme-prop(color, text-primary-on-dark);
         @include mdc-ext-multiselect-dd-arrow-svg-bg_(ffffff);
 
-        &::placeholder {
-          @include mdc-theme-prop(color, text-hint-on-dark);
-        }
+        border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark-idle;
 
-        &:focus::placeholder {
-          @include mdc-theme-prop(color, text-secondary-on-dark);
+        &:hover {
+          border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark;
         }
       }
     }
@@ -141,6 +118,28 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
         transform: translateY(-100%) scale(.75, .75);
         cursor: auto;
       }
+    }
+
+    &-bottom-line {
+      @include mdc-theme-prop(background-color, primary);
+
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      transform: scaleX(0);
+      transition: mdc-ext-multiselect-transition(transform), mdc-ext-multiselect-transition(opacity);
+      opacity: 0;
+      z-index: 2;
+    }
+
+    &-bottom-line--active {
+      transform: scaleX(1);
+    }
+
+    .mdc-ext-multiselect--focused &-bottom-line {
+      opacity: 1;
     }
   }
 
@@ -176,27 +175,34 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     width: 100%;
 
     .mdc-ext-multiselect__input {
+      @include mdc-theme-prop(color, text-primary-on-light);
+      @include mdc-typography-base;
+      // We use only a subset of the MDC typography values here as changing things such as line-height
+      // affects how the labels are transformed.
+      @each $prop in (font-size, letter-spacing) {
+        #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
+      }
+
       border-style: none;
       background-color: transparent;
       display: inline;
       flex-basis: 5px;
       flex-grow: 1;
-      font-size: inherit;
       min-width: 20px;
       outline: none;
       overflow-x: hidden;
       padding-left: 2px;
       width: auto;
 
-      @include mdc-theme-dark {
+      &::placeholder {
+        @include mdc-theme-prop(color, text-hint-on-light);
+      }
+
+      @include mdc-theme-dark(".mdc-ext-multiselect") {
         @include mdc-theme-prop(color, text-primary-on-dark);
 
         &::placeholder {
           @include mdc-theme-prop(color, text-hint-on-dark);
-        }
-
-        &:focus::placeholder {
-          @include mdc-theme-prop(color, text-secondary-on-dark);
         }
       }
     }
@@ -217,43 +223,11 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
     .mdc-ext-multiselect__label {
       pointer-events: none;
     }
-
-    .mdc-ext-multiselect__combobox::after {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      transform: translateY(50%) scaleY(1);
-      transform-origin: center bottom;
-      transition: mdc-ext-multiselect-transition(background-color), mdc-ext-multiselect-transition(transform);
-      background-color: $mdc-ext-multiselect-divider-on-light;
-      content: "";
-
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
-        background-color: $mdc-ext-multiselect-divider-on-dark;
-      }
-    }
   }
 
   &--focused {
-    @mixin mdc-ext-multiselect-after-styles {
-      @include mdc-theme-prop(background-color, primary);
-
-      transform: translateY(100%) scaleY(2);
-      transition: mdc-ext-multiselect-transition(transform);
-    }
-
     @mixin mdc-ext-multiselect-label-styles {
       @include mdc-theme-prop(color, primary);
-    }
-
-    .mdc-ext-multiselect__combobox::after {
-      @include mdc-ext-multiselect-after-styles;
-
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
-        @include mdc-ext-multiselect-after-styles;
-      }
     }
 
     .mdc-ext-multiselect__label {
@@ -292,7 +266,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 
     @include mdc-elevation(2);
 
-    @include mdc-theme-dark {
+    @include mdc-theme-dark(".mdc-ext-multiselect") {
       background-color: #424242;
     }
 
@@ -384,23 +358,23 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
 }
 
 .mdc-ext-multiselect--disabled,
-.mdc-ext-multiselect[disabled] {
+.mdc-ext-multiselect[aria-disabled] {
   @include mdc-theme-prop(color, text-disabled-on-light);
 
-  border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-light;
   cursor: default;
   pointer-events: none;
 
-  @include mdc-theme-dark(".mdc-multiselect", true) {
-    border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-dark;
-  }
+  .mdc-ext-multiselect__combobox-background {
+    border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-light;
 
-  .mdc-ext-multiselect__combobox::after {
-    display: none;
+    @include mdc-theme-dark(".mdc-ext-multiselect") {
+      border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-dark;
+    }
   }
 
   // stylelint-disable plugin/selector-bem-pattern
   .mdc-ext-multiselect__combobox,
+  .mdc-ext-multiselect__combobox-background,
   .mdc-ext-multiselect__input,
   .mdc-ext-multiselect__label {
     @include mdc-theme-prop(color, text-disabled-on-light);
@@ -412,7 +386,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
   // stylelint-enable plugin/selector-bem-pattern
 }
 
-// Graceful degredation for css-only inputs
+// Graceful degradation for css-only inputs
 
 .mdc-ext-multiselect {
   &:not(.mdc-ext-multiselect--upgraded) &__combobox {
@@ -475,7 +449,7 @@ $mdc-ext-multiselect-disabled-border-on-dark: rgba(white, .3);
   opacity: 0;
   will-change: opacity;
 
-  @include mdc-theme-dark {
+  @include mdc-theme-dark(".mdc-ext-multiselect") {
     @include mdc-theme-prop(color, text-hint-on-dark);
   }
 

@@ -13,6 +13,25 @@ export default class MDCExtMultiselectAdapter {
   removeClass(className) {}
 
   /**
+   * Adds a class to the bottom line element.
+   * @param {string} className
+   */
+  addClassToBottomLine(className) {}
+
+  /**
+   * Removes a class from the bottom line element.
+   * @param {string} className
+   */
+  removeClassFromBottomLine(className) {}
+
+  /**
+   * Sets an attribute with a given value on the bottom line element.
+   * @param {string} attr
+   * @param {string} value
+   */
+  setBottomLineAttr(attr, value) {}
+
+  /**
    * Adds a class to the label element.
    * @param {string} className
    */
@@ -122,6 +141,18 @@ export default class MDCExtMultiselectAdapter {
    * @param {!Function} handler
    */
   deregisterListInteractionHandler(type, handler) {}
+
+  /**
+   * Registers an event listener on the bottom line element for a "transitionend" event.
+   * @param {function(!Event): undefined} handler
+   */
+  registerTransitionEndHandler(handler) {}
+
+  /**
+   * Deregisters an event listener on the bottom line element for a "transitionend" event.
+   * @param {function(!Event): undefined} handler
+   */
+  deregisterTransitionEndHandler(handler) {}
 
   focus() {}
 

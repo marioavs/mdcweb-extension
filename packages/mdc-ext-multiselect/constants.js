@@ -20,23 +20,25 @@ const ROOT = 'mdc-ext-multiselect';
 /** @enum {string} */
 export const cssClasses = {
   ROOT: ROOT,
+  BOTTOM_LINE_ACTIVE: `${ROOT}__combobox-bottom-line--active`,
   DISABLED: `${ROOT}--disabled`,
   FOCUSED: `${ROOT}--focused`,
+  HELPTEXT_PERSISTENT: `${ROOT}-helptext--persistent`,
+  HELPTEXT_VALIDATION_MSG: `${ROOT}-helptext--validation-msg`,
   INVALID: `${ROOT}--invalid`,
+  ITEM_ACTIVE: 'mdc-list-item--active',
+  ITEM_NOMATCH: 'mdc-list-item__nomatch',
   LABEL_FLOAT_ABOVE: `${ROOT}__label--float-above`,
+  LIST_ITEM: 'mdc-list-item',
   LIST_OPEN: `${ROOT}__list--open`,
   OPEN: `${ROOT}--open`,
   SELECTED_OPTION: `${ROOT}__option`,
-  UPGRADED: `${ROOT}--upgraded`,
-  HELPTEXT_PERSISTENT: `${ROOT}-helptext--persistent`,
-  HELPTEXT_VALIDATION_MSG: `${ROOT}-helptext--validation-msg`,
-  ITEM_ACTIVE: 'mdc-list-item--active',
-  ITEM_NOMATCH: 'mdc-list-item__nomatch',
-  LIST_ITEM: 'mdc-list-item'
+  UPGRADED: `${ROOT}--upgraded`
 };
 
 /** @enum {string} */
 export const strings = {
+  BOTTOM_LINE_SELECTOR: `.${ROOT}__combobox-bottom-line`,
   COMBOBOX_SELECTOR: `.${ROOT}__combobox`,
   COMBOBOX_BACKGROUND_SELECTOR: `.${ROOT}__combobox-background`,
   DISPLAY_SELECTOR: `.${ROOT}__display`,
