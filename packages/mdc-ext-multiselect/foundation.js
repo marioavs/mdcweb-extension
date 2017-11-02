@@ -71,7 +71,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       deregisterTransitionEndHandler: (/* handler: EventListener */) => {},
       focus: () => {},
       isFocused: () => {},
-      addItem: (/* value: string, description: string, rawdata: Object */) => {},
+      addItem: (/* value: string, description: string, rawdata: string */) => {},
       removeItems: () => {},
       addSelectedOption: (/* value: string, description: string, rawdata: string */) => {},
       removeSelectedOption: (/* index: number */) => {},
@@ -246,20 +246,21 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       this.setValue('');
       return;
     }
-    const settings =  this.getSettings();
+    const settings = this.getSettings();
     if (this.isFull_)
       this.removeLastSelection_();
     this.clearInput_();
-    let value = rawdata[settings.itemValueProperty];
-    let description = rawdata[settings.itemDescriptionProperty];
+    let rawObject = JSON.parse(rawdata);
+    let value = rawObject[settings.itemValueProperty];
+    let description = rawObject[settings.itemDescriptionProperty];
     if ((!value) || (!description)){
       this.setValue('');
       return;
     }
     if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
-      this.adapter_.updateSelectedOption(0, value, description, JSON.stringify(rawdata));
+      this.adapter_.updateSelectedOption(0, value, description, JSON.stringify(rawObject));
     else
-      this.adapter_.addSelectedOption(value, description, JSON.stringify(rawdata));
+      this.adapter_.addSelectedOption(value, description, JSON.stringify(rawObject));
     this.updateStatus_();
 
     const input = this.getNativeInput_();
@@ -325,7 +326,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       value = items[i][settings.itemValueProperty];
       description = items[i][settings.itemDescriptionProperty];
       if ((value) && (description))
-        this.adapter_.addItem(value, description, items[i]);
+        this.adapter_.addItem(value, description, JSON.stringify(items[i]));
     }
   }
 

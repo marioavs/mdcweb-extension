@@ -162,7 +162,7 @@ export default class MDCExtMultiselectAdapter {
   /**
    * @param {string} value
    * @param {string} description
-   * @param {!Object} rawdata
+   * @param {string} rawdata
    */
   addItem(value, description, rawdata) {}
 

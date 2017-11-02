@@ -137,7 +137,6 @@ export class MDCExtMultiselect extends MDCComponent {
     return this.foundation_.getValue();
   }
 
-  /** @param {?string} value */
   set value(value) {
     this.foundation_.setValue(value);
   }
@@ -147,7 +146,6 @@ export class MDCExtMultiselect extends MDCComponent {
     return this.foundation_.getRawdata();
   }
 
-  /** @return {?string} */
   set rawdata(rawdata) {
     this.foundation_.setRawdata(rawdata);
   }
@@ -207,7 +205,7 @@ export class MDCExtMultiselect extends MDCComponent {
       node.setAttribute(ITEM_DATA_VALUE_ATTR, value);
       node.setAttribute(ITEM_DATA_DESC_ATTR, description);
       if (rawdata)
-        node.setAttribute(ITEM_DATA_RAWDATA_ATTR, JSON.stringify(rawdata));
+        node.setAttribute(ITEM_DATA_RAWDATA_ATTR, rawdata);
       node.textContent = description;
       this.listUl_.appendChild(node);
     }
