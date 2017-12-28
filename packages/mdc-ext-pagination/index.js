@@ -27,7 +27,7 @@ export class MDCExtPagination extends MDCComponent {
     return new MDCExtPagination(root);
   }
 
-  initialize(rippleFactory = this.initRipple_) {
+  initialize() {
     this.prevEl_ = this.root_.querySelector(strings.PREV_SELECTOR);
     this.nextEl_ = this.root_.querySelector(strings.NEXT_SELECTOR);
     this.firstEl_ = this.root_.querySelector(strings.FIRST_SELECTOR);
@@ -35,10 +35,10 @@ export class MDCExtPagination extends MDCComponent {
     this.totalEl_ = this.root_.querySelector(strings.TOTAL_SELECTOR);
 
     if (this.prevEl_) {
-      this.prevRipple_ = rippleFactory(this.prevEl_);
+      this.prevRipple_ = this.initRipple_(this.prevEl_);
     };
     if (this.nextEl_) {
-      this.nextRipple_ = rippleFactory(this.nextEl_);
+      this.nextRipple_ = this.initRipple_(this.nextEl_);
     };
   }
 
@@ -50,7 +50,7 @@ export class MDCExtPagination extends MDCComponent {
   initRipple_(el) {
     const MATCHES = util.getMatchesProperty(HTMLElement.prototype);
 
-    const adapter = Object.assign(MDCRipple.createAdapter(this), {
+    const adapter = Object.assign(MDCRipple.createAdapter(el), {
       isUnbounded: () => true,
       isSurfaceActive: () => el[MATCHES](':active'),
       isSurfaceDisabled: () => el.disabled,
@@ -61,7 +61,18 @@ export class MDCExtPagination extends MDCComponent {
       deregisterInteractionHandler: (evtType, handler) =>
         el.removeEventListener(evtType, handler, util.applyPassive()),
       updateCssVariable: (varName, value) => el.style.setProperty(varName, value),
-      computeBoundingRect: () => el.getBoundingClientRect()
+      computeBoundingRect: () => {
+        const {left, top} = el.getBoundingClientRect();
+        const DIM = 40;
+        return {
+          top,
+          left,
+          right: left + DIM,
+          bottom: top + DIM,
+          width: DIM,
+          height: DIM,
+        };
+      }
     });
     const foundation = new MDCRippleFoundation(adapter);
     return new MDCRipple(el, foundation);

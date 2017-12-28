@@ -26,7 +26,6 @@
   align-items: center;
   box-sizing: border-box;
   outline: none;
-  overflow: hidden;
   padding: 8px;
 
   @include mdc-typography(caption);
@@ -46,50 +45,34 @@
   }
 
   &__button {
-    @include mdc-ripple-base;
-    @include mdc-ripple-bg((pseudo: "::before"));
-    @include mdc-ripple-fg((pseudo: "::after"));
-    @include mdc-theme-prop(color, text-primary-on-light);
-    @include mdc-typography-base;
+    @include mdc-ripple-surface;
+    @include mdc-ripple-radius;
+    @include mdc-states(secondary);
 
     display: inline-flex;
-    overflow: hidden;
     position: relative;
     align-items: center;
-    background-color: inherit;
     border: none;
     border-radius: 50%;
     box-sizing: border-box;
     cursor: pointer;
-    height: 32px;
+    height: 40px;
     justify-content: center;
     outline: none;
-    padding: 0 8px;
     text-align: center;
     text-decoration: none;
     transition: box-shadow 280ms $mdc-animation-standard-curve-timing-function;
     user-select: none;
-    width: 32px;
-
-    @include mdc-theme-prop(color, text-icon-on-background);
-
-    &:not(.mdc-ripple-upgraded) {
-      -webkit-tap-highlight-color: rgba(black, .18);
-    }
+    width: 40px;
 
     @include mdc-theme-dark {
-      @include mdc-ripple-base;
-      @include mdc-ripple-bg((pseudo: "::before", base-color: white, opacity: .14));
-      @include mdc-ripple-fg((pseudo: "::after", base-color: white, opacity: .14));
+      @include mdc-states(white);
       @include mdc-theme-prop(color, text-primary-on-dark);
-
-      &:not(.mdc-ripple-upgraded) {
-        -webkit-tap-highlight-color: rgba(white, .18);
-      }
     }
 
     &:disabled {
-      @include mdc-theme-prop(color, text-disabled-on-background);
+      @include mdc-theme-prop(background-color, transparent);
+      @include mdc-theme-prop(color, text-disabled-on-light);
       cursor: default;
       pointer-events: none;
 
@@ -97,11 +80,19 @@
         @include mdc-theme-prop(color, text-disabled-on-dark);
       }
     }
+
+    // :not(:disabled) is used to support link styled as button
+    // as link does not support :enabled style
+    &:not(:disabled) {
+      @include mdc-theme-prop(background-color, transparent, $edgeOptOut: true);
+      @include mdc-theme-prop(color, text-primary-on-light);
+    }
   }
 
-  &--disabled {
+  &:disabled, &--disabled {
     .mdc-ext-pagination__button {
-      @include mdc-theme-prop(color, text-disabled-on-background);
+      @include mdc-theme-prop(background-color, transparent);
+      @include mdc-theme-prop(color, text-disabled-on-light);
       cursor: default;
       pointer-events: none;
 

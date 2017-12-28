@@ -14,12 +14,12 @@
     "url": "https://github.com/marioavs/mdcweb-extension.git"
   },
   "dependencies": {
-    "@material/animation": "^0.4.1",
-    "@material/base": "^0.2.6",
-    "@material/elevation": "^0.1.13",
-    "@material/ripple": "^0.8.8",
+    "@material/animation": "^0.25.0",
+    "@material/base": "^0.24.0",
+    "@material/elevation": "^0.25.0",
+    "@material/ripple": "^0.27.0",
     "@material/rtl": "^0.1.8",
-    "@material/theme": "^0.4.0",
+    "@material/theme": "^0.27.0",
     "@material/typography": "^0.3.0"
   }
 }
