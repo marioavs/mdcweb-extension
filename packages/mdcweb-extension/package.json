@@ -15,6 +15,7 @@
   "dependencies": {
     "@material/auto-init": "^0.25.0",
     "@mdcext/data-table": "^0.1.0",
+    "@mdcext/date-picker": "^0.1.0",
     "@mdcext/multiselect": "^0.1.0",
     "@mdcext/pagination": "^0.1.0",
     "@mdcext/treeview": "^0.1.0"

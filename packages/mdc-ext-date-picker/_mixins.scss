@@ -1,0 +1,40 @@
+@import "@material/theme/variables"; // for mdc-theme-accessible-ink-color
+
+//
+// Public
+//
+
+@mixin mdc-ext-date-picker-ink-color($color) {
+  @include mdc-theme-prop(color, $color);
+}
+
+@mixin mdc-ext-date-picker-fill-color($color) {
+  @include mdc-theme-prop(background-color, $color);
+}
+
+@mixin mdc-ext-date-picker-fill-color-accessible($color) {
+  @include mdc-ext-date-picker-fill-color($color);
+  @include mdc-ext-date-picker-ink-color(mdc-theme-accessible-ink-color($color));
+}
+
+@mixin mdc-ext-date-picker-invalid-label-shake-keyframes_($modifier, $positionY) {
+  @keyframes invalid-shake-float-above-#{$modifier} {
+    0% {
+      transform: translateX(0) translateY(-#{$positionY}) scale(.75, .75);
+    }
+
+    33% {
+      animation-timing-function: cubic-bezier(.5, 0, .701732, .495819);
+      transform: translateX(5px) translateY(-#{$positionY}) scale(.75, .75);
+    }
+
+    66% {
+      animation-timing-function: cubic-bezier(.302435, .381352, .55, .956352);
+      transform: translateX(-5px) translateY(-#{$positionY}) scale(.75, .75);
+    }
+
+    100% {
+      transform: translateX(0) translateY(-#{$positionY}) scale(.75, .75);
+    }
+  }
+}

@@ -1,0 +1,245 @@
+/* eslint-disable no-unused-vars */
+import MDCExtDatePickerLabelFoundation from './label/foundation';
+/* eslint-enable no-unused-vars */
+
+/**
+ * @typedef {{
+ *   value: string,
+ *   disabled: boolean,
+ *   badInput: boolean,
+ *   checkValidity: (function(): boolean)
+ * }}
+ */
+let NativeInputType;
+
+/**
+ * @typedef {{
+ *   label: (!MDCExtDatePickerLabelFoundation|undefined)
+ * }}
+ */
+let FoundationMapType;
+
+/**
+ * Adapter for MDC Text Field.
+ *
+ * Defines the shape of the adapter expected by the foundation. Implement this
+ * adapter to integrate the Text Field into your framework. See
+ * https://github.com/material-components/material-components-web/blob/master/docs/authoring-components.md
+ * for more information.
+ *
+ * @record
+ */
+class MDCExtDatePickerAdapter {
+  /**
+   * Adds a class to the root element.
+   * @param {string} className
+   */
+  addClass(className) {}
+
+  /**
+   * Removes a class from the root element.
+   * @param {string} className
+   */
+  removeClass(className) {}
+
+  /**
+   * Adds a class to the previous button element.
+   * @param {string} className
+   */
+  addPrevClass(className) {}
+
+  /**
+   * Removes a class from the previous button element.
+   * @param {string} className
+   */
+  removePrevClass(className) {}
+
+  /**
+   * Adds a class to the next button element.
+   * @param {string} className
+   */
+  addNextClass(className) {}
+
+  /**
+   * Removes a class from the next button element.
+   * @param {string} className
+   */
+  removeNextClass(className) {}
+
+  /**
+   * @param {string} className
+   * @return {boolean}
+   */
+  hasClass(className) {}
+
+  /** @return {boolean} */
+  hasNecessaryDom() {}
+
+  /** @return {boolean} */
+  eventTargetHasClass(target, className) {}
+
+  /**
+   * Registers an event handler on the root element for a given event.
+   * @param {string} type
+   * @param {function(!Event): undefined} handler
+   */
+  registerDatePickerInteractionHandler(type, handler) {}
+
+  /**
+   * Deregisters an event handler on the root element for a given event.
+   * @param {string} type
+   * @param {function(!Event): undefined} handler
+   */
+  deregisterDatePickerInteractionHandler(type, handler) {}
+
+  registerTransitionEndHandler(handler) {}
+
+  deregisterTransitionEndHandler(handler) {}
+
+  /**
+   * Registers an event handler for event type `type` on the previous button element.
+   * @param {string} type
+   * @param {!Function} handler
+   */
+  registerPrevInteractionHandler(type, handler) {}
+
+  /**
+   * Un-registers an event handler for event type `type` on the previous button element.
+   * @param {string} type
+   * @param {!Function} handler
+   */
+  deregisterPrevInteractionHandler(type, handler) {}
+
+  /**
+   * Registers an event listener `handler` for event type `type` on the next button element.
+   * @param {string} type
+   * @param {!Function} handler
+   */
+  registerNextInteractionHandler(type, handler) {}
+
+  /**
+   * Un-registers an event listener `handler` for event type `type` on the next button element.
+   * @param {string} type
+   * @param {!Function} handler
+   */
+  deregisterNextInteractionHandler(type, handler) {}
+
+  /**
+   * Registers an event handler on document for key down event.
+   * @param {!Function} handler
+   */
+  registerDocumentKeydownHandler(handler) {}
+
+  /**
+   * Un-registers an event handler on document for key down event.
+   * @param {!Function} handler
+   */
+  deregisterDocumentKeydownHandler(handler) {}
+
+  registerBodyClickHandler(handler) {}
+
+  deregisterBodyClickHandler(handler) {}
+
+  /** @return {number} */
+  getTabIndex() {}
+
+  /** @param {number} tabIndex */
+  setTabIndex(tabIndex) {}
+
+  /**
+   * @param {string} name
+   * @return {string}
+   */
+  getAttr(name) {}
+
+  /**
+   * @param {string} name
+   * @param {string} value
+   */
+  setAttr(name, value) {}
+
+  /** @param {string} name */
+  rmAttr(name) {}
+
+  /**
+   * @return {?Element|?NativeInputType}
+   */
+  getPrevNativeControl() {}
+
+  /**
+   * @return {?Element|?NativeInputType}
+   */
+  getNextNativeControl() {}
+
+  /**
+   * @param {string} name
+   * @param {string} value
+   */
+  setPrevAttr(name, value) {}
+
+  /** @param {string} name */
+  rmPrevAttr(name) {}
+
+  /**
+   * @param {string} name
+   * @param {string} value
+   */
+  setNextAttr(name, value) {}
+
+  /** @param {string} name */
+  rmNextAttr(name) {}
+
+  /**
+   * Returns true if the textfield is focused.
+   * We achieve this via `document.activeElement === this.root_`.
+   * @return {boolean}
+   */
+  isFocused() {}
+
+  /**
+   * Returns true if the direction of the root element is set to RTL.
+   * @return {boolean}
+   */
+  isRtl() {}
+
+  notifyAccept() {}
+
+  notifyCancel() {}
+
+  /** @param {{type: string}} evtData */
+  notifyChange(evtData) {}
+
+  isSurface() {}
+
+  trapFocusOnSurface() {}
+
+  untrapFocusOnSurface() {}
+
+  /**
+   * Registers an event listener on the native input element for a given event.
+   * @param {string} evtType
+   * @param {function(!Event): undefined} handler
+   */
+  registerInputInteractionHandler(evtType, handler) {}
+
+  /**
+   * Deregisters an event listener on the native input element for a given event.
+   * @param {string} evtType
+   * @param {function(!Event): undefined} handler
+   */
+  deregisterInputInteractionHandler(evtType, handler) {}
+
+  /**
+   * Returns an object representing the native text input element, with a
+   * similar API shape. The object returned should include the value, disabled
+   * and badInput properties, as well as the checkValidity() function. We never
+   * alter the value within our code, however we do update the disabled
+   * property, so if you choose to duck-type the return value for this method
+   * in your implementation it's important to keep this in mind. Also note that
+   * this method can return null, which the foundation will handle gracefully.
+   * @return {?Element|?NativeInputType}
+   */
+  getNativeInput() {}
+}
+
+export {MDCExtDatePickerAdapter, NativeInputType, FoundationMapType};

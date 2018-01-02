@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
+import * as datePicker from '@mdcext/date-picker';
 import * as multiselect from '@mdcext/multiselect';
 import * as pagination from '@mdcext/pagination';
 import * as treeview from '@mdcext/treeview';
 import autoInit from '@material/auto-init';
 
 // Register all components
+autoInit.register('MDCExtDatePicker', datePicker.MDCExtDatePicker);
 autoInit.register('MDCExtMultiselect', multiselect.MDCExtMultiselect);
 autoInit.register('MDCExtPagination', pagination.MDCExtPagination);
 autoInit.register('MDCExtTreeview', treeview.MDCExtTreeview);
 
 // Export all components.
 export {
+  datePicker,
   multiselect,
   pagination,
   treeview

@@ -1,0 +1,44 @@
+@import "../mixins";
+@import "../variables";
+@import "@material/rtl/mixins";
+@import "@material/theme/variables";
+@import "@material/theme/mixins";
+
+@include mdc-ext-date-picker-invalid-label-shake_keyframes_(standard, 100%);
+@include mdc-ext-date-picker-invalid-label-shake_keyframes_(box, 50%);
+
+// postcss-bem-linter: define ext-date-picker-label
+.mdc-ext-date-picker__label {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  transform-origin: left top;
+  transition: mdc-ext-date-picker-transition(transform), mdc-ext-date-picker-transition(color);
+  color: $mdc-ext-date-picker-underline-on-light-idle;
+  cursor: text;
+
+  // stylelint-disable plugin/selector-bem-pattern
+  @include mdc-rtl(".mdc-ext-date-picker") {
+    right: 0;
+    left: auto;
+    transform-origin: right top;
+  }
+  // stylelint-enable plugin/selector-bem-pattern
+
+  @include mdc-theme-dark(".mdc-ext-date-picker") {
+    @include mdc-theme-prop(color, $mdc-ext-date-picker-dark-label);
+  }
+
+  &--float-above {
+    transform: translateY(-100%) scale(.75, .75);
+    cursor: auto;
+  }
+}
+
+// stylelint-disable plugin/selector-bem-pattern
+.mdc-ext-date-picker__label--float-above {
+  &.mdc-ext-date-picker__label--shake {
+    animation: invalid-shake-float-above-standard 250ms 1;
+  }
+}
+// stylelint-enable plugin/selector-bem-pattern

@@ -1,0 +1,207 @@
+//
+// Copyright 2017 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+@import "./functions";
+@import "./mixins";
+@import "@material/animation/functions";
+@import "@material/elevation/mixins";
+@import "@material/ripple/mixins";
+@import "@material/theme/mixins";
+@import "@material/typography/mixins";
+@import "./label/mdc-ext-date-picker-label";
+
+// postcss-bem-linter: define date-picker
+
+.mdc-ext-date-picker {
+  display: inline-block;
+  position: relative;
+  margin-bottom: 8px;
+  outline: none;
+  will-change: opacity, transform, color;
+
+  &__input {
+    @include mdc-theme-prop(color, text-primary-on-light);
+    @include mdc-typography-base;
+
+    width: 100%;
+    padding: 0 0 8px;
+    transition: mdc-ext-date-picker-transition(opacity);
+    border: none;
+    border-bottom: 1px solid $mdc-ext-date-picker-underline-on-light-idle;
+    border-radius: 0;
+    background: none;
+    font-size: inherit;
+    appearance: none;
+
+    &::placeholder {
+      @include mdc-theme-prop(color, text-hint-on-light);
+
+      transition: mdc-ext-date-picker-transition(color);
+      opacity: 1;
+    }
+
+    &:hover {
+      border-color: $mdc-ext-date-picker-underline-on-light;
+    }
+
+    &:focus {
+      outline: none;
+
+      &::placeholder {
+        @include mdc-theme-prop(color, $mdc-ext-date-picker-light-placeholder);
+      }
+    }
+
+    // Remove red outline on firefox
+    &:invalid {
+      box-shadow: none;
+    }
+
+    @include mdc-theme-dark {
+      @include mdc-theme-prop(color, text-primary-on-dark);
+
+      border-bottom: 1px solid $mdc-ext-date-picker-underline-on-dark-idle;
+
+      &:hover {
+        border-bottom: 1px solid $mdc-ext-date-picker-underline-on-dark;
+      }
+
+      &::placeholder {
+        @include mdc-theme-prop(color, text-hint-on-dark);
+      }
+
+      &:focus::placeholder {
+        @include mdc-theme-prop(color, $mdc-ext-date-picker-dark-placeholder);
+      }
+    }
+  }
+
+  &__surface {
+    @include mdc-elevation(2);
+    @include mdc-theme-prop(background-color, background);
+
+    display: inline-block;
+    visibility: hidden;
+    position: absolute;
+    flex-direction: column;
+    box-sizing: border-box;
+    transform: scale(.8);
+    z-index: 3;
+  }
+
+  &--animating {
+    visibility: visible;
+
+    .mdc-ext-date-picker__surface {
+      transition: mdc-animation-enter(opacity, 120ms), mdc-animation-enter(transform, 120ms);
+    }
+  }
+
+  &--open {
+    .mdc-ext-date-picker__surface {
+      visibility: visible;
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  &__primary {
+    @include mdc-ext-date-picker-fill-color-accessible(primary);
+    @include mdc-typography(title);
+
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  &__header {
+    @include mdc-typography(body2);
+    @include mdc-theme-prop(color, text-primary-on-light);
+
+    display: flex;
+    align-items: center;
+
+    // Adjust text color for dark theme.
+    @include mdc-theme-dark(".ext-date-picker") {
+      @include mdc-theme-prop(color, text-primary-on-dark);
+    }
+  }
+
+  &__txtmonth {
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  &__button {
+    @include mdc-ripple-surface;
+    @include mdc-ripple-radius;
+    @include mdc-states(secondary);
+
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    border: none;
+    border-radius: 50%;
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 40px;
+    justify-content: center;
+    outline: none;
+    text-align: center;
+    text-decoration: none;
+    transition: box-shadow 280ms $mdc-animation-standard-curve-timing-function;
+    user-select: none;
+    width: 40px;
+
+    @include mdc-theme-dark {
+      @include mdc-states(white);
+      @include mdc-theme-prop(color, text-primary-on-dark);
+    }
+
+    &:disabled {
+      @include mdc-theme-prop(background-color, transparent);
+      @include mdc-theme-prop(color, text-disabled-on-light);
+      cursor: default;
+      pointer-events: none;
+
+      @include mdc-theme-dark(".mdc-ext-pagination") {
+        @include mdc-theme-prop(color, text-disabled-on-dark);
+      }
+    }
+
+    // :not(:disabled) is used to support link styled as button
+    // as link does not support :enabled style
+    &:not(:disabled) {
+      @include mdc-theme-prop(background-color, transparent, $edgeOptOut: true);
+      @include mdc-theme-prop(color, text-primary-on-light);
+    }
+  }
+
+  &__days {
+    border: none;
+    text-align: center;
+    width: 100%;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+}
+// postcss-bem-linter: end
