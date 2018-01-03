@@ -52,6 +52,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       hasClass: () => false,
       hasNecessaryDom: () => false,
       eventTargetHasClass: () => false,
+      getDayTableDimensions: () => {},
       registerDatePickerInteractionHandler: () => {},
       deregisterDatePickerInteractionHandler: () => {},
       registerTransitionEndHandler: () => {},
@@ -64,11 +65,22 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       deregisterDocumentKeydownHandler: () => {},
       registerBodyClickHandler: () => {},
       deregisterBodyClickHandler: () => {},
+      registerTableTransitionEndHandler: () => {},
+      deregisterTableTransitionEndHandler: () => {},
+      isActiveTable: () => {},
+      setupDayTables: () => {},
+      replaceTableBody: () => {},
+      replaceTableClass: () => {},
+      setDateContent: () => {},
+      setMonthContent: () => {},
+      setYearContent: () => {},
       getTabIndex: () => 0,
       setTabIndex: () => {},
       getAttr: () => '',
       setAttr: () => {},
       rmAttr: () => {},
+      setMonthsHeight: () => {},
+      setMonthsWidth: () => {},
       getPrevNativeControl: () => {},
       getNextNativeControl: () => {},
       setPrevAttr: () => {},
@@ -92,6 +104,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   constructor(adapter = /** @type {!MDCExtDatePickerAdapter} */ ({}),
     foundationMap = /** @type {!FoundationMapType} */ ({})) {
     super(Object.assign(MDCExtDatePickerFoundation.defaultAdapter, adapter));
+
+    this.settings_ = this.getDefaultSettings_();
 
     /** @type {!MDCExtDatePickerLabelFoundation|undefined} */
     this.label_ = foundationMap.label;
@@ -136,16 +150,12 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     this.transitionEndHandler_ = (evt) => this.handleTransitionEnd_(evt);
     /** @private {function(!Event): undefined} */
     this.surfaceHandler_ = (evt) => this.handleDatePickerSurface(evt);
-
-    this.prevClickHandler_ = /** @private {!EventListener} */ (() => {
-      if (!this.disabled_)
-        this.adapter_.notifyChange({type: strings.TYPE_PREV});
-    });
-
-    this.nextClickHandler_ = /** @private {!EventListener} */ (() => {
-      if (!this.disabled_)
-        this.adapter_.notifyChange({type: strings.TYPE_NEXT});
-    });
+    /** @private {function(!Event): undefined} */
+    this.nextClickHandler_ = (evt) => this.handleNextClick_(evt);
+    /** @private {function(!Event): undefined} */
+    this.prevClickHandler_ = (evt) => this.handlePrevClick_(evt);
+    /** @private {function(!Event): undefined} */
+    this.tableTransitionEndHandler_ = (evt) => this.handleTableTransitionEnd_(evt);
   }
 
   init() {
@@ -182,6 +192,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     });
     this.adapter_.registerPrevInteractionHandler('click', this.prevClickHandler_);
     this.adapter_.registerNextInteractionHandler('click', this.nextClickHandler_);
+    this.adapter_.setupDayTables();
   }
 
   destroy() {
@@ -199,7 +210,24 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     if (this.isOpen_) {
       this.adapter_.deregisterBodyClickHandler(this.bodyClickHandler_);
       this.adapter_.deregisterTransitionEndHandler(this.transitionEndHandler_);
+      this.adapter_.deregisterTableTransitionEndHandler(this.tableTransitionEndHandler_);
     }
+  }
+
+  getSettings() {
+    return this.settings_ ;
+  }
+
+  setSettings(settings) {
+    Object.assign(this.settings_, settings);
+  }
+
+  getDefaultSettings_() {
+    return {
+      days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      months: ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December']
+    };
   }
 
   /**
@@ -216,8 +244,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
 
   handleDatePickerSurface(evt) {
     evt.preventDefault();
-    // evt.stopPropagation();
     if (!this.isOpen()) {
+      // evt.stopPropagation();
       this.open_();
     }
   }
@@ -380,10 +408,15 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    * @private
    */
   handleBodyClick_(evt) {
+    const {ANIMATING, ROOT, SURFACE} =  cssClasses;
     let el = evt.target;
 
     while (el && el !== document.documentElement) {
-      if (this.adapter_.eventTargetHasClass(el, cssClasses.ROOT)) {
+      if (this.adapter_.eventTargetHasClass(el, SURFACE)) {
+        return;
+      }
+      if (this.adapter_.eventTargetHasClass(el, ROOT) &&
+        (this.adapter_.hasClass(ANIMATING))) {
         return;
       }
       el = el.parentNode;
@@ -403,23 +436,107 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     }
   };
 
+  /**
+   * Handles click event on next month button.
+   * @param {!Event} evt
+   */
+  handleNextClick_(evt) {
+    const {DAY_TABLE_ACTIVE, DAY_TABLE_ANIMATING, DAY_TABLE_HIDDEN, DAY_TABLE_NEXT, DAY_TABLE_PREV} = cssClasses;
+    const {TYPE_ACTIVE, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = strings;
+    if (this.disabled_)
+      return;
+    this.displayValue_ = new Date(this.displayValue_.getFullYear(), this.displayValue_.getMonth() + 1, 1);
+    this.updateHeader_(this.displayValue_);
+    this.adapter_.replaceTableBody(TYPE_NEXT, this.buildTableData_(this.displayValue_));
+    this.adapter_.replaceTableClass(TYPE_PREV, DAY_TABLE_PREV, DAY_TABLE_HIDDEN);
+    this.adapter_.replaceTableClass(TYPE_ACTIVE, null, DAY_TABLE_ANIMATING);
+    this.adapter_.replaceTableClass(TYPE_NEXT, null, DAY_TABLE_ANIMATING);
+    this.adapter_.registerTableTransitionEndHandler(this.tableTransitionEndHandler_);
+    this.adapter_.replaceTableClass(TYPE_ACTIVE, DAY_TABLE_ACTIVE, DAY_TABLE_PREV);
+    this.adapter_.replaceTableClass(TYPE_NEXT, DAY_TABLE_NEXT, DAY_TABLE_ACTIVE);
+    this.adapter_.replaceTableClass(TYPE_HIDDEN, DAY_TABLE_HIDDEN, DAY_TABLE_NEXT);
+    this.adapter_.notifyChange({type: TYPE_NEXT});
+  }
+
+  /**
+   * Handles click event on previous month button.
+   * @param {!Event} evt
+   */
+  handlePrevClick_(evt) {
+    const {DAY_TABLE_ACTIVE, DAY_TABLE_ANIMATING, DAY_TABLE_HIDDEN, DAY_TABLE_NEXT, DAY_TABLE_PREV} = cssClasses;
+    const {TYPE_ACTIVE, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = strings;
+    if (this.disabled_)
+      return;
+    this.displayValue_ = new Date(this.displayValue_.getFullYear(), this.displayValue_.getMonth(), 0);
+    this.updateHeader_(this.displayValue_);
+    this.adapter_.replaceTableBody(TYPE_PREV, this.buildTableData_(this.displayValue_));
+    this.adapter_.replaceTableClass(TYPE_NEXT, DAY_TABLE_NEXT, DAY_TABLE_HIDDEN);
+    this.adapter_.replaceTableClass(TYPE_ACTIVE, null, DAY_TABLE_ANIMATING);
+    this.adapter_.replaceTableClass(TYPE_PREV, null, DAY_TABLE_ANIMATING);
+    this.adapter_.registerTableTransitionEndHandler(this.tableTransitionEndHandler_);
+    this.adapter_.replaceTableClass(TYPE_ACTIVE, DAY_TABLE_ACTIVE, DAY_TABLE_NEXT);
+    this.adapter_.replaceTableClass(TYPE_PREV, DAY_TABLE_PREV, DAY_TABLE_ACTIVE);
+    this.adapter_.replaceTableClass(TYPE_HIDDEN, DAY_TABLE_HIDDEN, DAY_TABLE_PREV);
+    this.adapter_.notifyChange({type: TYPE_PREV});
+  }
+
+  updateDaysTable_() {
+    const {TYPE_ACTIVE} = strings;
+    if (!this.displayValue_)
+      this.displayValue_ = new Date();
+    this.adapter_.replaceTableBody(TYPE_ACTIVE, this.buildTableData_(this.displayValue_));
+  }
+
+  buildTableData_(date) {
+    let firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    let lastDayDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    let lastDayOfMonth = lastDayDate.getDate();
+    let tableData = [[], [], [], [], [], []];
+    let firstDayOfWeek = firstDayOfMonth.getDay();
+    for (let i = 0; i < firstDayOfWeek; i++)
+      tableData[0].push(0);
+    for (let i = 1; i <= lastDayOfMonth; i++) {
+      tableData[Math.floor((firstDayOfWeek + i - 1)/7)].push(i);
+    }
+    return tableData;
+  }
+
+  updateHeader_(date) {
+    const {TYPE_ACTIVE} = strings;
+    this.adapter_.setMonthContent(this.settings_.months[date.getMonth()] + ' ' + date.getFullYear());
+  }
+
+  handleTableTransitionEnd_(evt) {
+    const {DAY_TABLE_ANIMATING, DAY_TABLE_HIDDEN, DAY_TABLE_NEXT, DAY_TABLE_PREV} = cssClasses;
+    const {TYPE_ACTIVE, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = strings;
+    if (this.adapter_.isActiveTable(evt.target)) {
+      this.adapter_.deregisterTableTransitionEndHandler(this.tableTransitionEndHandler_);
+      this.adapter_.replaceTableClass(TYPE_ACTIVE, DAY_TABLE_ANIMATING, null);
+      this.adapter_.replaceTableClass(TYPE_NEXT, DAY_TABLE_ANIMATING, null);
+      this.adapter_.replaceTableClass(TYPE_PREV, DAY_TABLE_ANIMATING, null);
+      this.adapter_.removeClass(cssClasses.ANIMATING);
+    };
+  };
+
   open_() {
     const {ANIMATING, OPEN} = cssClasses;
+    if (!this.displayValue_)
+      this.displayValue_ = new Date();
+    this.updateHeader_(this.displayValue_);
+    this.updateDaysTable_();
     this.adapter_.registerDocumentKeydownHandler(this.documentKeydownHandler_);
     this.adapter_.registerBodyClickHandler(this.bodyClickHandler_);
     // this.adapter_.registerInteractionHandler('click', this.componentClickHandler_);
-    // this.adapter_.registerBodyClickHandler(this.documentClickHandler_);
+    this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
     this.adapter_.addClass(ANIMATING);
     this.adapter_.addClass(OPEN);
     this.isOpen_ = true;
-    this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
   }
 
   close_() {
     const {ANIMATING, OPEN} = cssClasses;
     this.adapter_.deregisterDocumentKeydownHandler(this.documentKeydownHandler_);
     // this.adapter_.deregisterInteractionHandler('click', this.componentClickHandler_);
-    // this.adapter_.deregisterBodyClickHandler(this.documentClickHandler_);
     this.adapter_.untrapFocusOnSurface();
     this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
     this.adapter_.addClass(ANIMATING);

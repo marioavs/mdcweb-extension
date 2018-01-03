@@ -79,6 +79,11 @@ class MDCExtDatePickerAdapter {
   eventTargetHasClass(target, className) {}
 
   /**
+   * @return {{bottom: number, height: number, left: number, right: number, top: number, width: number}}
+   */
+  getDayTableDimensions() {}
+
+  /**
    * Registers an event handler on the root element for a given event.
    * @param {string} type
    * @param {function(!Event): undefined} handler
@@ -140,6 +145,24 @@ class MDCExtDatePickerAdapter {
 
   deregisterBodyClickHandler(handler) {}
 
+  registerTableTransitionEndHandler(handler) {}
+
+  deregisterTableTransitionEndHandler(handler) {}
+
+  isActiveTable() {}
+
+  setupDayTables() {}
+
+  replaceTableBody() {}
+
+  replaceTableClass() {}
+
+  setDateContent() {}
+
+  setMonthContent() {}
+
+  setYearContent() {}
+
   /** @return {number} */
   getTabIndex() {}
 
@@ -160,6 +183,10 @@ class MDCExtDatePickerAdapter {
 
   /** @param {string} name */
   rmAttr(name) {}
+
+  setMonthsHeight(height) {}
+
+  setMonthsWidth(width) {}
 
   /**
    * @return {?Element|?NativeInputType}

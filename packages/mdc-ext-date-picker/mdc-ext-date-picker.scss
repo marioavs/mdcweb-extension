@@ -30,7 +30,6 @@
   position: relative;
   margin-bottom: 8px;
   outline: none;
-  will-change: opacity, transform, color;
 
   &__input {
     @include mdc-theme-prop(color, text-primary-on-light);
@@ -191,10 +190,49 @@
     }
   }
 
+  &__months {
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
   &__days {
+    position: relative;
     border: none;
     text-align: center;
+    transform: none;
+    top: 0px;
     width: 100%;
+
+    td {
+      width: 3em;
+    }
+
+    tr {
+      height: 2em;
+    }
+
+    &--hidden {
+      position: absolute;
+      visibility: hidden;
+    }
+
+    &--next {
+      position: absolute;
+      transform: translateX(100%);
+      visibility: hidden;
+    }
+
+    &--prev {
+      position: absolute;
+      transform: translateX(-100%);
+      visibility: hidden;
+    }
+
+    &--animating {
+      visibility: visible;
+      transition: mdc-animation-enter(transform, 120ms);
+    }
   }
 
   &__actions {

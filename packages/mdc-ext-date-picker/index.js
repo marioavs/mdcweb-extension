@@ -39,11 +39,23 @@ class MDCExtDatePicker extends MDCComponent {
     /** @private {?MDCExtDatePickerLabel} */
     this.label_;
     /** @private {?Element} */
+    this.acceptButton_;
+    /** @private {?Element} */
+    this.cancelButton_;
+    /** @private {?Element} */
     this.surface_;
+    /** @private {?Object} */
+    this.focusTrap_;
     /** @private {?Element} */
     this.prevEl_;
     /** @private {?Element} */
     this.nextEl_;
+    /** @private {?Element} */
+    this.txtDateEl_;
+    /** @private {?Element} */
+    this.txtMonthEl_;
+    /** @private {?Element} */
+    this.txtYearEl_;
     /** @type {?MDCRipple} */
     this.prevRipple_;
     /** @type {?MDCRipple} */
@@ -77,6 +89,10 @@ class MDCExtDatePicker extends MDCComponent {
     this.focusTrap_ = createFocusTrapInstance(this.surface_, this.acceptButton_);
     this.prevEl_ = this.root_.querySelector(strings.PREV_SELECTOR);
     this.nextEl_ = this.root_.querySelector(strings.NEXT_SELECTOR);
+    this.txtDateEl_ = this.root_.querySelector(strings.TXT_DATE_SELECTOR);
+    this.txtMonthEl_ = this.root_.querySelector(strings.TXT_MONTH_SELECTOR);
+    this.txtYearEl_ = this.root_.querySelector(strings.TXT_YEAR_SELECTOR);
+    this.monthsEl_ =  this.root_.querySelector(strings.MONTHS_SELECTOR);
 
     if (this.prevEl_) {
       this.prevRipple_ = rippleFactory(this.prevEl_);
@@ -145,8 +161,10 @@ class MDCExtDatePicker extends MDCComponent {
         addNextClass: (className) => this.nextEl_.classList.add(className),
         removeNextClass: (className) => this.nextEl_.classList.remove(className),
         hasClass: (className) => this.root_.classList.contains(className),
-        hasNecessaryDom: () => Boolean(this.prevEl_) && Boolean(this.nextEl_),
+        hasNecessaryDom: () => Boolean(this.surface_) && Boolean(this.monthsEl_) &&
+          Boolean(this.prevEl_) && Boolean(this.nextEl_),
         eventTargetHasClass: (target, className) => target.classList.contains(className),
+        getDayTableDimensions: () => this.dayTableEl_.getBoundingClientRect(),
         registerDatePickerInteractionHandler: (evtType, handler) => this.root_.addEventListener(evtType, handler),
         deregisterDatePickerInteractionHandler: (evtType, handler) => this.root_.removeEventListener(evtType, handler),
         registerTransitionEndHandler: (handler) => this.surface_.addEventListener('transitionend', handler),
@@ -159,11 +177,22 @@ class MDCExtDatePicker extends MDCComponent {
         deregisterDocumentKeydownHandler: (handler) => document.removeEventListener('keydown', handler),
         registerBodyClickHandler: (handler) => document.body.addEventListener('click', handler),
         deregisterBodyClickHandler: (handler) => document.body.removeEventListener('click', handler),
+        registerTableTransitionEndHandler: (handler) => this.monthsEl_.addEventListener('transitionend', handler),
+        deregisterTableTransitionEndHandler: (handler) => this.monthsEl_.removeEventListener('transitionend', handler),
+        isActiveTable: (el) => (el && el.classList.contains(cssClasses.DAY_TABLE_ACTIVE)),
+        setupDayTables: () => this.setupDayTables_(),
+        replaceTableBody: (tableType, tableData) => this.replaceTableBody_(tableType, tableData),
+        replaceTableClass: (tableType, fromClassName, toClassName) => this.replaceTableClass_(tableType, fromClassName, toClassName),
+        setDateContent: (value) => ((this.txtDateEl_) && (this.txtDateEl_.textContent = value)),
+        setMonthContent: (value) => ((this.txtMonthEl_) && (this.txtMonthEl_.textContent = value)),
+        setYearContent: (value) => ((this.txtYearEl_) && (this.txtYearEl_.textContent = value)),
         getTabIndex: () => this.root_.tabIndex,
         setTabIndex: (tabIndex) => this.root_.tabIndex = tabIndex,
         getAttr: (name) => this.root_.getAttribute(name),
         setAttr: (name, value) => this.root_.setAttribute(name, value),
         rmAttr: (name) => this.root_.removeAttribute(name),
+        setMonthsHeight: (height) => { this.monthsEl_.height = height },
+        setMonthsWidth: (width) => { this.monthsEl_.width = width },
         getPrevNativeControl: () => this.prevEl_,
         getNextNativeControl: () => this.nextEl_,
         setPrevAttr: (name, value) => this.prevEl_.setAttribute(name, value),
@@ -219,6 +248,14 @@ class MDCExtDatePicker extends MDCComponent {
       this.input_.disabled;
   }
 
+  get settings() {
+    return this.foundation_.getSettings();
+  }
+
+  set settings(settings) {
+    return this.foundation_.setSettings(settings);
+  }
+
   /**
    * @return {boolean} True if the Date Picker is disabled.
    */
@@ -231,6 +268,67 @@ class MDCExtDatePicker extends MDCComponent {
    */
   set disabled(disabled) {
     this.foundation_.setDisabled(disabled);
+  }
+
+  setupDayTables_() {
+    const {DAY_TABLE_ACTIVE, DAY_TABLE_NEXT, DAY_TABLE_PREV} = cssClasses;
+    let dayTable = this.root_.querySelector(strings.DAY_TABLE_SELECTOR);
+    let clonedTable = dayTable.cloneNode(true);
+    clonedTable.classList.add(DAY_TABLE_ACTIVE);
+    this.monthsEl_.appendChild(clonedTable);
+    clonedTable = dayTable.cloneNode(true);
+    clonedTable.classList.add(DAY_TABLE_NEXT);
+    this.monthsEl_.appendChild(clonedTable);
+    dayTable.classList.add(DAY_TABLE_PREV);
+  }
+
+  replaceTableBody_(tableType, tableData) {
+    const {DAY_ROWS_SELECTOR, DAY_TABLE_ACTIVE_SELECTOR, DAY_TABLE_NEXT_SELECTOR, DAY_TABLE_PREV_SELECTOR, TYPE_NEXT, TYPE_PREV} = strings;
+    let tableEl = undefined;
+    if (tableType === TYPE_NEXT)
+      tableEl = this.root_.querySelector(DAY_TABLE_NEXT_SELECTOR);
+    else if (tableType === TYPE_PREV)
+      tableEl = this.root_.querySelector(DAY_TABLE_PREV_SELECTOR);
+    else
+      tableEl = this.root_.querySelector(DAY_TABLE_ACTIVE_SELECTOR);
+    if (!tableEl)
+      return;
+    let rows = tableEl.querySelectorAll(DAY_ROWS_SELECTOR);
+    for (let i = 0; i < 6; i++) {
+      if (rows[i]) {
+        this.removeChildElements(rows[i])
+        for (let j = 0; j < 7; j++) {
+          let tdNode = document.createElement('td');
+          if (tableData[i] && tableData[i][j])
+            tdNode.textContent = tableData[i][j];
+          rows[i].appendChild(tdNode);
+        }
+      }
+    }
+  }
+
+  replaceTableClass_(tableType, fromClassName, toClassName) {
+    const {DAY_TABLE_ACTIVE_SELECTOR, DAY_TABLE_HIDDEN_SELECTOR, DAY_TABLE_NEXT_SELECTOR,
+      DAY_TABLE_PREV_SELECTOR, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = strings;
+    let tableEl = undefined;
+    if (tableType === TYPE_HIDDEN)
+      tableEl = this.root_.querySelector(DAY_TABLE_HIDDEN_SELECTOR);
+    else if (tableType === TYPE_NEXT)
+      tableEl = this.root_.querySelector(DAY_TABLE_NEXT_SELECTOR);
+    else if (tableType === TYPE_PREV)
+      tableEl = this.root_.querySelector(DAY_TABLE_PREV_SELECTOR);
+    else
+      tableEl = this.root_.querySelector(DAY_TABLE_ACTIVE_SELECTOR);
+    if (!tableEl)
+      return;
+    if (fromClassName)
+      tableEl.classList.remove(fromClassName);
+    if (toClassName)
+      tableEl.classList.add(toClassName);
+  }
+
+  removeChildElements(el) {
+    while (el.firstChild) el.removeChild(el.firstChild);
   }
 }
 
