@@ -97,6 +97,8 @@
     position: absolute;
     flex-direction: column;
     box-sizing: border-box;
+    left: 0;
+    top: 0;
     transform: scale(.8);
     z-index: 3;
   }
@@ -138,6 +140,10 @@
     @include mdc-theme-dark(".ext-date-picker") {
       @include mdc-theme-prop(color, text-primary-on-dark);
     }
+  }
+
+  &__txtyear {
+    @include mdc-typography(body1);
   }
 
   &__txtmonth {
@@ -197,6 +203,7 @@
   }
 
   &__days {
+    @include mdc-typography(caption);
     position: relative;
     border: none;
     text-align: center;
@@ -204,12 +211,8 @@
     top: 0px;
     width: 100%;
 
-    td {
-      width: 3em;
-    }
-
     tr {
-      height: 2em;
+      height: 2.5em;
     }
 
     &--hidden {
@@ -233,6 +236,45 @@
       visibility: visible;
       transition: mdc-animation-enter(transform, 120ms);
     }
+  }
+
+  &__day {
+    position: relative;
+    border-radius: 50%;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+    min-width: 2.5em;
+
+    &::before {
+      @include mdc-theme-prop(background-color, black);
+
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      content: "";
+      will-change: opacity;
+
+      @include mdc-theme-dark(".mdc-tab-bar") {
+        @include mdc-theme-prop(background-color, white);
+      }
+    }
+
+    &:not(.mdc-ext-date-picker__day--selected):hover {
+      &::before {
+        display: block;
+        opacity: .38
+      }
+    }
+  }
+
+  &__day--selected {
+    @include mdc-theme-prop(background-color, secondary);
   }
 
   &__actions {

@@ -141,15 +141,25 @@ class MDCExtDatePickerAdapter {
    */
   deregisterDocumentKeydownHandler(handler) {}
 
+  registerSurfaceInteractionHandler(type, handler) {}
+
+  deregisterSurfaceInteractionHandler(type, handler) {}
+
   registerBodyClickHandler(handler) {}
 
   deregisterBodyClickHandler(handler) {}
+
+  registerDayClickHandler(handler) {}
+
+  deregisterDayClickHandler(handler) {}
 
   registerTableTransitionEndHandler(handler) {}
 
   deregisterTableTransitionEndHandler(handler) {}
 
   isActiveTable() {}
+
+  isCalendarDay() {}
 
   setupDayTables() {}
 
@@ -162,6 +172,14 @@ class MDCExtDatePickerAdapter {
   setMonthContent() {}
 
   setYearContent() {}
+
+  getDayAttr() {}
+
+  addDayClass() {}
+
+  removeAllDaysClass() {}
+
+  setDisplayValue() {}
 
   /** @return {number} */
   getTabIndex() {}

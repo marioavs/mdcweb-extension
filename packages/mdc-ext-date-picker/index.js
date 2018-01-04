@@ -86,7 +86,7 @@ class MDCExtDatePicker extends MDCComponent {
     this.acceptButton_ = this.root_.querySelector(strings.ACCEPT_SELECTOR);
     this.cancelButton_ = this.root_.querySelector(strings.CANCEL_SELECTOR);
     this.surface_ = this.root_.querySelector(strings.SURFACE_SELECTOR);
-    this.focusTrap_ = createFocusTrapInstance(this.surface_, this.acceptButton_);
+    this.focusTrap_ = createFocusTrapInstance(this.surface_, null);
     this.prevEl_ = this.root_.querySelector(strings.PREV_SELECTOR);
     this.nextEl_ = this.root_.querySelector(strings.NEXT_SELECTOR);
     this.txtDateEl_ = this.root_.querySelector(strings.TXT_DATE_SELECTOR);
@@ -161,7 +161,7 @@ class MDCExtDatePicker extends MDCComponent {
         addNextClass: (className) => this.nextEl_.classList.add(className),
         removeNextClass: (className) => this.nextEl_.classList.remove(className),
         hasClass: (className) => this.root_.classList.contains(className),
-        hasNecessaryDom: () => Boolean(this.surface_) && Boolean(this.monthsEl_) &&
+        hasNecessaryDom: () => Boolean(this.input_) && Boolean(this.surface_) && Boolean(this.monthsEl_) &&
           Boolean(this.prevEl_) && Boolean(this.nextEl_),
         eventTargetHasClass: (target, className) => target.classList.contains(className),
         getDayTableDimensions: () => this.dayTableEl_.getBoundingClientRect(),
@@ -175,17 +175,26 @@ class MDCExtDatePicker extends MDCComponent {
         deregisterNextInteractionHandler: (type, handler) => this.nextEl_.removeEventListener(type, handler),
         registerDocumentKeydownHandler: (handler) => document.addEventListener('keydown', handler),
         deregisterDocumentKeydownHandler: (handler) => document.removeEventListener('keydown', handler),
+        registerSurfaceInteractionHandler: (evtType, handler) => this.surface_.addEventListener(evtType, handler),
+        deregisterSurfaceInteractionHandler: (evtType, handler) => this.surface_.removeEventListener(evtType, handler),
         registerBodyClickHandler: (handler) => document.body.addEventListener('click', handler),
         deregisterBodyClickHandler: (handler) => document.body.removeEventListener('click', handler),
+        registerDayClickHandler: (handler) => this.monthsEl_.addEventListener('click', handler),
+        deregisterDayClickHandler: (handler) => this.monthsEl_.removeEventListener('click', handler),
         registerTableTransitionEndHandler: (handler) => this.monthsEl_.addEventListener('transitionend', handler),
         deregisterTableTransitionEndHandler: (handler) => this.monthsEl_.removeEventListener('transitionend', handler),
         isActiveTable: (el) => (el && el.classList.contains(cssClasses.DAY_TABLE_ACTIVE)),
+        isCalendarDay: (el) => (el && el.classList.contains(cssClasses.CALENDAR_DAY)),
         setupDayTables: () => this.setupDayTables_(),
         replaceTableBody: (tableType, tableData) => this.replaceTableBody_(tableType, tableData),
         replaceTableClass: (tableType, fromClassName, toClassName) => this.replaceTableClass_(tableType, fromClassName, toClassName),
         setDateContent: (value) => ((this.txtDateEl_) && (this.txtDateEl_.textContent = value)),
         setMonthContent: (value) => ((this.txtMonthEl_) && (this.txtMonthEl_.textContent = value)),
         setYearContent: (value) => ((this.txtYearEl_) && (this.txtYearEl_.textContent = value)),
+        getDayAttr: (el) => ({date: el.getAttribute('data-date'), month: el.getAttribute('data-month'), year: el.getAttribute('data-year')}),
+        addDayClass: (el, className) => el.classList.add(className),
+        removeAllDaysClass: (className) => this.removeAllDaysClass_(className),
+        setDisplayValue: (value) => this.input_.value = value,
         getTabIndex: () => this.root_.tabIndex,
         setTabIndex: (tabIndex) => this.root_.tabIndex = tabIndex,
         getAttr: (name) => this.root_.getAttribute(name),
@@ -283,7 +292,9 @@ class MDCExtDatePicker extends MDCComponent {
   }
 
   replaceTableBody_(tableType, tableData) {
-    const {DAY_ROWS_SELECTOR, DAY_TABLE_ACTIVE_SELECTOR, DAY_TABLE_NEXT_SELECTOR, DAY_TABLE_PREV_SELECTOR, TYPE_NEXT, TYPE_PREV} = strings;
+    const {CALENDAR_DAY} = cssClasses;
+    const {ARIA_DISABLED, DAY_ROWS_SELECTOR, DAY_TABLE_ACTIVE_SELECTOR, DAY_TABLE_NEXT_SELECTOR,
+      DAY_TABLE_PREV_SELECTOR, TYPE_NEXT, TYPE_PREV} = strings;
     let tableEl = undefined;
     if (tableType === TYPE_NEXT)
       tableEl = this.root_.querySelector(DAY_TABLE_NEXT_SELECTOR);
@@ -299,12 +310,30 @@ class MDCExtDatePicker extends MDCComponent {
         this.removeChildElements(rows[i])
         for (let j = 0; j < 7; j++) {
           let tdNode = document.createElement('td');
-          if (tableData[i] && tableData[i][j])
-            tdNode.textContent = tableData[i][j];
+          if (tableData[i] && tableData[i][j]) {
+            if (tableData[i][j]['content']) {
+              tdNode.setAttribute('role', 'button');
+              tdNode.setAttribute('tabindex', '-1');
+              tdNode.setAttribute('data-date', tableData[i][j]['date']);
+              tdNode.setAttribute('data-month', tableData[i][j]['month']);
+              tdNode.setAttribute('data-year', tableData[i][j]['year']);
+              tdNode.classList.add(CALENDAR_DAY);
+              if (!tableData[i][j]['enabled'])
+                tdNode.setAttribute(ARIA_DISABLED, 'true');
+              tdNode.textContent = tableData[i][j]['content'];
+            }
+            if (tableData[i][j]['cssClass']) {
+              tdNode.classList.add(tableData[i][j]['cssClass']);
+            }
+          }
           rows[i].appendChild(tdNode);
         }
       }
     }
+  }
+
+  removeChildElements(el) {
+    while (el.firstChild) el.removeChild(el.firstChild);
   }
 
   replaceTableClass_(tableType, fromClassName, toClassName) {
@@ -327,8 +356,12 @@ class MDCExtDatePicker extends MDCComponent {
       tableEl.classList.add(toClassName);
   }
 
-  removeChildElements(el) {
-    while (el.firstChild) el.removeChild(el.firstChild);
+  removeAllDaysClass_(className) {
+    const {CALENDAR_DAY_SELECTOR} = strings;
+    let elements = this.monthsEl_.querySelectorAll(CALENDAR_DAY_SELECTOR);
+    for (let i = 0, l = elements.length; i < l; i++) {
+      elements[i].classList.remove(className);
+    }
   }
 }
 

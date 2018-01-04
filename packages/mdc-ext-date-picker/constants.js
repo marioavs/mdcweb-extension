@@ -20,8 +20,12 @@ const ROOT = 'mdc-ext-date-picker';
 /** @enum {string} */
 const cssClasses = {
   ROOT: ROOT,
+  ACCEPT_BTN: `${ROOT}__button--accept`,
   ANIMATING: `${ROOT}--animating`,
   BUTTON_DISABLED: `${ROOT}__button--disabled`,
+  CALENDAR_DAY: `${ROOT}__day`,
+  CANCEL_BTN: `${ROOT}__button--cancel`,
+  DAY_SELECTED: `${ROOT}__day--selected`,
   DAY_TABLE_ACTIVE: `${ROOT}__days--active`,
   DAY_TABLE_ANIMATING: `${ROOT}__days--animating`,
   DAY_TABLE_HIDDEN: `${ROOT}__days--hidden`,
@@ -38,6 +42,7 @@ const cssClasses = {
 /** @enum {string} */
 const strings = {
   ACCEPT_SELECTOR: `.${ROOT}__button--accept`,
+  CALENDAR_DAY_SELECTOR: `.${ROOT}__day`,
   CANCEL_SELECTOR: `.${ROOT}__button--cancel`,
   DAY_ROWS_SELECTOR: `.${ROOT}__days tbody tr`,
   DAY_TABLE_SELECTOR: `.${ROOT}__days`,

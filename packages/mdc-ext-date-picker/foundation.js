@@ -63,17 +63,25 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       deregisterNextInteractionHandler: () => {},
       registerDocumentKeydownHandler: () => {},
       deregisterDocumentKeydownHandler: () => {},
+      registerSurfaceInteractionHandler: () => {},
+      deregisterSurfaceInteractionHandler: () => {},
       registerBodyClickHandler: () => {},
       deregisterBodyClickHandler: () => {},
+      registerDayClickHandler: () => {},
+      deregisterDayClickHandler: () => {},
       registerTableTransitionEndHandler: () => {},
       deregisterTableTransitionEndHandler: () => {},
       isActiveTable: () => {},
+      isCalendarDay: () => {},
       setupDayTables: () => {},
       replaceTableBody: () => {},
       replaceTableClass: () => {},
       setDateContent: () => {},
       setMonthContent: () => {},
       setYearContent: () => {},
+      getDayAttr: () => {},
+      addDayClass: () => {},
+      removeAllDaysClass: () => {},
       getTabIndex: () => 0,
       setTabIndex: () => {},
       getAttr: () => '',
@@ -110,6 +118,9 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     /** @type {!MDCExtDatePickerLabelFoundation|undefined} */
     this.label_ = foundationMap.label;
 
+    this.value_ = null;
+    this.selectedValue_ = null;
+    this.displayValue_ = null;
     /** @private {boolean} */
     this.disabled_ = false;
     /** @private {boolean} */
@@ -134,6 +145,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     this.dimensions_;
     /** @private {number} */
     this.startTime_;
+    this.defaultValueToString_ = () => this.valueToString_();
     /** @private {function(): undefined} */
     this.inputFocusHandler_ = () => this.activateFocus();
     /** @private {function(): undefined} */
@@ -144,12 +156,14 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     this.datePickerInteractionHandler_ = (evt) => this.handleDatePickerInteraction(evt);
     /** @private {function(!Event)} */
     this.bodyClickHandler_ = (evt) => this.handleBodyClick_(evt);
+    /** @private {function(!Event)} */
+    this.dayClickHandler_ = (evt) => this.handleDayClick_(evt);
     /** @private {function(!Event): undefined} */
     this.documentKeydownHandler_ = (evt) => this.handleDocumentKeydown_(evt);
     /** @private {function(!Event): undefined} */
     this.transitionEndHandler_ = (evt) => this.handleTransitionEnd_(evt);
     /** @private {function(!Event): undefined} */
-    this.surfaceHandler_ = (evt) => this.handleDatePickerSurface(evt);
+    this.surfaceInteractionHandler_ = (evt) => this.handleSurfaceInteraction(evt);
     /** @private {function(!Event): undefined} */
     this.nextClickHandler_ = (evt) => this.handleNextClick_(evt);
     /** @private {function(!Event): undefined} */
@@ -190,8 +204,6 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     ['click', 'keydown'].forEach((evtType) => {
       this.adapter_.registerDatePickerInteractionHandler(evtType, this.datePickerInteractionHandler_);
     });
-    this.adapter_.registerPrevInteractionHandler('click', this.prevClickHandler_);
-    this.adapter_.registerNextInteractionHandler('click', this.nextClickHandler_);
     this.adapter_.setupDayTables();
   }
 
@@ -205,10 +217,12 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     ['click', 'keydown'].forEach((evtType) => {
       this.adapter_.deregisterDatePickerInteractionHandler(evtType, this.datePickerInteractionHandler_);
     });
-    this.adapter_.deregisterPrevInteractionHandler('click', this.prevClickHandler_);
-    this.adapter_.deregisterNextInteractionHandler('click', this.nextClickHandler_);
     if (this.isOpen_) {
+      this.adapter_.deregisterSurfaceInteractionHandler('click', this.surfaceInterHandler_);
+      this.adapter_.deregisterPrevInteractionHandler('click', this.prevClickHandler_);
+      this.adapter_.deregisterNextInteractionHandler('click', this.nextClickHandler_);
       this.adapter_.deregisterBodyClickHandler(this.bodyClickHandler_);
+      this.adapter_.deregisterDayClickHandler(this.dayClickHandler_);
       this.adapter_.deregisterTransitionEndHandler(this.transitionEndHandler_);
       this.adapter_.deregisterTableTransitionEndHandler(this.tableTransitionEndHandler_);
     }
@@ -226,8 +240,17 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     return {
       days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
       months: ['January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December']
+        'July', 'August', 'September', 'October', 'November', 'December'],
+      shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      valueToString: () => this.valueToString_()
     };
+  }
+
+  valueToString_() {
+    if (!this.value_)
+      return '';
+    return (this.value_.getMonth() + 1) + '/' + this.value_.getDate() + '/' + this.value_.getFullYear();
   }
 
   /**
@@ -235,18 +258,29 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    * @param {!Event} evt
    */
   handleDatePickerInteraction(evt) {
+    const {SURFACE} = cssClasses;
     if (this.adapter_.getNativeInput().disabled) {
       return;
     }
-    this.surfaceHandler_(evt)
     this.receivedUserInput_ = true;
+    if ((evt.type === 'click') && (!this.isOpen())) {
+      let el = evt.target;
+      while (el && el !== document.documentElement) {
+        if (this.adapter_.eventTargetHasClass(el, SURFACE)) {
+          return;
+        }
+        el = el.parentNode;
+      }
+      this.open_();
+    }
   }
 
-  handleDatePickerSurface(evt) {
-    evt.preventDefault();
-    if (!this.isOpen()) {
-      // evt.stopPropagation();
-      this.open_();
+  handleSurfaceInteraction(evt) {
+    const {ACCEPT_BTN, CANCEL_BTN} = cssClasses;
+    if (this.adapter_.eventTargetHasClass(evt.target, ACCEPT_BTN)) {
+      this.accept(true);
+    } else if (this.adapter_.eventTargetHasClass(evt.target, CANCEL_BTN)) {
+      this.cancel(true);
     }
   }
 
@@ -426,6 +460,24 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   };
 
   /**
+   * Handle day clicks
+   * @param {!Event} evt
+   * @private
+   */
+  handleDayClick_(evt) {
+    const {DAY_SELECTED} = cssClasses;
+    if (this.adapter_.isCalendarDay(evt.target)) {
+      let dayAttr = this.adapter_.getDayAttr(evt.target);
+      this.selectedValue_.setFullYear(+dayAttr['year']);
+      this.selectedValue_.setMonth(+dayAttr['month'], +dayAttr['date']);
+      this.displayValue_ = this.selectedValue_;
+      this.adapter_.removeAllDaysClass(DAY_SELECTED);
+      this.adapter_.addDayClass(evt.target, DAY_SELECTED);
+      this.updatePrimary_(this.selectedValue_);
+    }
+  };
+
+  /**
    * Handle key down and cancel the component if needed
    * @param {!Event} evt
    * @private
@@ -482,28 +534,47 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
 
   updateDaysTable_() {
     const {TYPE_ACTIVE} = strings;
-    if (!this.displayValue_)
-      this.displayValue_ = new Date();
     this.adapter_.replaceTableBody(TYPE_ACTIVE, this.buildTableData_(this.displayValue_));
   }
 
   buildTableData_(date) {
+    const {DAY_SELECTED} = cssClasses;
     let firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     let lastDayDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     let lastDayOfMonth = lastDayDate.getDate();
     let tableData = [[], [], [], [], [], []];
     let firstDayOfWeek = firstDayOfMonth.getDay();
+    let dayData = null;
     for (let i = 0; i < firstDayOfWeek; i++)
-      tableData[0].push(0);
+      tableData[0].push({
+        enabled: false
+      });
     for (let i = 1; i <= lastDayOfMonth; i++) {
-      tableData[Math.floor((firstDayOfWeek + i - 1)/7)].push(i);
+      dayData = {
+        content: i,
+        date: i,
+        enabled: true,
+        month: date.getMonth(),
+        year: date.getFullYear()
+      };
+      if (this.selectedValue_) {
+        if ((this.selectedValue_.getFullYear() === date.getFullYear()) &&
+          (this.selectedValue_.getMonth() === date.getMonth()) &&
+          (this.selectedValue_.getDate() === i))
+          dayData.cssClass = DAY_SELECTED;
+      }
+      tableData[Math.floor((firstDayOfWeek + i - 1)/7)].push(dayData);
     }
     return tableData;
   }
 
   updateHeader_(date) {
-    const {TYPE_ACTIVE} = strings;
     this.adapter_.setMonthContent(this.settings_.months[date.getMonth()] + ' ' + date.getFullYear());
+  }
+
+  updatePrimary_(date) {
+    this.adapter_.setDateContent(this.settings_.days[date.getDay()] + ', ' + this.settings_.shortMonths[date.getMonth()] + ' ' + date.getDate());
+    this.adapter_.setYearContent(date.getFullYear());
   }
 
   handleTableTransitionEnd_(evt) {
@@ -520,12 +591,18 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
 
   open_() {
     const {ANIMATING, OPEN} = cssClasses;
-    if (!this.displayValue_)
-      this.displayValue_ = new Date();
+    if (!this.selectedValue_)
+      this.selectedValue_ = new Date();
+    this.displayValue_ = this.selectedValue_;
+    this.updatePrimary_(this.displayValue_);
     this.updateHeader_(this.displayValue_);
     this.updateDaysTable_();
     this.adapter_.registerDocumentKeydownHandler(this.documentKeydownHandler_);
+    this.adapter_.registerSurfaceInteractionHandler('click', this.surfaceInteractionHandler_);
+    this.adapter_.registerPrevInteractionHandler('click', this.prevClickHandler_);
+    this.adapter_.registerNextInteractionHandler('click', this.nextClickHandler_);
     this.adapter_.registerBodyClickHandler(this.bodyClickHandler_);
+    this.adapter_.registerDayClickHandler(this.dayClickHandler_);
     // this.adapter_.registerInteractionHandler('click', this.componentClickHandler_);
     this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
     this.adapter_.addClass(ANIMATING);
@@ -536,6 +613,11 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   close_() {
     const {ANIMATING, OPEN} = cssClasses;
     this.adapter_.deregisterDocumentKeydownHandler(this.documentKeydownHandler_);
+    this.adapter_.deregisterSurfaceInteractionHandler('click', this.surfaceInteractionHandler_);
+    this.adapter_.deregisterPrevInteractionHandler('click', this.prevClickHandler_);
+    this.adapter_.deregisterNextInteractionHandler('click', this.nextClickHandler_);
+    this.adapter_.deregisterBodyClickHandler(this.bodyClickHandler_);
+    this.adapter_.deregisterDayClickHandler(this.dayClickHandler_);
     // this.adapter_.deregisterInteractionHandler('click', this.componentClickHandler_);
     this.adapter_.untrapFocusOnSurface();
     this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
@@ -563,7 +645,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     if (shouldNotify) {
       this.adapter_.notifyAccept();
     }
-
+    this.value_ = this.selectedValue_;
+    this.adapter_.setDisplayValue(this.settings_.valueToString());
     this.close_();
   }
 
@@ -571,7 +654,6 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     if (shouldNotify) {
       this.adapter_.notifyCancel();
     }
-
     this.close_();
   }
 }
