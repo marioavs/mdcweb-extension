@@ -22,7 +22,9 @@ const cssClasses = {
   ROOT: ROOT,
   ACCEPT_BTN: `${ROOT}__button--accept`,
   ANIMATING: `${ROOT}--animating`,
+  BUTTON: `${ROOT}__button`,
   BUTTON_DISABLED: `${ROOT}__button--disabled`,
+  BUTTON_YEAR: `${ROOT}__button--year`,
   CALENDAR_DAY: `${ROOT}__day`,
   CANCEL_BTN: `${ROOT}__button--cancel`,
   DAY_SELECTED: `${ROOT}__day--selected`,
@@ -36,12 +38,14 @@ const cssClasses = {
   INVALID: `${ROOT}--invalid`,
   OPEN: `${ROOT}--open`,
   SURFACE: `${ROOT}__surface`,
-  UPGRADED: `${ROOT}--upgraded`
+  UPGRADED: `${ROOT}--upgraded`,
+  YEAR_SELECTION_ACTIVE: `${ROOT}__year-selection--active`
 };
 
 /** @enum {string} */
 const strings = {
   ACCEPT_SELECTOR: `.${ROOT}__button--accept`,
+  BUTTON_YEAR_SELECTOR: `.${ROOT}__button--year`,
   CALENDAR_DAY_SELECTOR: `.${ROOT}__day`,
   CANCEL_SELECTOR: `.${ROOT}__button--cancel`,
   DAY_ROWS_SELECTOR: `.${ROOT}__days tbody tr`,
@@ -58,11 +62,16 @@ const strings = {
   SURFACE_SELECTOR: `.${ROOT}__surface`,
   TXT_DATE_SELECTOR: `.${ROOT}__txtdate`,
   TXT_MONTH_SELECTOR: `.${ROOT}__txtmonth`,
-  TXT_YEAR_SELECTOR: `.${ROOT}__txtyear`,
+  TXT_WEEK_DAY_SELECTOR: `.${ROOT}__txtweekday`,
+  YEAR_LIST_SELECTOR: `.${ROOT}__year-list`,
+  YEAR_SELECTION_SELECTOR: `.${ROOT}__year-selection`,
   ARIA_DISABLED: 'aria-disabled',
   ACCEPT_EVENT: 'MDCExtDatePicker:accept',
   CANCEL_EVENT: 'MDCExtDatePicker:cancel',
   CHANGE_EVENT: 'MDCExtDatePicker:change',
+  DATA_DATE: 'data-date',
+  DATA_MONTH: 'data-month',
+  DATA_YEAR: 'data-year',
   TYPE_ACTIVE: 'active',
   TYPE_HIDDEN: 'hidden',
   TYPE_NEXT: 'next',

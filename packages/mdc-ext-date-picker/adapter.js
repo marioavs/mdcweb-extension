@@ -67,6 +67,18 @@ class MDCExtDatePickerAdapter {
   removeNextClass(className) {}
 
   /**
+   * Adds a class to the year button element.
+   * @param {string} className
+   */
+  addYearSelectionClass(className) {}
+
+  /**
+   * Removes a class from the year button element.
+   * @param {string} className
+   */
+  removeYearSelectionClass(className) {}
+
+  /**
    * @param {string} className
    * @return {boolean}
    */
@@ -157,10 +169,6 @@ class MDCExtDatePickerAdapter {
 
   deregisterTableTransitionEndHandler(handler) {}
 
-  isActiveTable() {}
-
-  isCalendarDay() {}
-
   setupDayTables() {}
 
   replaceTableBody() {}
@@ -171,15 +179,25 @@ class MDCExtDatePickerAdapter {
 
   setMonthContent() {}
 
+  setWeekDayContent() {}
+
   setYearContent() {}
 
   getDayAttr() {}
+
+  getDayElement() {}
 
   addDayClass() {}
 
   removeAllDaysClass() {}
 
-  setDisplayValue() {}
+  focusDayElement() {}
+
+  setupYearList() {}
+
+  scrollToYear() {}
+
+  setInputValue() {}
 
   /** @return {number} */
   getTabIndex() {}
@@ -253,8 +271,6 @@ class MDCExtDatePickerAdapter {
 
   /** @param {{type: string}} evtData */
   notifyChange(evtData) {}
-
-  isSurface() {}
 
   trapFocusOnSurface() {}
 

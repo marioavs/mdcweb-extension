@@ -57,36 +57,41 @@
           <label for="top-date-picker-input" class="mdc-ext-date-picker__label">Birthdate</label>
           <div class="mdc-ext-date-picker__surface">
             <section class="mdc-ext-date-picker__primary">
-              <span class="mdc-ext-date-picker__txtyear"></span>
-              <span class="mdc-ext-date-picker__txtdate"></span>
+              <button class="mdc-ext-date-picker__button--year"></button>
+              <div class="mdc-ext-date-picker__txtdayanddate">
+                <span class="mdc-ext-date-picker__txtweekday"></span>
+                <span>&nbsp;</span>
+                <span class="mdc-ext-date-picker__txtdate"></span>
+              </div>
             </section>
             <section class="mdc-ext-date-picker__calendar">
-              <div class="mdc-ext-date-picker__header">
-                <button class="mdc-ext-date-picker__button mdc-ext-date-picker__prev"><i class="material-icons">keyboard_arrow_left</i></button>
-                <span class="mdc-ext-date-picker__txtmonth"></span>
-                <button class="mdc-ext-date-picker__button mdc-ext-date-picker__next"><i class="material-icons">keyboard_arrow_right</i></button>
+              <div class="mdc-ext-date-picker__selection-container">
+                <div class="mdc-ext-date-picker__header">
+                  <button class="mdc-ext-date-picker__button mdc-ext-date-picker__prev"><i class="material-icons">&#xE314;</i></button>
+                  <span class="mdc-ext-date-picker__txtmonth"></span>
+                  <button class="mdc-ext-date-picker__button mdc-ext-date-picker__next"><i class="material-icons">&#xE315;</i></button>
+                </div>
+                <div class="mdc-ext-date-picker__months">
+                  <table class="mdc-ext-date-picker__days">
+                    <thead>
+                      <tr>
+                        <th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr></tr><tr></tr><tr></tr><tr></tr><tr></tr><tr></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="mdc-ext-date-picker__year-selection">
+                  <ul class="mdc-ext-date-picker__year-list">
+                  </ul>
+                </div>
               </div>
-              <div class="mdc-ext-date-picker__months">
-                <table class="mdc-ext-date-picker__days">
-                  <thead>
-                    <tr>
-                      <th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr></tr>
-                    <tr></tr>
-                    <tr></tr>
-                    <tr></tr>
-                    <tr></tr>
-                    <tr></tr>
-                  </tbody>
-                </table>
+              <div class="mdc-ext-date-picker__actions">
+                <button class="mdc-button mdc-button--compact mdc-ext-date-picker__button--cancel">CANCEL</button>
+                <button class="mdc-button mdc-button--compact mdc-ext-date-picker__button--accept">OK</button>
               </div>
-            </section>
-            <section class="mdc-ext-date-picker__actions">
-              <button class="mdc-button mdc-button--compact mdc-ext-date-picker__button--cancel">CANCEL</button>
-              <button class="mdc-button mdc-button--compact mdc-ext-date-picker__button--accept">OK</button>
             </section>
           </div>
         </div>
@@ -101,13 +106,17 @@
             <div class="mdc-ext-date-picker__surface">
               <section class="mdc-ext-date-picker__primary">
                 <span class="mdc-ext-date-picker__txtyear"></span>
-                <span class="mdc-ext-date-picker__txtdate"></span>
+                <div class="mdc-ext-date-picker__txtdayanddate">
+                  <span class="mdc-ext-date-picker__txtweekday"></span>
+                  <span>&nbsp;</span>
+                  <span class="mdc-ext-date-picker__txtdate"></span>
+                </div>
               </section>
               <section class="mdc-ext-date-picker__calendar">
                 <div class="mdc-ext-date-picker__header">
-                  <button class="mdc-ext-date-picker__button mdc-ext-date-picker__prev"><i class="material-icons">keyboard_arrow_left</i></button>
+                  <button class="mdc-ext-date-picker__button mdc-ext-date-picker__prev"><i class="material-icons">&#xE314;</i></button>
                   <span class="mdc-ext-date-picker__txtmonth"></span>
-                  <button class="mdc-ext-date-picker__button mdc-ext-date-picker__next"><i class="material-icons">keyboard_arrow_right</i></button>
+                  <button class="mdc-ext-date-picker__button mdc-ext-date-picker__next"><i class="material-icons">&#xE315;</i></button>
                 </div>
                 <div class="mdc-ext-date-picker__months">
                   <table class="mdc-ext-date-picker__days">
@@ -126,10 +135,10 @@
                     </tbody>
                   </table>
                 </div>
-              </section>
-              <section class="mdc-ext-date-picker__actions">
-                <button class="mdc-button mdc-button--compact mdc-ext-date-picker__button--cancel">CANCEL</button>
-                <button class="mdc-button mdc-button--compact mdc-ext-date-picker__button--accept">OK</button>
+                <div class="mdc-ext-date-picker__actions">
+                  <button class="mdc-button mdc-button--compact mdc-ext-date-picker__button--cancel">CANCEL</button>
+                  <button class="mdc-button mdc-button--compact mdc-ext-date-picker__button--accept">OK</button>
+                </div>
               </section>
             </div>
           </div>
@@ -156,6 +165,7 @@
     <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
     <script src="assets/mdcweb-extension.js"></script>
     <script>
+      var datePicker;
       (function() {
         var topDatePicker = document.getElementById('top-date-picker');
         mdcext.datePicker.MDCExtDatePicker.attachTo(topDatePicker);
@@ -163,7 +173,7 @@
         var MDCExtDatePicker = mdcext.datePicker.MDCExtDatePicker;
         var root = document.getElementById('js-date-picker');
         var lastEvent = document.getElementById('last-event');
-        var datePicker = MDCExtDatePicker.attachTo(root);
+        datePicker = MDCExtDatePicker.attachTo(root);
         root.addEventListener('MDCExtDatePicker:change', function(evt) {
           lastEvent.textContent = '"' + evt.detail.type  + '"';
         });

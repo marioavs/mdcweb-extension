@@ -21,6 +21,7 @@
 @import "@material/ripple/mixins";
 @import "@material/theme/mixins";
 @import "@material/typography/mixins";
+@import "@material/typography/variables";
 @import "./label/mdc-ext-date-picker-label";
 
 // postcss-bem-linter: define date-picker
@@ -92,10 +93,10 @@
     @include mdc-elevation(2);
     @include mdc-theme-prop(background-color, background);
 
-    display: inline-block;
+    display: flex;
     visibility: hidden;
     position: absolute;
-    flex-direction: column;
+    flex-wrap: nowrap;
     box-sizing: border-box;
     left: 0;
     top: 0;
@@ -104,10 +105,9 @@
   }
 
   &--animating {
-    visibility: visible;
-
     .mdc-ext-date-picker__surface {
       transition: mdc-animation-enter(opacity, 120ms), mdc-animation-enter(transform, 120ms);
+      visibility: visible;
     }
   }
 
@@ -121,12 +121,37 @@
 
   &__primary {
     @include mdc-ext-date-picker-fill-color-accessible(primary);
-    @include mdc-typography(title);
 
     display: flex;
     position: relative;
     flex-direction: column;
+    flex-grow: 1;
     box-sizing: border-box;
+    min-width: 120px;
+    padding: 16px;
+  }
+
+  &__button--year {
+    @include mdc-typography(body1);
+
+    text-align: left;
+    background: transparent;
+    border: none;
+    outline: none;
+  }
+
+  &__txtdayanddate {
+    @include mdc-typography(headline);
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &__calendar {
+    padding: 0;
+  }
+
+  &__selection-container {
+    position: relative;
   }
 
   &__header {
@@ -137,13 +162,9 @@
     align-items: center;
 
     // Adjust text color for dark theme.
-    @include mdc-theme-dark(".ext-date-picker") {
+    @include mdc-theme-dark(".mdc-ext-date-picker") {
       @include mdc-theme-prop(color, text-primary-on-dark);
     }
-  }
-
-  &__txtyear {
-    @include mdc-typography(body1);
   }
 
   &__txtmonth {
@@ -183,7 +204,7 @@
       cursor: default;
       pointer-events: none;
 
-      @include mdc-theme-dark(".mdc-ext-pagination") {
+      @include mdc-theme-dark(".mdc-ext-date-picker") {
         @include mdc-theme-prop(color, text-disabled-on-dark);
       }
     }
@@ -200,6 +221,7 @@
     display: block;
     position: relative;
     overflow: hidden;
+    padding: 0 16px;
   }
 
   &__days {
@@ -209,27 +231,30 @@
     text-align: center;
     transform: none;
     top: 0px;
+    visibility: hidden;
     width: 100%;
 
     tr {
       height: 2.5em;
     }
 
+    &--active {
+      visibility: inherit;
+    }
+
     &--hidden {
       position: absolute;
-      visibility: hidden;
+      transform: none;
     }
 
     &--next {
       position: absolute;
       transform: translateX(100%);
-      visibility: hidden;
     }
 
     &--prev {
       position: absolute;
       transform: translateX(-100%);
-      visibility: hidden;
     }
 
     &--animating {
@@ -260,7 +285,7 @@
       content: "";
       will-change: opacity;
 
-      @include mdc-theme-dark(".mdc-tab-bar") {
+      @include mdc-theme-dark(".mdc-ext-date-picker") {
         @include mdc-theme-prop(background-color, white);
       }
     }
@@ -281,7 +306,41 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    padding: 0 16px 16px 16px;
   }
 
+  &__year-selection {
+    @include mdc-theme-prop(background-color, background);
+
+    display: none;
+    position: absolute;
+    overflow-y: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+
+    &--active {
+      display: block;
+    }
+  }
+
+  &__year-list {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+
+    li {
+      @include mdc-typography(subheading2);
+      height: 40px;
+    }
+  }
 }
 // postcss-bem-linter: end
+
+@media screen and (min-height: 361px) {
+  .mdc-ext-date-picker__surface {
+    flex-wrap: wrap;
+    max-width: 280px;
+  }
+}
