@@ -26,6 +26,7 @@ const cssClasses = {
   BUTTON_DISABLED: `${ROOT}__button--disabled`,
   BUTTON_YEAR: `${ROOT}__button--year`,
   CALENDAR_DAY: `${ROOT}__day`,
+  CALENDAR_YEAR: `${ROOT}__year`,
   CANCEL_BTN: `${ROOT}__button--cancel`,
   DAY_SELECTED: `${ROOT}__day--selected`,
   DAY_TABLE_ACTIVE: `${ROOT}__days--active`,
@@ -36,10 +37,14 @@ const cssClasses = {
   DISABLED: `${ROOT}--disabled`,
   FOCUSED: `${ROOT}--focused`,
   INVALID: `${ROOT}--invalid`,
+  NEXT_BTN: `${ROOT}__next`,
   OPEN: `${ROOT}--open`,
+  PREV_BTN: `${ROOT}__prev`,
   SURFACE: `${ROOT}__surface`,
   UPGRADED: `${ROOT}--upgraded`,
-  YEAR_SELECTION_ACTIVE: `${ROOT}__year-selection--active`
+  YEAR_LIST_ANIMATING: `${ROOT}__year-list--animating`,
+  YEAR_SELECTED: `${ROOT}__year--selected`,
+  YEAR_VIEW: `${ROOT}--year-view`
 };
 
 /** @enum {string} */
@@ -65,6 +70,7 @@ const strings = {
   TXT_WEEK_DAY_SELECTOR: `.${ROOT}__txtweekday`,
   YEAR_LIST_SELECTOR: `.${ROOT}__year-list`,
   YEAR_SELECTION_SELECTOR: `.${ROOT}__year-selection`,
+  YEAR_SELECTOR: `.${ROOT}__year`,
   ARIA_DISABLED: 'aria-disabled',
   ACCEPT_EVENT: 'MDCExtDatePicker:accept',
   CANCEL_EVENT: 'MDCExtDatePicker:cancel',

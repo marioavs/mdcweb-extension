@@ -133,11 +133,13 @@
 
   &__button--year {
     @include mdc-typography(body1);
+    @include mdc-ext-date-picker-fill-color-accessible(primary);
 
     text-align: left;
     background: transparent;
     border: none;
     outline: none;
+    padding: 0;
   }
 
   &__txtdayanddate {
@@ -146,12 +148,20 @@
     flex-wrap: wrap;
   }
 
-  &__calendar {
+  &__body {
     padding: 0;
   }
 
   &__selection-container {
     position: relative;
+  }
+
+  &__calendar {
+    display: block;
+  }
+
+  &--year-view &__calendar {
+    visibility: hidden;
   }
 
   &__header {
@@ -312,27 +322,38 @@
   &__year-selection {
     @include mdc-theme-prop(background-color, background);
 
-    display: none;
+    display: block;
     position: absolute;
-    overflow-y: auto;
+    overflow-y: hidden;
     bottom: 0;
     left: 0;
     right: 0;
     top: 0;
+    visibility: hidden;
+  }
 
-    &--active {
-      display: block;
-    }
+  &--year-view &__year-selection {
+    visibility: visible;
   }
 
   &__year-list {
+    display: block;
+    position: relative;
     list-style-type: none;
     padding: 0;
     text-align: center;
+    transition: mdc-animation-enter(transform, 120ms);
+    will-change: transform;
+  }
 
-    li {
-      @include mdc-typography(subheading2);
-      height: 40px;
+  &__year {
+    @include mdc-typography(subheading2);
+    position: relative;
+    line-height: 2.5rem;
+
+    &.mdc-ext-date-picker__year--selected{
+      @include mdc-typography(title);
+      line-height: 2.5rem;
     }
   }
 }

@@ -66,17 +66,17 @@ class MDCExtDatePickerAdapter {
    */
   removeNextClass(className) {}
 
-  /**
-   * Adds a class to the year button element.
-   * @param {string} className
-   */
-  addYearSelectionClass(className) {}
+  addDayClassAndFocus(date, className, focus) {}
 
-  /**
-   * Removes a class from the year button element.
-   * @param {string} className
-   */
-  removeYearSelectionClass(className) {}
+  removeAllDaysClass(className) {}
+
+  addYearClass(year, className) {}
+
+  removeYearClass(year, className) {}
+
+  addYearListClass(className) {}
+
+  removeYearListClass(className) {}
 
   /**
    * @param {string} className
@@ -89,6 +89,9 @@ class MDCExtDatePickerAdapter {
 
   /** @return {boolean} */
   eventTargetHasClass(target, className) {}
+
+  /** @return {!Object} */
+  eventTargetDateAttr(target) {}
 
   /**
    * @return {{bottom: number, height: number, left: number, right: number, top: number, width: number}}
@@ -112,34 +115,6 @@ class MDCExtDatePickerAdapter {
   registerTransitionEndHandler(handler) {}
 
   deregisterTransitionEndHandler(handler) {}
-
-  /**
-   * Registers an event handler for event type `type` on the previous button element.
-   * @param {string} type
-   * @param {!Function} handler
-   */
-  registerPrevInteractionHandler(type, handler) {}
-
-  /**
-   * Un-registers an event handler for event type `type` on the previous button element.
-   * @param {string} type
-   * @param {!Function} handler
-   */
-  deregisterPrevInteractionHandler(type, handler) {}
-
-  /**
-   * Registers an event listener `handler` for event type `type` on the next button element.
-   * @param {string} type
-   * @param {!Function} handler
-   */
-  registerNextInteractionHandler(type, handler) {}
-
-  /**
-   * Un-registers an event listener `handler` for event type `type` on the next button element.
-   * @param {string} type
-   * @param {!Function} handler
-   */
-  deregisterNextInteractionHandler(type, handler) {}
 
   /**
    * Registers an event handler on document for key down event.
@@ -169,6 +144,12 @@ class MDCExtDatePickerAdapter {
 
   deregisterTableTransitionEndHandler(handler) {}
 
+  registerYearTransitionEndHandler(handler) {}
+
+  deregisterYearTransitionEndHandler(handler) {}
+
+  setYearListStyleProperty(propertyName, value) {}
+
   setupDayTables() {}
 
   replaceTableBody() {}
@@ -183,19 +164,15 @@ class MDCExtDatePickerAdapter {
 
   setYearContent() {}
 
-  getDayAttr() {}
+  setupYearList(size, minYear, maxYear) {}
 
-  getDayElement() {}
+  setFirstYear(year) {}
 
-  addDayClass() {}
+  getYearListOffsetHeight() {}
 
-  removeAllDaysClass() {}
+  getYearOffsetHeight(i) {}
 
-  focusDayElement() {}
-
-  setupYearList() {}
-
-  scrollToYear() {}
+  getYearSelectionClientHeight() {}
 
   setInputValue() {}
 

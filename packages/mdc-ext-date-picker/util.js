@@ -3,7 +3,8 @@ import createFocusTrap from 'focus-trap';
 function createFocusTrapInstance(surfaceEl, acceptButtonEl, focusTrapFactory = createFocusTrap) {
   return focusTrapFactory(surfaceEl, {
     initialFocus: acceptButtonEl,
-    clickOutsideDeactivates: true
+    clickOutsideDeactivates: true,
+    escapeDeactivates: false
   });
 }
 
