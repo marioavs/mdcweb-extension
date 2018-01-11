@@ -64,6 +64,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       removeYearListClass: () => {},
       hasClass: () => false,
       hasNecessaryDom: () => false,
+      eventTargetInDatePicker: () => false,
+      eventTargetInSurface: () => false,
       eventTargetHasClass: () => false,
       eventTargetDateAttr: () => {},
       getDayTableDimensions: () => {},
@@ -75,8 +77,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       deregisterDocumentKeydownHandler: () => {},
       registerSurfaceInteractionHandler: () => {},
       deregisterSurfaceInteractionHandler: () => {},
-      registerBodyClickHandler: () => {},
-      deregisterBodyClickHandler: () => {},
+      registerDocumentClickHandler: () => {},
+      deregisterDocumentClickHandler: () => {},
       registerDayClickHandler: () => {},
       deregisterDayClickHandler: () => {},
       registerTableTransitionEndHandler: () => {},
@@ -171,7 +173,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     /** @private {function(!Event): undefined} */
     this.datePickerInteractionHandler_ = (evt) => this.handleDatePickerInteraction(evt);
     /** @private {function(!Event)} */
-    this.bodyClickHandler_ = (evt) => this.handleBodyClick_(evt);
+    this.bodyClickHandler_ = (evt) => this.handleDocumentClick_(evt);
     /** @private {function(!Event)} */
     this.dayClickHandler_ = (evt) => this.handleDayClick_(evt);
     /** @private {function(!Event): undefined} */
@@ -231,10 +233,10 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       this.adapter_.deregisterDatePickerInteractionHandler(evtType, this.datePickerInteractionHandler_);
     });
     if (this.isOpen_) {
-      ['click', 'keydown', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+      ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
         this.adapter_.deregisterSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
       });
-      this.adapter_.deregisterBodyClickHandler(this.bodyClickHandler_);
+      this.adapter_.deregisterDocumentClickHandler(this.bodyClickHandler_);
       this.adapter_.deregisterDayClickHandler(this.dayClickHandler_);
       this.adapter_.deregisterTransitionEndHandler(this.transitionEndHandler_);
       this.adapter_.deregisterTableTransitionEndHandler(this.tableTransitionEndHandler_);
@@ -298,13 +300,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     }
     this.receivedUserInput_ = true;
     if ((evt.type === 'click') && (!this.isOpen())) {
-      let el = evt.target;
-      while (el && el !== document.documentElement) {
-        if (this.adapter_.eventTargetHasClass(el, SURFACE)) {
-          return;
-        }
-        el = el.parentNode;
-      }
+      if (this.adapter_.eventTargetInSurface(evt.target))
+        return;
       this.open_();
     }
     const isOpenerKey = OPENER_KEYS.some(({key, keyCode, forType}) => {
@@ -494,29 +491,27 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    * @param {!Event} evt
    * @private
    */
-  handleBodyClick_(evt) {
+  handleDocumentClick_(evt) {
     const {ANIMATING, ROOT, SURFACE} =  cssClasses;
-    let el = evt.target;
 
-    while (el && el !== document.documentElement) {
-      if (this.adapter_.eventTargetHasClass(el, SURFACE)) {
-        return;
-      }
-      if (this.adapter_.eventTargetHasClass(el, ROOT) &&
-        (this.adapter_.hasClass(ANIMATING))) {
-        return;
-      }
-      el = el.parentNode;
-    }
+    if (this.adapter_.eventTargetInSurface(evt.target))
+      return;
+    if (this.adapter_.eventTargetInDatePicker(evt.target) &&
+      this.adapter_.hasClass(ANIMATING))
+      return;
+
     this.adapter_.notifyCancel();
     this.close_();
   };
 
   handleSurfaceInteraction(evt) {
+    console.log(evt.type);
     if (evt.type === 'click')
       this.handleSurfaceClick_(evt);
     else if (evt.type === 'keydown')
       this.handleSurfaceKeydown_(evt);
+    else if (evt.type === 'keyup')
+      this.handleSurfaceKeyup_(evt);
     else if (evt.type === 'wheel')
       this.handleSurfaceWheel_(evt);
     else if (evt.type === 'touchstart')
@@ -528,7 +523,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   }
 
   handleSurfaceClick_(evt) {
-    const {ACCEPT_BTN, BUTTON, BUTTON_YEAR, CALENDAR_YEAR, CANCEL_BTN, NEXT_BTN, PREV_BTN, YEAR_SELECTED, YEAR_VIEW} = cssClasses;
+    const {ACCEPT_BTN, BUTTON, BUTTON_YEAR, CALENDAR_YEAR, CANCEL_BTN, NEXT_BTN, PREV_BTN,
+      YEAR_LIST_ANIMATING, YEAR_SELECTED, YEAR_VIEW} = cssClasses;
     if (!this.adapter_.hasClass(YEAR_VIEW)) {
       if (this.adapter_.eventTargetHasClass(evt.target, ACCEPT_BTN)) {
         this.accept(true);
@@ -536,10 +532,10 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
         this.cancel(true);
       } else if ((this.adapter_.eventTargetHasClass(evt.target, NEXT_BTN)) ||
         (evt.target.parentElement && (this.adapter_.eventTargetHasClass(evt.target.parentElement, NEXT_BTN)))) {
-        this.shiftMonth_(1);
+        this.shiftMonth_(1, false);
       } else if ((this.adapter_.eventTargetHasClass(evt.target, PREV_BTN)) ||
         (evt.target.parentElement && (this.adapter_.eventTargetHasClass(evt.target.parentElement, PREV_BTN)))) {
-        this.shiftMonth_(-1);
+        this.shiftMonth_(-1, false);
       } else if (this.adapter_.eventTargetHasClass(evt.target, BUTTON_YEAR)) {
         let offsetHeight = this.adapter_.getYearListOffsetHeight();
         let clientHeight = this.adapter_.getYearSelectionClientHeight();
@@ -553,14 +549,20 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     } else {
       if (this.adapter_.eventTargetHasClass(evt.target, ACCEPT_BTN)) {
         this.updateCalendarYear_(this.displayYear_);
+        this.adapter_.removeYearListClass(YEAR_LIST_ANIMATING);
         this.adapter_.removeClass(YEAR_VIEW);
+        this.adapter_.setMonthFocus();
       } else if (this.adapter_.eventTargetHasClass(evt.target, CANCEL_BTN)) {
+        this.adapter_.removeYearListClass(YEAR_LIST_ANIMATING);
         this.adapter_.removeClass(YEAR_VIEW);
+        this.adapter_.setMonthFocus();
       } else if (this.adapter_.eventTargetHasClass(evt.target, CALENDAR_YEAR)) {
         let dateAttr = this.adapter_.eventTargetDateAttr(evt.target);
         if (dateAttr['year']) {
           this.updateCalendarYear_(+dateAttr['year']);
+          this.adapter_.removeYearListClass(YEAR_LIST_ANIMATING);
           this.adapter_.removeClass(YEAR_VIEW);
+          this.adapter_.setMonthFocus();
         }
       }
     }
@@ -578,7 +580,16 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   }
 
   handleSurfaceKeydown_(evt) {
-    const {ACCEPT_BTN, BUTTON, BUTTON_YEAR, CALENDAR_YEAR, CANCEL_BTN, YEAR_SELECTED, YEAR_VIEW} = cssClasses;
+    const {ACCEPT_BTN, BUTTON, BUTTON_YEAR, CALENDAR_YEAR, CANCEL_BTN, YEAR_LIST_ANIMATING, YEAR_VIEW} = cssClasses;
+    if ((evt.key && evt.key === 'PageUp' || evt.keyCode === 33) ||
+      (evt.key && evt.key === 'PageDown' || evt.keyCode === 34) ||
+      (evt.key && evt.key === 'ArrowLeft' || evt.keyCode === 37) ||
+      (evt.key && evt.key === 'ArrowRight' || evt.keyCode === 39) ||
+      (evt.key && evt.key === 'ArrowUp' || evt.keyCode === 38) ||
+      (evt.key && evt.key === 'ArrowDown' || evt.keyCode === 40)) {
+      evt.preventDefault();
+      return;
+    }
     if (!this.adapter_.hasClass(YEAR_VIEW)) {
       if (evt.key && evt.key === 'Escape' || evt.keyCode === 27) {
         this.cancel(true);
@@ -590,12 +601,36 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
           this.accept(true);
         }
       }
+    } else {
+      if (evt.key && evt.key === 'Escape' || evt.keyCode === 27) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.adapter_.removeYearListClass(YEAR_LIST_ANIMATING);
+        this.adapter_.removeClass(YEAR_VIEW);
+        this.adapter_.setMonthFocus();
+      }
+      if (!this.adapter_.eventTargetHasClass(evt.target, CANCEL_BTN)) {
+        if (evt.key && evt.key === 'Enter' || evt.keyCode === 13) {
+          evt.preventDefault();
+          this.updateCalendarYear_(this.displayYear_);
+          this.adapter_.removeYearListClass(YEAR_LIST_ANIMATING);
+          this.adapter_.removeClass(YEAR_VIEW);
+          if (!this.adapter_.eventTargetHasClass(evt.target, ACCEPT_BTN))
+            this.adapter_.setMonthFocus();
+        }
+      }
+    }
+  }
+
+  handleSurfaceKeyup_(evt) {
+    const {YEAR_LIST_ANIMATING, YEAR_VIEW} = cssClasses;
+    if (!this.adapter_.hasClass(YEAR_VIEW)) {
       if (evt.key && evt.key === 'PageUp' || evt.keyCode === 33) {
         evt.preventDefault();
-        this.shiftMonth_(-1);
+        this.shiftMonth_(-1, true);
       } else if (evt.key && evt.key === 'PageDown' || evt.keyCode === 34) {
         evt.preventDefault();
-        this.shiftMonth_(1);
+        this.shiftMonth_(1, true);
       } else if (evt.key && evt.key === 'ArrowLeft' || evt.keyCode === 37) {
         evt.preventDefault();
         this.shiftSelected(-1);
@@ -610,22 +645,14 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
         this.shiftSelected(7);
       }
     } else {
-      if (evt.key && evt.key === 'Escape' || evt.keyCode === 27) {
-        evt.preventDefault();
-        evt.stopPropagation();
-        this.adapter_.removeClass(YEAR_VIEW);
-      }
-      if (!this.adapter_.eventTargetHasClass(evt.target, CANCEL_BTN)) {
-        if (evt.key && evt.key === 'Enter' || evt.keyCode === 13) {
-          evt.preventDefault();
-          this.updateCalendarYear_(this.displayYear_);
-          this.adapter_.removeClass(YEAR_VIEW);
-        }
-      }
       if (evt.key && evt.key === 'ArrowLeft' || evt.keyCode === 37) {
+        this.adapter_.removeYearListClass(YEAR_LIST_ANIMATING);
         this.adapter_.removeClass(YEAR_VIEW);
+        this.adapter_.setMonthFocus();
       } else if (evt.key && evt.key === 'ArrowRight' || evt.keyCode === 39) {
+        this.adapter_.removeYearListClass(YEAR_LIST_ANIMATING);
         this.adapter_.removeClass(YEAR_VIEW);
+        this.adapter_.setMonthFocus();
       } else if ((evt.key && evt.key === 'PageUp' || evt.keyCode === 33) ||
         (evt.key && evt.key === 'PageDown' || evt.keyCode === 34)) {
         evt.preventDefault();
@@ -646,24 +673,23 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
 
   handleSurfaceWheel_(evt) {
     const {YEAR_VIEW} = cssClasses;
-    if (!this.adapter_.hasClass(YEAR_VIEW)) {
-      if (evt.deltaY > 0) {
-        evt.preventDefault();
-        this.shiftMonth_(1);
-      } else if (evt.deltaY < 0) {
-        evt.preventDefault();
-        this.shiftMonth_(-1);
+    evt.preventDefault();
+    requestAnimationFrame(() => {
+      if (!this.adapter_.hasClass(YEAR_VIEW)) {
+        if (evt.deltaY > 0) {
+          this.shiftMonth_(1, true);
+        } else if (evt.deltaY < 0) {
+          this.shiftMonth_(-1, true);
+        }
       }
-    }
-    else {
-      if (evt.deltaY > 0) {
-        evt.preventDefault();
-        this.shiftYear_(1);
-      } else if (evt.deltaY < 0) {
-        evt.preventDefault();
-        this.shiftYear_(-1);
+      else {
+        if (evt.deltaY > 0) {
+          this.shiftYear_(1);
+        } else if (evt.deltaY < 0) {
+          this.shiftYear_(-1);
+        }
       }
-    }
+    });
   }
 
   handleSurfaceTouchStart_(evt) {
@@ -734,10 +760,11 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   handleDocumentKeydown_(evt) {
   };
 
-  shiftMonth_(shift) {
+  shiftMonth_(shift, updateFocus) {
     const {DAY_TABLE_ACTIVE, DAY_TABLE_ANIMATING, DAY_TABLE_HIDDEN, DAY_TABLE_NEXT, DAY_TABLE_PREV} = cssClasses;
     const {TYPE_ACTIVE, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = strings;
-    this.adapter_.setMonthFocus();
+    if (updateFocus)
+      this.adapter_.setMonthFocus();
     let typeToShow = TYPE_NEXT;
     let classToShow = DAY_TABLE_NEXT;
     let typeToHide = TYPE_PREV;
@@ -784,9 +811,9 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       if (this.selectedValue_.getMonth() != this.displayValue_.getMonth()) {
         differentMonth = true;
         if (days < 0)
-          this.shiftMonth_(-1);
+          this.shiftMonth_(-1, true);
         else
-          this.shiftMonth_(1);
+          this.shiftMonth_(1, true);
       }
     }
     this.updatePrimary_(this.selectedValue_);
@@ -900,10 +927,10 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     this.updateHeader_(this.displayValue_);
     this.updateDaysTable_();
     this.adapter_.registerDocumentKeydownHandler(this.documentKeydownHandler_);
-    ['click', 'keydown', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+    ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
       this.adapter_.registerSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
     });
-    this.adapter_.registerBodyClickHandler(this.bodyClickHandler_);
+    this.adapter_.registerDocumentClickHandler(this.bodyClickHandler_);
     this.adapter_.registerDayClickHandler(this.dayClickHandler_);
     // this.adapter_.registerInteractionHandler('click', this.componentClickHandler_);
     this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
@@ -913,18 +940,19 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   }
 
   close_() {
-    const {ANIMATING, OPEN, YEAR_VIEW} = cssClasses;
+    const {ANIMATING, OPEN, YEAR_LIST_ANIMATING, YEAR_VIEW} = cssClasses;
     this.adapter_.deregisterDocumentKeydownHandler(this.documentKeydownHandler_);
-    ['click', 'keydown', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+    ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
       this.adapter_.deregisterSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
     });
-    this.adapter_.deregisterBodyClickHandler(this.bodyClickHandler_);
+    this.adapter_.deregisterDocumentClickHandler(this.bodyClickHandler_);
     this.adapter_.deregisterDayClickHandler(this.dayClickHandler_);
     // this.adapter_.deregisterInteractionHandler('click', this.componentClickHandler_);
     this.adapter_.untrapFocusOnSurface();
     this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
     this.adapter_.addClass(ANIMATING);
     this.adapter_.removeClass(OPEN);
+    this.adapter_.removeYearListClass(YEAR_LIST_ANIMATING);
     this.adapter_.removeClass(YEAR_VIEW);
     this.isOpen_ = false;
   }

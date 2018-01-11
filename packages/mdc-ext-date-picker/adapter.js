@@ -89,6 +89,12 @@ class MDCExtDatePickerAdapter {
   hasNecessaryDom() {}
 
   /** @return {boolean} */
+  eventTargetInDatePicker(target) {}
+
+  /** @return {boolean} */
+  eventTargetInSurface(target) {}
+
+  /** @return {boolean} */
   eventTargetHasClass(target, className) {}
 
   /** @return {!Object} */
@@ -133,9 +139,9 @@ class MDCExtDatePickerAdapter {
 
   deregisterSurfaceInteractionHandler(type, handler) {}
 
-  registerBodyClickHandler(handler) {}
+  registerDocumentClickHandler(handler) {}
 
-  deregisterBodyClickHandler(handler) {}
+  deregisterDocumentClickHandler(handler) {}
 
   registerDayClickHandler(handler) {}
 

@@ -24,6 +24,12 @@
 @import "@material/typography/variables";
 @import "./label/mdc-ext-date-picker-label";
 
+$mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
+
+:root {
+  --mdc-ext-date-picker-dark-theme-bg-color: #{$mdc-ext-date-picker-dark-theme-bg-color};
+}
+
 // postcss-bem-linter: define date-picker
 
 .mdc-ext-date-picker {
@@ -105,6 +111,12 @@
     top: 0;
     transform: scale(.8);
     z-index: 3;
+
+    // Adjust text color for dark theme.
+    @include mdc-theme-dark(".mdc-ext-date-picker") {
+      background-color: $mdc-ext-date-picker-dark-theme-bg-color;
+      background-color: var(--mdc-ext-date-picker-dark-theme-bg-color, #{$mdc-ext-date-picker-dark-theme-bg-color});
+    }
   }
 
   &--animating {
@@ -215,7 +227,7 @@
     user-select: none;
     width: 40px;
 
-    @include mdc-theme-dark {
+    @include mdc-theme-dark(".mdc-ext-date-picker") {
       @include mdc-states(white);
       @include mdc-theme-prop(color, text-primary-on-dark);
     }
@@ -260,8 +272,21 @@
     visibility: hidden;
     width: 100%;
 
+    @include mdc-theme-dark(".mdc-ext-date-picker") {
+      @include mdc-theme-prop(color, text-primary-on-dark);
+    }
+
     tr {
       height: 2.5em;
+    }
+
+    th {
+      @include mdc-typography(caption);
+      @include mdc-theme-prop(color, text-hint-on-light);
+
+      @include mdc-theme-dark(".mdc-ext-date-picker") {
+        @include mdc-theme-prop(color, text-hint-on-dark);
+      }
     }
 
     &--active {

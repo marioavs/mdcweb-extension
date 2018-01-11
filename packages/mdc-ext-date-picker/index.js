@@ -96,7 +96,7 @@ class MDCExtDatePicker extends MDCComponent {
     this.buttonYearEl_ = this.root_.querySelector(strings.BUTTON_YEAR_SELECTOR);
     this.acceptButton_ = this.root_.querySelector(strings.ACCEPT_SELECTOR);
     this.cancelButton_ = this.root_.querySelector(strings.CANCEL_SELECTOR);
-    this.focusTrap_ = createFocusTrapInstance(this.surfaceEl_, null);
+    this.focusTrap_ = createFocusTrapInstance(this.surfaceEl_, this.acceptButton_);
     this.prevEl_ = this.root_.querySelector(strings.PREV_SELECTOR);
     this.nextEl_ = this.root_.querySelector(strings.NEXT_SELECTOR);
     this.txtDateEl_ = this.root_.querySelector(strings.TXT_DATE_SELECTOR);
@@ -183,6 +183,8 @@ class MDCExtDatePicker extends MDCComponent {
         hasClass: (className) => this.root_.classList.contains(className),
         hasNecessaryDom: () => Boolean(this.input_) && Boolean(this.surfaceEl_) && Boolean(this.monthsEl_) &&
           Boolean(this.prevEl_) && Boolean(this.nextEl_),
+        eventTargetInDatePicker: (target) => this.root_.contains(target),
+        eventTargetInSurface: (target) => this.surfaceEl_.contains(target),
         eventTargetHasClass: (target, className) => target.classList.contains(className),
         eventTargetDateAttr: (target) => ({
           date: target.getAttribute(strings.DATA_DATE),
@@ -198,8 +200,8 @@ class MDCExtDatePicker extends MDCComponent {
         deregisterDocumentKeydownHandler: (handler) => document.removeEventListener('keydown', handler),
         registerSurfaceInteractionHandler: (evtType, handler) => this.surfaceEl_.addEventListener(evtType, handler),
         deregisterSurfaceInteractionHandler: (evtType, handler) => this.surfaceEl_.removeEventListener(evtType, handler),
-        registerBodyClickHandler: (handler) => document.body.addEventListener('click', handler),
-        deregisterBodyClickHandler: (handler) => document.body.removeEventListener('click', handler),
+        registerDocumentClickHandler: (handler) => document.addEventListener('click', handler),
+        deregisterDocumentClickHandler: (handler) => document.removeEventListener('click', handler),
         registerDayClickHandler: (handler) => this.monthsEl_.addEventListener('click', handler),
         deregisterDayClickHandler: (handler) => this.monthsEl_.removeEventListener('click', handler),
         registerTableTransitionEndHandler: (handler) => this.monthsEl_.addEventListener(getCorrectEventName(window, 'transitionend'), handler),
