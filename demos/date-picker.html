@@ -154,16 +154,12 @@
           <label for="dark-theme">Dark Theme</label>
         </div>
         <div>
-          <input type="checkbox" id="disabled">
-          <label for="disabled">Disabled</label>
+          <input type="checkbox" id="disable">
+          <label for="disable">Disable</label>
         </div>
         <div>
-          <input type="checkbox" id="prev-disabled">
-          <label for="prev-disabled">Previous Button Disabled</label>
-        </div>
-        <div>
-          <input type="checkbox" id="next-disabled">
-          <label for="next-disabled">Next Button Disabled</label>
+          <input type="checkbox" id="readonly">
+          <label for="readonly">Read only</label>
         </div>
       </section>
     </main>
@@ -183,24 +179,19 @@
           lastEvent.textContent = '"' + evt.detail.type  + '"';
         });
 
-        // var demoWrapper = document.getElementById('demo-wrapper');
-        // var darkThemeCb = document.getElementById('dark-theme');
-        // var disabledCb = document.getElementById('disabled');
-        // var disabledPrevCb = document.getElementById('prev-disabled');
-        // var disabledNextCb = document.getElementById('next-disabled');
-        //
-        // darkThemeCb.addEventListener('change', function() {
-        //   demoWrapper.classList[darkThemeCb.checked ? 'add' : 'remove']('mdc-theme--dark');
-        // });
-        // disabledCb.addEventListener('change', function() {
-        //   datePicker.disabled = disabledCb.checked;
-        // });
-        // disabledPrevCb.addEventListener('change', function() {
-        //   datePicker.setButtonDisabled('previous', disabledPrevCb.checked);
-        // });
-        // disabledNextCb.addEventListener('change', function() {
-        //   datePicker.setButtonDisabled('next', disabledNextCb.checked);
-        // });
+        var demoWrapper = document.getElementById('demo-wrapper');
+        var darkThemeCb = document.getElementById('dark-theme');
+        var disableCb = document.getElementById('disable');
+        var readOnlyCb = document.getElementById('readonly');
+        darkThemeCb.addEventListener('change', function() {
+          demoWrapper.classList[darkThemeCb.checked ? 'add' : 'remove']('mdc-theme--dark');
+        });
+        disableCb.addEventListener('change', function() {
+          datePicker.disabled = disableCb.checked;
+        });
+        readOnlyCb.addEventListener('change', function() {
+          datePicker.readOnly = readOnlyCb.checked;
+        });
       })();
     </script>
   </body>

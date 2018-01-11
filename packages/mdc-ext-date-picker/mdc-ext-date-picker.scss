@@ -27,9 +27,12 @@
 // postcss-bem-linter: define date-picker
 
 .mdc-ext-date-picker {
-  display: inline-block;
+  display: inline-flex;
   position: relative;
+  align-items: flex-end;
+  height: 48px;
   margin-bottom: 8px;
+  margin-top: 16px;
   outline: none;
 
   &__input {
@@ -140,6 +143,10 @@
     border: none;
     outline: none;
     padding: 0;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   &__txtdayanddate {
@@ -180,6 +187,11 @@
   &__txtmonth {
     flex-grow: 1;
     text-align: center;
+    outline: none;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   &__button {
@@ -206,6 +218,10 @@
     @include mdc-theme-dark {
       @include mdc-states(white);
       @include mdc-theme-prop(color, text-primary-on-dark);
+    }
+
+    &:focus {
+      outline: none;
     }
 
     &:disabled {

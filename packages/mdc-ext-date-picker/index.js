@@ -106,6 +106,8 @@ class MDCExtDatePicker extends MDCComponent {
     this.yearSelectionEl_ = this.root_.querySelector(strings.YEAR_SELECTION_SELECTOR);
     this.yearListEl_ = this.root_.querySelector(strings.YEAR_LIST_SELECTOR);
 
+    if (this.txtMonthEl_)
+      this.txtMonthEl_.tabIndex = 0;
     if (this.prevEl_) {
       this.prevRipple_ = rippleFactory(this.prevEl_);
     };
@@ -210,6 +212,7 @@ class MDCExtDatePicker extends MDCComponent {
         replaceTableClass: (tableType, fromClassName, toClassName) => this.replaceTableClass_(tableType, fromClassName, toClassName),
         setDateContent: (value) => this.txtDateEl_ && (this.txtDateEl_.textContent = value),
         setMonthContent: (value) => this.txtMonthEl_ && (this.txtMonthEl_.textContent = value),
+        setMonthFocus: () => this.txtMonthEl_ && this.txtMonthEl_.focus(),
         setWeekDayContent: (value) => this.txtWeekDayEl_ && (this.txtWeekDayEl_.textContent = value),
         setYearContent: (value) => this.buttonYearEl_ && (this.buttonYearEl_.textContent = value),
         setupYearList: (size, minYear, maxYear) => this.setupYearList_(size, minYear, maxYear),
@@ -306,6 +309,20 @@ class MDCExtDatePicker extends MDCComponent {
    */
   set disabled(disabled) {
     this.foundation_.setDisabled(disabled);
+  }
+
+  /**
+   * @return {boolean} True if the Date Picker is read only.
+   */
+  get readOnly() {
+    return this.foundation_.isReadOnly();
+  }
+
+  /**
+   * @param {boolean} readOnly Sets the Date Picker read only.
+   */
+  set readOnly(readOnly) {
+    this.foundation_.setReadOnly(readOnly);
   }
 
   addDayClassAndFocus_(date, className, focus) {

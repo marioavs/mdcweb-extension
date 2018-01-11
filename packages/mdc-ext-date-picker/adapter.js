@@ -6,6 +6,7 @@ import MDCExtDatePickerLabelFoundation from './label/foundation';
  * @typedef {{
  *   value: string,
  *   disabled: boolean,
+ *   readOnly: boolean,
  *   badInput: boolean,
  *   checkValidity: (function(): boolean)
  * }}
@@ -160,6 +161,8 @@ class MDCExtDatePickerAdapter {
 
   setMonthContent() {}
 
+  setMonthFocus() {}
+
   setWeekDayContent() {}
 
   setYearContent() {}
@@ -202,12 +205,12 @@ class MDCExtDatePickerAdapter {
   setMonthsWidth(width) {}
 
   /**
-   * @return {?Element|?NativeInputType}
+   * @return {?Element}
    */
   getPrevNativeControl() {}
 
   /**
-   * @return {?Element|?NativeInputType}
+   * @return {?Element}
    */
   getNextNativeControl() {}
 

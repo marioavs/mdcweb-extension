@@ -89,6 +89,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       replaceTableClass: () => {},
       setDateContent: () => {},
       setMonthContent: () => {},
+      setMonthFocus: () => {},
       setWeekDayContent: () => {},
       setYearContent: () => {},
       setupYearList: () => {},
@@ -136,8 +137,6 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     this.selectedValue_ = null;
     this.displayValue_ = null;
     this.displayYear_ = null;
-    /** @private {boolean} */
-    this.disabled_ = false;
     /** @private {boolean} */
     this.isFocused_ = false;
     /** @private {boolean} */
@@ -294,7 +293,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    */
   handleDatePickerInteraction(evt) {
     const {SURFACE} = cssClasses;
-    if (this.adapter_.getNativeInput().disabled) {
+    if ((this.getNativeInput_().disabled) || (this.getNativeInput_().readOnly)) {
       return;
     }
     this.receivedUserInput_ = true;
@@ -320,15 +319,18 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   }
 
   /**
-   * Activates the text field focus state.
+   * Activates the Date Picker focus state.
    */
   activateFocus() {
-    const {FOCUSED} = cssClasses;
+    const {ANIMATING, FOCUSED} = cssClasses;
     this.adapter_.addClass(FOCUSED);
     if (this.label_) {
       this.label_.floatAbove();
     }
     this.isFocused_ = true;
+    if ((!this.getNativeInput_().readOnly) && (!this.isOpen()) &&
+      (!this.adapter_.hasClass(ANIMATING)))
+      this.open_();
   }
 
   /**
@@ -388,28 +390,43 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     return input.validity ? input.validity.badInput : input.badInput;
   }
 
-  /** @return {boolean} */
+  /**
+   * @return {boolean} True if the Date Picker is disabled.
+   */
   isDisabled() {
-    return this.disabled_;
+    return this.getNativeInput_().disabled;
   }
 
-  /** @param {boolean} isDisabled */
-  setDisabled(isDisabled) {
-    this.disabled_ = isDisabled;
-
+  /**
+   * @param {boolean} disabled Sets the Date Picker disabled or enabled.
+   */
+  setDisabled(disabled) {
     const {DISABLED} = cssClasses;
     const {ARIA_DISABLED} = strings;
 
-    if (this.disabled_) {
-      this.savedTabIndex_ = this.adapter_.getTabIndex();
-      this.adapter_.setTabIndex(-1);
+    this.getNativeInput_().disabled = disabled;
+    if (disabled) {
       this.adapter_.setAttr(ARIA_DISABLED, 'true');
       this.adapter_.addClass(DISABLED);
     } else {
-      this.adapter_.setTabIndex(this.savedTabIndex_);
       this.adapter_.rmAttr(ARIA_DISABLED);
       this.adapter_.removeClass(DISABLED);
     }
+  }
+
+  /**
+   * @return {boolean} True if the Date Picker is read only.
+   */
+  isReadOnly() {
+    return this.getNativeInput_().readOnly;
+  }
+
+  /**
+   * @param {boolean} readOnly Sets the Date Picker read only.
+   */
+  /** @param {boolean} readOnly */
+  setReadOnly(readOnly) {
+    this.getNativeInput_().readOnly = readOnly;
   }
 
   /**
@@ -459,6 +476,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       checkValidity: () => true,
       value: '',
       disabled: false,
+      readOnly: false,
       badInput: false,
     });
   }
@@ -495,7 +513,6 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   };
 
   handleSurfaceInteraction(evt) {
-    console.log(evt.type);
     if (evt.type === 'click')
       this.handleSurfaceClick_(evt);
     else if (evt.type === 'keydown')
@@ -720,8 +737,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   shiftMonth_(shift) {
     const {DAY_TABLE_ACTIVE, DAY_TABLE_ANIMATING, DAY_TABLE_HIDDEN, DAY_TABLE_NEXT, DAY_TABLE_PREV} = cssClasses;
     const {TYPE_ACTIVE, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = strings;
-    if (this.disabled_)
-      return;
+    this.adapter_.setMonthFocus();
     let typeToShow = TYPE_NEXT;
     let classToShow = DAY_TABLE_NEXT;
     let typeToHide = TYPE_PREV;
