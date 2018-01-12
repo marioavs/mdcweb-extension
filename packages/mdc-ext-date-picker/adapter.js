@@ -7,8 +7,10 @@ import MDCExtDatePickerLabelFoundation from './label/foundation';
  *   value: string,
  *   disabled: boolean,
  *   readOnly: boolean,
- *   badInput: boolean,
- *   checkValidity: (function(): boolean)
+ *   validity: {
+ *     badInput: boolean,
+ *     valid: boolean,
+ *   },
  * }}
  */
 let NativeInputType;
@@ -182,8 +184,6 @@ class MDCExtDatePickerAdapter {
   getYearOffsetHeight(i) {}
 
   getYearSelectionClientHeight() {}
-
-  setInputValue() {}
 
   /** @return {number} */
   getTabIndex() {}

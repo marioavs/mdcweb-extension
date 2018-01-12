@@ -99,7 +99,6 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       getYearListOffsetHeight: () => {},
       getYearOffsetHeight: () => {},
       getYearSelectionClientHeight: () => {},
-      setInputValue: () => {},
       getTabIndex: () => 0,
       setTabIndex: () => {},
       getAttr: () => '',
@@ -143,6 +142,10 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     this.isFocused_ = false;
     /** @private {boolean} */
     this.isOpen_ = false;
+    /** @private {boolean} */
+    this.useCustomValidityChecking_ = false;
+    /** @private {boolean} */
+    this.isValid_ = true;
     /** @private {boolean} */
     this.animatingYear_ = false;
     /** @private {number} */
@@ -200,8 +203,9 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
 
     this.adapter_.addClass(UPGRADED);
     // Ensure label does not collide with any pre-filled value.
-    if (this.getNativeInput_().value && this.label_) {
-      this.label_.floatAbove();
+    if (this.label_ && this.getValue()) {
+      this.label_.styleFloat(
+        this.getValue(), this.isFocused_, this.isBadInput_());
     }
 
     if (this.adapter_.hasClass(OPEN)) {
@@ -243,24 +247,6 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     }
   }
 
-  /** @return {?string} */
-  getValue() {
-    return this.value_;
-  }
-
-  /** @param {?string} value */
-  setValue(value) {
-    if (!value) {
-      this.value_ = null;
-      this.adapter_.setInputValue(this.settings_.valueToString(this.value_));
-      return;
-    }
-    if ((typeof value === 'Date') || (typeof value === 'string')) {
-      this.value_ = new Date(value);
-      this.adapter_.setInputValue(this.settings_.valueToString(this.value_));
-    }
-  }
-
   getSettings() {
     return this.settings_ ;
   }
@@ -287,6 +273,167 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     if (!date)
       return '';
     return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+  }
+
+  /** @return {?string} */
+  getValue() {
+    return this.value_;
+  }
+
+  /** @param {?string} value */
+  setValue(value) {
+    if (!value) {
+      this.value_ = null;
+      this.getNativeInput_().value = '';
+      return;
+    }
+    if ((typeof value.getDate === 'function') || (typeof value === 'string')) {
+      this.value_ = new Date(value);
+      this.getNativeInput_().value = this.settings_.valueToString(this.value_);
+      const isValid = this.isValid();
+      this.styleValidity_(isValid);
+      if (this.label_) {
+        this.label_.styleShake(isValid, this.isFocused_);
+        this.label_.styleFloat(
+          this.getValue(), this.isFocused_, this.isBadInput_());
+      }
+    }
+  }
+
+  /**
+   * @return {boolean} If a custom validity is set, returns that value.
+   *     Otherwise, returns the result of native validity checks.
+   */
+  isValid() {
+    return this.useCustomValidityChecking_
+      ? this.isValid_ : this.isNativeInputValid_();
+  }
+
+  /**
+   * @param {boolean} isValid Sets the validity state of the Date Picker.
+   */
+  setValid(isValid) {
+    this.useCustomValidityChecking_ = true;
+    this.isValid_ = isValid;
+    // Retrieve from the getter to ensure correct logic is applied.
+    isValid = this.isValid();
+    this.styleValidity_(isValid);
+    if (this.label_) {
+      this.label_.styleShake(isValid, this.isFocused_);
+    }
+  }
+
+  /**
+   * @return {boolean} True if the Date Picker is disabled.
+   */
+  isDisabled() {
+    return this.getNativeInput_().disabled;
+  }
+
+  /**
+   * @param {boolean} disabled Sets the Date Picker disabled or enabled.
+   */
+  setDisabled(disabled) {
+    this.getNativeInput_().disabled = disabled;
+    this.styleDisabled_(disabled);
+  }
+
+  /**
+   * @return {boolean} True if the Date Picker is read only.
+   */
+  isReadOnly() {
+    return this.getNativeInput_().readOnly;
+  }
+
+  /**
+   * @param {boolean} readOnly Sets the Date Picker read only.
+   */
+  /** @param {boolean} readOnly */
+  setReadOnly(readOnly) {
+    this.getNativeInput_().readOnly = readOnly;
+  }
+
+  /**
+   * @return {boolean} True if the Date Picker is required.
+   */
+  isRequired() {
+    return this.getNativeInput_().required;
+  }
+
+  /**
+   * @param {boolean} isRequired Sets the Date Picker required or not.
+   */
+  setRequired(isRequired) {
+    this.getNativeInput_().required = isRequired;
+    // Addition of the asterisk is automatic based on CSS, but validity checking
+    // needs to be manually run.
+    this.styleValidity_(this.isValid());
+  }
+
+  /**
+   * @return {boolean} True if the Date Picker input fails in converting the
+   *     user-supplied value.
+   * @private
+   */
+  isBadInput_() {
+    return this.getNativeInput_().validity.badInput;
+  }
+
+  /**
+   * @return {boolean} The result of native validity checking
+   *     (ValidityState.valid).
+   */
+  isNativeInputValid_() {
+    return this.getNativeInput_().validity.valid;
+  }
+
+  /**
+   * Styles the component based on the validity state.
+   * @param {boolean} isValid
+   * @private
+   */
+  styleValidity_(isValid) {
+    const {INVALID} = cssClasses;
+    if (isValid) {
+      this.adapter_.removeClass(INVALID);
+    } else {
+      this.adapter_.addClass(INVALID);
+    }
+    if (this.helperText_) {
+      this.helperText_.setValidity(isValid);
+    }
+  }
+
+  /**
+   * Styles the component based on the focused state.
+   * @param {boolean} isFocused
+   * @private
+   */
+  styleFocused_(isFocused) {
+    const {FOCUSED} = cssClasses;
+    if (isFocused) {
+      this.adapter_.addClass(FOCUSED);
+    } else {
+      this.adapter_.removeClass(FOCUSED);
+    }
+  }
+
+  /**
+   * Styles the component based on the disabled state.
+   * @param {boolean} isDisabled
+   * @private
+   */
+  styleDisabled_(isDisabled) {
+    const {DISABLED, INVALID} = cssClasses;
+    const {ARIA_DISABLED} = strings;
+    if (isDisabled) {
+      this.adapter_.setAttr(ARIA_DISABLED, 'true');
+      this.adapter_.addClass(DISABLED);
+      this.adapter_.removeClass(INVALID);
+    } else {
+      this.adapter_.rmAttr(ARIA_DISABLED);
+      this.adapter_.removeClass(DISABLED);
+    }
   }
 
   /**
@@ -319,12 +466,14 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    * Activates the Date Picker focus state.
    */
   activateFocus() {
-    const {ANIMATING, FOCUSED} = cssClasses;
-    this.adapter_.addClass(FOCUSED);
-    if (this.label_) {
-      this.label_.floatAbove();
-    }
+    const {ANIMATING} = cssClasses;
     this.isFocused_ = true;
+    this.styleFocused_(this.isFocused_);
+    if (this.label_) {
+      this.label_.styleShake(this.isValid(), this.isFocused_);
+      this.label_.styleFloat(
+        this.getValue(), this.isFocused_, this.isBadInput_());
+    }
     if ((!this.getNativeInput_().readOnly) && (!this.isOpen()) &&
       (!this.adapter_.hasClass(ANIMATING)))
       this.open_();
@@ -344,86 +493,19 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    * Deactives the Date Picker's focus state.
    */
   deactivateFocus() {
-    const {FOCUSED} = cssClasses;
     const input = this.getNativeInput_();
     const shouldRemoveLabelFloat = !input.value && !this.isBadInput_();
 
     this.isFocused_ = false;
-    this.adapter_.removeClass(FOCUSED);
+    this.styleFocused_(this.isFocused_);
     if (this.label_) {
-      this.label_.deactivateFocus(shouldRemoveLabelFloat);
+      this.label_.styleShake(this.isValid(), this.isFocused_);
+      this.label_.styleFloat(
+        this.getValue(), this.isFocused_, this.isBadInput_());
     }
     if (shouldRemoveLabelFloat) {
       this.receivedUserInput_ = false;
     }
-  }
-
-  /**
-   * Updates the Date Picker's valid state based on the supplied validity.
-   * @param {boolean} isValid
-   * @private
-   */
-  changeValidity_(isValid) {
-    const {INVALID} = cssClasses;
-    if (isValid) {
-      this.adapter_.removeClass(INVALID);
-    } else {
-      this.adapter_.addClass(INVALID);
-    }
-    if (this.helperText_) {
-      this.helperText_.setValidity(isValid);
-    }
-    if (this.label_) {
-      this.label_.setValidity(isValid);
-    }
-  }
-
-  /**
-   * @return {boolean} True if the Date Picker input fails validity checks.
-   * @private
-   */
-  isBadInput_() {
-    const input = this.getNativeInput_();
-    return input.validity ? input.validity.badInput : input.badInput;
-  }
-
-  /**
-   * @return {boolean} True if the Date Picker is disabled.
-   */
-  isDisabled() {
-    return this.getNativeInput_().disabled;
-  }
-
-  /**
-   * @param {boolean} disabled Sets the Date Picker disabled or enabled.
-   */
-  setDisabled(disabled) {
-    const {DISABLED} = cssClasses;
-    const {ARIA_DISABLED} = strings;
-
-    this.getNativeInput_().disabled = disabled;
-    if (disabled) {
-      this.adapter_.setAttr(ARIA_DISABLED, 'true');
-      this.adapter_.addClass(DISABLED);
-    } else {
-      this.adapter_.rmAttr(ARIA_DISABLED);
-      this.adapter_.removeClass(DISABLED);
-    }
-  }
-
-  /**
-   * @return {boolean} True if the Date Picker is read only.
-   */
-  isReadOnly() {
-    return this.getNativeInput_().readOnly;
-  }
-
-  /**
-   * @param {boolean} readOnly Sets the Date Picker read only.
-   */
-  /** @param {boolean} readOnly */
-  setReadOnly(readOnly) {
-    this.getNativeInput_().readOnly = readOnly;
   }
 
   /**
@@ -470,20 +552,14 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   getNativeInput_() {
     return this.adapter_.getNativeInput() ||
     /** @type {!NativeInputType} */ ({
-      checkValidity: () => true,
       value: '',
       disabled: false,
       readOnly: false,
-      badInput: false,
+      validity: {
+        badInput: false,
+        valid: true,
+      }
     });
-  }
-
-  /**
-   * @param {boolean} isValid Sets the validity state of the Date Picker.
-   */
-  setValid(isValid) {
-    this.useCustomValidityChecking_ = true;
-    this.changeValidity_(isValid);
   }
 
   /**
@@ -505,7 +581,6 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
   };
 
   handleSurfaceInteraction(evt) {
-    console.log(evt.type);
     if (evt.type === 'click')
       this.handleSurfaceClick_(evt);
     else if (evt.type === 'keydown')
@@ -977,8 +1052,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     if (shouldNotify) {
       this.adapter_.notifyAccept();
     }
-    this.value_ = new Date(this.selectedValue_);
-    this.adapter_.setInputValue(this.settings_.valueToString(this.value_));
+    this.setValue(new Date(this.selectedValue_));
     this.close_();
   }
 

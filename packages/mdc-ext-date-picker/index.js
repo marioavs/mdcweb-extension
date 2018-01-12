@@ -222,7 +222,6 @@ class MDCExtDatePicker extends MDCComponent {
         getYearListOffsetHeight: () => this.yearListEl_ && this.yearListEl_.offsetHeight,
         getYearOffsetHeight: (i) => this.years_[i] && this.years_[i].offsetHeight,
         getYearSelectionClientHeight: () => this.yearSelectionEl_ && this.yearSelectionEl_.clientHeight,
-        setInputValue: (value) => this.input_.value = value,
         getTabIndex: () => this.root_.tabIndex,
         setTabIndex: (tabIndex) => this.root_.tabIndex = tabIndex,
         getAttr: (name) => this.root_.getAttribute(name),
