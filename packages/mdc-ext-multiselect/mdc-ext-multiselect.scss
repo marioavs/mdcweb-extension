@@ -37,25 +37,26 @@
 .mdc-ext-multiselect {
   $dd-arrow-padding: 18px;
 
-  display: block;
-  margin-bottom: 8px;
+  display: inline-flex;
   position: relative;
-  width: 100%;
-  will-change: color;
+  align-items: flex-end;
+  box-sizing: border-box;
+  height: 48px;
+  margin-bottom: 8px;
+  margin-top: 16px;
 
   &__combobox {
     bottom: 0;
-    position: absolute;
+    position: relative;
     width: 100%;
 
     &-background {
+      display: block;
+      position: relative;
       border: none;
       border-bottom: 1px solid $mdc-ext-multiselect-underline-on-light-idle;
-      display: block;
-      font-size: inherit;
+      min-width: 100px;
       padding: 0 #{$dd-arrow-padding} 8px;
-      position: relative;
-      will-change: transform;
 
       background: none;
       background-repeat: no-repeat;
@@ -191,7 +192,7 @@
       min-width: 20px;
       outline: none;
       overflow-x: hidden;
-      padding-left: 2px;
+      padding: 0 0 0 2px;
       width: auto;
 
       &::placeholder {
@@ -215,11 +216,6 @@
   }
 
   &--upgraded {
-    box-sizing: border-box;
-    align-items: flex-end;
-    height: 48px;
-    margin-top: 16px;
-
     .mdc-ext-multiselect__label {
       pointer-events: none;
     }
