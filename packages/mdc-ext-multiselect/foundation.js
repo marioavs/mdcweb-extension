@@ -118,8 +118,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.focusHandler_ = () => this.activateFocus_();
     this.blurHandler_ = () => this.deactivateFocus_();
     this.clickHandler_ = (evt) => this.handleClick_(evt);
-    this.listClickHandler_ = (evt) => this.handleListClick_(evt);
-    this.listMousedownHandler_ = (evt) => /* avoid component blur event */ evt.preventDefault();
     this.inputKeydownHandler_ = (evt) => this.handleKeydown_(evt);
     this.setPointerXOffset_ = (evt) => this.setBottomLineTransformOrigin_(evt);
     /** @private {function(!Event)} */
@@ -134,7 +132,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
   init() {
     const {ROOT, UPGRADED} = cssClasses;
-    const {AUTOCOMPLETE} = strings;
+    const {AUTOCOMPLETE, AUTOCORRECT, SPELLCHECK} = strings;
 
     if (!this.adapter_.hasClass(ROOT)) {
       throw new Error(`${ROOT} class required in root element.`);
@@ -145,14 +143,14 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     }
 
     this.adapter_.addClass(UPGRADED);
-    this.adapter_.setInputAttr(AUTOCOMPLETE, 'off');
+    this.adapter_.setInputAttr(AUTOCOMPLETE, 'nope');
+    this.adapter_.setInputAttr(AUTOCORRECT, 'off');
+    this.adapter_.setInputAttr(SPELLCHECK, 'false');
     this.adapter_.registerInteractionHandler('click', this.clickHandler_);
     this.adapter_.registerInputInteractionHandler('focus', this.focusHandler_);
     this.adapter_.registerInputInteractionHandler('blur', this.blurHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.inputKeydownHandler_);
     this.adapter_.registerInputInteractionHandler('input', this.inputInputHandler_);
-    this.adapter_.registerListInteractionHandler('mousedown', this.listMousedownHandler_);
-    this.adapter_.registerListInteractionHandler('click', this.listClickHandler_);
     ['mousedown', 'touchstart'].forEach((evtType) => {
       this.adapter_.registerInteractionHandler(evtType, this.setPointerXOffset_);
     });
@@ -172,8 +170,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.deregisterInputInteractionHandler('blur', this.blurHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.keydownHandler_);
     this.adapter_.deregisterInputInteractionHandler('input', this.inputInputHandler_);
-    this.adapter_.deregisterListInteractionHandler('mousedown', this.listMousedownHandler_);
-    this.adapter_.deregisterListInteractionHandler('click', this.listClickHandler_);
     ['mousedown', 'touchstart'].forEach((evtType) => {
       this.adapter_.deregisterInteractionHandler(evtType, this.setPointerXOffset_);
     });
@@ -225,11 +221,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     }
     this.updateHelptextOnDeactivation_(isValid);
     this.adapter_.notifyChange();
-  }
-
-  /** @param {?string} value */
-  setInputValue(value) {
-    this.getNativeInput_().value = value;
   }
 
   /** @return {?string} */
@@ -408,17 +399,35 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     }
     this.updateHelptextOnDeactivation_(isValid);
     this.clearInput_();
-    this.close_();
+    // this.close_();
   }
 
   handleClick_(evt) {
-    if (!this.adapter_.isFocused()) {
-      this.adapter_.focus()
-    } else {
-      if (!this.isOpen()) {
-        this.open_();
+    const {LIST_ITEM} = cssClasses;
+    console.log('click');
+
+    if ((evt.target) && (evt.target.classList.contains(LIST_ITEM))) {
+      console.log('list click');
+      evt.stopPropagation();
+      evt.preventDefault();
+      if (this.disabled_) {
+        return;
       }
+      if (evt.target !== this.adapter_.getActiveItem()) {
+        this.adapter_.removeActiveItem();
+        this.adapter_.setActiveItem(evt.target);
+        this.cachedActiveItem_ = this.adapter_.getActiveItemIndex();
+      }
+      this.adapter_.focus();
+      this.applyValueFromActiveItem_();
     }
+    // if (!this.adapter_.isFocused()) {
+    //   this.adapter_.focus()
+    // } else {
+    //   if (!this.isOpen()) {
+    //     this.open_();
+    //   }
+    // }
   }
 
   handleKeydown_(evt) {
@@ -462,7 +471,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
         this.cachedActiveItem_++;
         this.adapter_.setActiveForItemAtIndex(this.cachedActiveItem_);
       }
-    } else if ((isBackspace) && (this.adapter_.getNativeInput().selectionStart == 0)) {
+    } else if ((isBackspace) && (this.getNativeInput_().selectionStart == 0)) {
       if (this.adapter_.getNumberOfSelectedOptions() > 0) {
         this.removeLastSelection_();
       }
@@ -479,33 +488,28 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
     if ((tryOpen) && (!this.isOpen()))
       this.open_();
+    if ((this.isFull_) && (!isBackspace) && (!isTab) && (!isEnter)) {
+      evt.preventDefault();
+      return false;
+    }
   }
 
   handleInputInput_(evt = null) {
+    const {keyCode, key, shiftKey} = evt;
+    const isBackspace = key === 'Backspace' || keyCode === 8;
+    const isTab = key === 'Tab' || keyCode === 9;
+    const isEnter = key === 'Enter' || keyCode === 13;
+    if ((this.isFull_) && (!isBackspace) && (!isTab) && (!isEnter)) {
+      evt.preventDefault();
+      this.getNativeInput_().value = '';
+      return false;
+    }
     let currentValue = evt ? evt.target.value : this.getNativeInput_().value;
     if (currentValue !== this.lastInputValue_) {
       this.lastInputValue_ = currentValue;
       this.updateAvailableItems_();
     }
   }
-
-  handleListClick_(evt) {
-    const {LIST_ITEM} = cssClasses;
-
-    if ((evt.target) && (evt.target.classList.contains(LIST_ITEM))) {
-      evt.stopPropagation();
-      evt.preventDefault();
-      if (this.disabled_) {
-        return;
-      }
-      if (evt.target !== this.adapter_.getActiveItem()) {
-        this.adapter_.removeActiveItem();
-        this.adapter_.setActiveItem(evt.target);
-        this.cachedActiveItem_ = this.adapter_.getActiveItemIndex();
-      }
-      this.applyValueFromActiveItem_();
-    }
-  };
 
   /**
    * Opens the item list.
@@ -662,15 +666,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       ((this.maxSelectedItems_ > 1) && (this.adapter_.getNumberOfSelectedOptions() >= this.maxSelectedItems_))));
     this.isEmpty_ = ((this.adapter_.getNumberOfSelectedOptions() === 0) ||
       ((this.maxSelectedItems_ === 1) && (!this.adapter_.getSelectedOptionValue(0))));
-    this.updateInputStatus_();
-  }
-
-  updateInputStatus_() {
-    const {MAXLENGTH} = strings;
-    if (this.isFull_)
-      this.adapter_.setInputAttr(MAXLENGTH,0);
-    else
-      this.adapter_.removeInputAttr(MAXLENGTH);
   }
 
   applyValueFromActiveItem_() {
@@ -689,7 +684,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
   clearInput_() {
     this.lastInputValue_ = '';
-    this.setInputValue('');
+    this.getNativeInput_().value = '';
   }
 
   /**
