@@ -18,17 +18,13 @@
 const ROOT = 'mdc-ext-multiselect';
 
 /** @enum {string} */
-export const cssClasses = {
+const cssClasses = {
   ROOT: ROOT,
-  BOTTOM_LINE_ACTIVE: `${ROOT}__combobox-bottom-line--active`,
   DISABLED: `${ROOT}--disabled`,
   FOCUSED: `${ROOT}--focused`,
-  HELPTEXT_PERSISTENT: `${ROOT}-helptext--persistent`,
-  HELPTEXT_VALIDATION_MSG: `${ROOT}-helptext--validation-msg`,
   INVALID: `${ROOT}--invalid`,
   ITEM_ACTIVE: 'mdc-list-item--active',
   ITEM_NOMATCH: 'mdc-list-item__nomatch',
-  LABEL_FLOAT_ABOVE: `${ROOT}__label--float-above`,
   LIST_ITEM: 'mdc-list-item',
   LIST_OPEN: `${ROOT}__list--open`,
   OPEN: `${ROOT}--open`,
@@ -37,8 +33,8 @@ export const cssClasses = {
 };
 
 /** @enum {string} */
-export const strings = {
-  BOTTOM_LINE_SELECTOR: `.${ROOT}__combobox-bottom-line`,
+const strings = {
+  BOTTOM_LINE_SELECTOR: `.${ROOT}__bottom-line`,
   COMBOBOX_SELECTOR: `.${ROOT}__combobox`,
   COMBOBOX_BACKGROUND_SELECTOR: `.${ROOT}__combobox-background`,
   DISPLAY_SELECTOR: `.${ROOT}__display`,
@@ -64,7 +60,10 @@ export const strings = {
 };
 
 /** @enum {number} */
-export const numbers = {
+const numbers = {
   // Amount of miliseconds to wait before triggering a change value functionality.
-  CHANGE_VALUE_TRIGGER_DELAY: 500
+  CHANGE_VALUE_TRIGGER_DELAY: 500,
+  LABEL_SCALE: 0.75
 }
+
+export {cssClasses, strings, numbers};

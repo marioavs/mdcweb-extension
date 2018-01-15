@@ -14,16 +14,20 @@
 // limitations under the License.
 //
 
+@import "./functions";
+@import "./mixins";
 @import "./variables";
 @import "@material/animation/variables";
 @import "@material/animation/functions";
 @import "@material/elevation/mixins";
-@import "@material/ripple/mixins";
 @import "@material/rtl/mixins";
 @import "@material/theme/variables";
 @import "@material/theme/mixins";
 @import "@material/typography/variables";
 @import "@material/typography/mixins";
+@import "./bottom-line/mdc-ext-multiselect-bottom-line";
+@import "./label/mdc-ext-multiselect-label";
+
 
 @function mdc-ext-multiselect-transition($property) {
   @return #{$property} 180ms $mdc-animation-standard-curve-timing-function;
@@ -37,6 +41,12 @@
 .mdc-ext-multiselect {
   $dd-arrow-padding: 18px;
 
+  @include mdc-ext-multiselect-bottom-line-color($mdc-ext-multiselect-underline-on-light-idle);
+  @include mdc-ext-multiselect-hover-bottom-line-color($mdc-ext-multiselect-underline-on-light);
+  @include mdc-ext-multiselect-focused-bottom-line-color(primary);
+  @include mdc-ext-multiselect-ink-color(text-primary-on-light);
+  @include mdc-ext-multiselect-label-color($mdc-ext-multiselect-light-label);
+
   display: inline-flex;
   position: relative;
   align-items: flex-end;
@@ -46,7 +56,6 @@
   margin-top: 16px;
 
   &__combobox {
-    bottom: 0;
     position: relative;
     width: 100%;
 
@@ -91,56 +100,6 @@
           border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark;
         }
       }
-    }
-
-    .mdc-ext-multiselect__label {
-      @include mdc-theme-prop(color, text-hint-on-light);
-
-      position: absolute;
-      bottom: 8px;
-      left: 0;
-      transform-origin: left top;
-      transition: mdc-ext-multiselect-transition(transform), mdc-ext-multiselect-transition(color);
-      cursor: text;
-
-      // stylelint-disable plugin/selector-bem-pattern
-      @include mdc-rtl(".mdc-ext-multiselect") {
-        right: 0;
-        left: auto;
-        transform-origin: right top;
-      }
-      // stylelint-enable plugin/selector-bem-pattern
-
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
-        @include mdc-theme-prop(color, text-hint-on-dark);
-      }
-
-      &--float-above {
-        transform: translateY(-100%) scale(.75, .75);
-        cursor: auto;
-      }
-    }
-
-    &-bottom-line {
-      @include mdc-theme-prop(background-color, primary);
-
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      transform: scaleX(0);
-      transition: mdc-ext-multiselect-transition(transform), mdc-ext-multiselect-transition(opacity);
-      opacity: 0;
-      z-index: 2;
-    }
-
-    &-bottom-line--active {
-      transform: scaleX(1);
-    }
-
-    .mdc-ext-multiselect--focused &-bottom-line {
-      opacity: 1;
     }
   }
 
@@ -430,41 +389,6 @@
       }
     }
   }
-}
-
-// postcss-bem-linter: end
-
-// postcss-bem-linter: define multiselect-helptext
-
-.mdc-ext-multiselect-helptext {
-  @include mdc-theme-prop(color, text-hint-on-light);
-
-  margin: 0;
-  transition: mdc-ext-multiselect-transition(opacity);
-  font-size: .75rem;
-  opacity: 0;
-  will-change: opacity;
-
-  @include mdc-theme-dark(".mdc-ext-multiselect") {
-    @include mdc-theme-prop(color, text-hint-on-dark);
-  }
-
-  // stylelint-disable plugin/selector-bem-pattern
-  .mdc-ext-multiselect + & {
-    margin-bottom: 8px;
-  }
-
-  .mdc-ext-multiselect--focused + &:not(#{&}--validation-msg) {
-    opacity: 1;
-  }
-
-  // stylelint-enable plugin/selector-bem-pattern
-}
-
-.mdc-ext-multiselect-helptext--persistent {
-  transition: none;
-  opacity: 1;
-  will-change: initial;
 }
 
 // postcss-bem-linter: end

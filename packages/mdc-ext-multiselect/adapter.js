@@ -1,4 +1,41 @@
-/** @record */
+/* eslint-disable no-unused-vars */
+import MDCExtMultiselectBottomLineFoundation from './bottom-line/foundation';
+import MDCExtMultiselectLabelFoundation from './label/foundation';
+
+/* eslint no-unused-vars: [2, {"args": "none"}] */
+
+
+/**
+ * @typedef {{
+ *   value: string,
+ *   disabled: boolean,
+ *   readOnly: boolean,
+ *   validity: {
+ *     badInput: boolean,
+ *     valid: boolean,
+ *   },
+ * }}
+ */
+let NativeInputType;
+
+/**
+ * @typedef {{
+ *   bottomLine: (!MDCExtMultiselectBottomLineFoundation|undefined),
+ *   label: (!MDCExtMultiselectLabelFoundation|undefined),
+ * }}
+ */
+let FoundationMapType;
+
+/**
+ * Adapter for MDC Extension Multiselect.
+ *
+ * Defines the shape of the adapter expected by the foundation. Implement this
+ * adapter to integrate the Extension Multiselect into your framework. See
+ * https://github.com/material-components/material-components-web/blob/master/docs/authoring-components.md
+ * for more information.
+ *
+ * @record
+ */
 export default class MDCExtMultiselectAdapter {
   /**
    * Adds a class to the root element.
@@ -11,56 +48,6 @@ export default class MDCExtMultiselectAdapter {
    * @param {string} className
    */
   removeClass(className) {}
-
-  /**
-   * Adds a class to the bottom line element.
-   * @param {string} className
-   */
-  addClassToBottomLine(className) {}
-
-  /**
-   * Removes a class from the bottom line element.
-   * @param {string} className
-   */
-  removeClassFromBottomLine(className) {}
-
-  /**
-   * Sets an attribute with a given value on the bottom line element.
-   * @param {string} attr
-   * @param {string} value
-   */
-  setBottomLineAttr(attr, value) {}
-
-  /**
-   * Adds a class to the label element.
-   * @param {string} className
-   */
-  addClassToLabel(className) {}
-
-  /**
-   * Removes a class from the label element.
-   * @param {string} className
-   */
-  removeClassFromLabel(className) {}
-
-  /**
-   * Adds a class to the helptext element.
-   * @param {string} className
-   */
-  addClassToHelptext(className) {}
-
-  /**
-   * Removes a class from the helptext element.
-   * @param {string} className
-   */
-  removeClassFromHelptext(className) {}
-
-  /** @return {boolean} */
-  helptextHasClass(className) {}
-
-  setHelptextAttr(attr, value) {}
-
-  removeHelptextAttr(attr) {}
 
   /**
    * Adds a class to the list element.
@@ -78,10 +65,6 @@ export default class MDCExtMultiselectAdapter {
 
   removeAttr(attr) {}
 
-  setInputAttr(attr, value) {}
-
-  removeInputAttr(attr) {}
-
   /**
    * @param {string} className
    * @return {boolean}
@@ -90,6 +73,9 @@ export default class MDCExtMultiselectAdapter {
 
   /** @return {boolean} */
   hasNecessaryDom() {}
+
+  /** @return {boolean} */
+  eventTargetInComponent() {}
 
   /** @return {number} */
   getComboboxElOffsetHeight() {}
@@ -101,32 +87,46 @@ export default class MDCExtMultiselectAdapter {
   getComboboxElOffsetWidth() {}
 
   /**
-   * Registers an event listener `handler` for event type `type` on the root element.
-   * @param {string} type
+   * Registers an event listener `handler` for event type `evtType` on the root element.
+   * @param {string} evtType
    * @param {!Function} handler
    */
-  registerInteractionHandler(type, handler) {}
+  registerInteractionHandler(evtType, handler) {}
 
   /**
-   * Un-registers an event listener `handler` for event type `type` on the root element.
-   * @param {string} type
+   * Un-registers an event listener `handler` for event type `evtType` on the root element.
+   * @param {string} evtType
    * @param {!Function} handler
    */
-  deregisterInteractionHandler(type, handler) {}
+  deregisterInteractionHandler(evtType, handler) {}
 
   /**
-   * Registers an event listener `handler` for event type `type` on the input element.
-   * @param {string} type
-   * @param {!Function} handler
+   * Registers an event listener on the bottom line element for a given event.
+   * @param {string} evtType
+   * @param {function(!Event): undefined} handler
    */
-  registerInputInteractionHandler(type, handler) {}
+  registerBottomLineEventHandler(evtType, handler) {}
 
   /**
-   * Un-registers an event listener `handler` for event type `type` on the input element.
-   * @param {string} type
+   * Deregisters an event listener on the bottom line element for a given event.
+   * @param {string} evtType
+   * @param {function(!Event): undefined} handler
+   */
+  deregisterBottomLineEventHandler(evtType, handler) {}
+
+  /**
+   * Registers an event listener `handler` for a given event on the document.
+   * @param {string} evtType
    * @param {!Function} handler
    */
-  deregisterInputInteractionHandler(type, handler) {}
+  registerDocumentClickHandler(evtType, handler) {}
+
+  /**
+   * Un-registers an event listener `handler` for a given event on the document.
+   * @param {string} evtType
+   * @param {!Function} handler
+   */
+  deregisterDocumentClickHandler(evtType, handler) {}
 
   /**
    * Registers an event listener `handler` for event type `type` on the list element.
@@ -141,23 +141,6 @@ export default class MDCExtMultiselectAdapter {
    * @param {!Function} handler
    */
   deregisterListInteractionHandler(type, handler) {}
-
-  /**
-   * Registers an event listener on the bottom line element for a "transitionend" event.
-   * @param {function(!Event): undefined} handler
-   */
-  registerTransitionEndHandler(handler) {}
-
-  /**
-   * Deregisters an event listener on the bottom line element for a "transitionend" event.
-   * @param {function(!Event): undefined} handler
-   */
-  deregisterTransitionEndHandler(handler) {}
-
-  focus() {}
-
-  /** @return {boolean} */
-  isFocused() {}
 
   /**
    * @param {string} value
@@ -236,7 +219,26 @@ export default class MDCExtMultiselectAdapter {
 
   notifyChange() {}
 
-  getNativeElement() {}
+  setInputAttr(attr, value) {}
+
+  inputFocus() {}
+
+  /** @return {boolean} */
+  isInputFocused() {}
+
+  /**
+   * Registers an event listener `handler` for event type `type` on the input element.
+   * @param {string} type
+   * @param {!Function} handler
+   */
+  registerInputInteractionHandler(type, handler) {}
+
+  /**
+   * Un-registers an event listener `handler` for event type `type` on the input element.
+   * @param {string} type
+   * @param {!Function} handler
+   */
+  deregisterInputInteractionHandler(type, handler) {}
 
   getNativeInput() {}
 }

@@ -1,0 +1,133 @@
+@import "bottom-line/mixins";
+@import "label/mixins";
+
+@mixin mdc-ext-multiselect-invalid-label-shake-keyframes_($modifier, $positionY, $scale: .75) {
+  @keyframes invalid-shake-float-above-#{$modifier} {
+    0% {
+      transform: translateX(0) translateY(-#{$positionY}) scale(#{$scale});
+    }
+
+    33% {
+      animation-timing-function: cubic-bezier(.5, 0, .701732, .495819);
+      transform: translateX(5px) translateY(-#{$positionY}) scale(#{$scale});
+    }
+
+    66% {
+      animation-timing-function: cubic-bezier(.302435, .381352, .55, .956352);
+      transform: translateX(-5px) translateY(-#{$positionY}) scale(#{$scale});
+    }
+
+    100% {
+      transform: translateX(0) translateY(-#{$positionY}) scale(#{$scale});
+    }
+  }
+}
+
+@mixin mdc-ext-multiselect-ink-color($color) {
+  &:not(.mdc-ext-multiselect--disabled) {
+    @include mdc-ext-multiselect-ink-color_($color);
+  }
+}
+
+// Private mixins
+
+// Common
+
+@mixin mdc-ext-multiselect-disabled_ {
+  @include mdc-ext-multiselect-bottom-line-color_($mdc-ext-multiselect-disabled-border-on-light);
+  @include mdc-ext-multiselect-ink-color_(text-disabled-on-light);
+  @include mdc-ext-multiselect-label-color_(text-disabled-on-light);
+
+  @include mdc-theme-dark(".mdc-ext-multiselect") {
+    @include mdc-ext-multiselect-bottom-line-color_($mdc-ext-multiselect-disabled-border-on-dark);
+    @include mdc-ext-multiselect-ink-color_(text-disabled-on-dark);
+    @include mdc-ext-multiselect-label-color_(text-disabled-on-dark);
+  }
+
+  pointer-events: none;
+
+  .mdc-ext-multiselect__input {
+    border-bottom: 1px dotted;
+
+    @include mdc-theme-dark(".mdc-ext-multiselect", true) {
+      border-bottom: 1px dotted;
+    }
+  }
+
+  // stylelint-disable plugin/selector-bem-pattern
+  + .mdc-ext-multiselect-helper-text {
+    @include mdc-theme-prop(color, text-disabled-on-light);
+  }
+  // stylelint-enable plugin/selector-bem-pattern
+
+  @include mdc-theme-dark(".mdc-ext-multiselect", true) {
+    // stylelint-disable plugin/selector-bem-pattern
+    + .mdc-ext-multiselect-helper-text {
+      @include mdc-theme-prop(color, text-disabled-on-dark);
+    }
+    // stylelint-enable plugin/selector-bem-pattern
+  }
+
+  .mdc-ext-multiselect__label {
+    bottom: 8px;
+    cursor: default;
+  }
+}
+
+@mixin mdc-ext-multiselect-invalid_ {
+  @include mdc-ext-multiselect-bottom-line-color($mdc-ext-multiselect-error-on-light);
+  @include mdc-ext-multiselect-hover-bottom-line-color($mdc-ext-multiselect-error-on-light);
+  @include mdc-ext-multiselect-focused-bottom-line-color($mdc-ext-multiselect-error-on-light);
+  @include mdc-ext-multiselect-label-color($mdc-ext-multiselect-error-on-light);
+
+  .mdc-ext-multiselect__idle-outline {
+    border-color: $mdc-ext-multiselect-error-on-light;
+  }
+
+  .mdc-ext-multiselect__input:hover ~ .mdc-ext-multiselect__idle-outline {
+    border-color: $mdc-ext-multiselect-error-on-light;
+  }
+
+  .mdc-ext-multiselect__outline .mdc-ext-multiselect__outline-path {
+    stroke: $mdc-ext-multiselect-error-on-light;
+  }
+
+  + .mdc-ext-multiselect-helper-text--validation-msg {
+    opacity: 1;
+    color: $mdc-ext-multiselect-error-on-light;
+  }
+
+  @include mdc-theme-dark(".mdc-ext-multiselect", true) {
+    + .mdc-ext-multiselect-helper-text--validation-msg {
+      color: $mdc-ext-multiselect-error-on-dark;
+    }
+  }
+}
+
+@mixin mdc-ext-multiselect-focused_ {
+  @include mdc-required-ext-multiselect-label-asterix_ {
+    color: $mdc-ext-multiselect-error-on-light;
+
+    @include mdc-theme-dark(".mdc-ext-multiselect", true) {
+      color: $mdc-ext-multiselect-error-on-dark;
+    }
+  }
+
+  + .mdc-ext-multiselect-helper-text:not(.mdc-ext-multiselect-helper-text--validation-msg) {
+    opacity: 1;
+  }
+}
+
+@mixin mdc-required-ext-multiselect-label-asterix_() {
+  .mdc-ext-multiselect__input:required + .mdc-ext-multiselect__label::after {
+    @content;
+  }
+}
+
+// Private Color Mixins
+
+@mixin mdc-ext-multiselect-ink-color_($color) {
+  .mdc-ext-multiselect__input {
+    @include mdc-theme-prop(color, $color);
+  }
+}

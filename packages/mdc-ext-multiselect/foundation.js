@@ -15,7 +15,9 @@
  */
 
 import MDCFoundation from '@material/base/foundation';
-import MDCExtMultiselectAdapter from './adapter';
+import {MDCExtMultiselectAdapter, NativeInputType, FoundationMapType} from './adapter';
+import MDCExtMultiselectBottomLineFoundation from './bottom-line/foundation';
+import MDCExtMultiselectLabelFoundation from './label/foundation';
 import {cssClasses, strings, numbers} from './constants';
 
 /** @const {!Array<@dict>} */
@@ -28,36 +30,37 @@ const OPENER_KEYS = [
  * @final @extends {MDCFoundation<!MDCExtMultiselectAdapter>}
  */
 export default class MDCExtMultiselectFoundation extends MDCFoundation {
+  /** @return enum {string} */
   static get cssClasses() {
     return cssClasses;
   }
 
+  /** @return enum {string} */
   static get strings() {
     return strings;
   }
 
+  /** @return enum {number} */
+  static get numbers() {
+    return numbers;
+  }
+
+  /**
+   * {@see MDCExtMultiselectAdapter} for typing information on parameters and return
+   * types.
+   * @return {!MDCExtMultiselectAdapter}
+   */
   static get defaultAdapter() {
     return {
       addClass: (/* className: string */) => {},
       removeClass: (/* className: string */) => {},
-      addClassToBottomLine: (/* className: string */) => {},
-      removeClassFromBottomLine: (/* className: string */) => {},
-      setBottomLineAttr: (/* attr: string, value: string */) => {},
-      addClassToLabel: (/* className: string */) => {},
-      removeClassFromLabel: (/* className: string */) => {},
-      addClassToHelptext: (/* className: string */) => {},
-      removeClassFromHelptext: (/* className: string */) => {},
-      helptextHasClass: (/* className: string */) => {},
-      setHelptextAttr: (/* attr: string, value: string */) => {},
-      removeHelptextAttr: (/* attr: string */) => {},
       addClassToList: (/* className: string */) => {},
       removeClassFromList: (/* className: string */) => {},
       setAttr: (/* attr: string, value: string */) => {},
       removeAttr: (/* attr: string */) => {},
-      setInputAttr: (/* attr: string, value: string */) => {},
-      removeInputAttr: (/* attr: string */) => {},
       hasClass: (/* className: string */) => /* boolean */ false,
       hasNecessaryDom: () => /* boolean */ false,
+      eventTargetInComponent: () => false,
       getComboboxElOffsetHeight: () => /* number */ 0,
       getComboboxElOffsetTop: () => /* number */ 0,
       getComboboxElOffsetWidth: () => /* number */ 0,
@@ -65,12 +68,12 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       deregisterInteractionHandler: (/* type: string, handler: EventListener */) => {},
       registerInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
+      registerBottomLineEventHandler: () => {},
+      deregisterBottomLineEventHandler: () => {},
+      registerDocumentClickHandler: () => {},
+      deregisterDocumentClickHandler: () => {},
       registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
-      registerTransitionEndHandler: (/* handler: EventListener */) => {},
-      deregisterTransitionEndHandler: (/* handler: EventListener */) => {},
-      focus: () => {},
-      isFocused: () => {},
       addItem: (/* value: string, description: string, rawdata: string */) => {},
       removeItems: () => {},
       addSelectedOption: (/* value: string, description: string, rawdata: string */) => {},
@@ -100,16 +103,37 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       setAttrForItemAtIndex: (/* index: number, attr: string, value: string */) => {},
       rmAttrForItemAtIndex: (/* index: number, attr: string */) => {},
       notifyChange: () => {},
-      getNativeElement: () => /* HTMLElement */ {},
+      setInputAttr: (/* attr: string, value: string */) => {},
+      inputFocus: () => {},
+      isInputFocused: () => {},
+      registerInputInteractionHandler: () => {},
+      deregisterInputInteractionHandler: () => {},
       getNativeInput: () => /* HTMLInputElement */ {}
     };
   }
 
-  constructor(adapter) {
+  /**
+   * @param {!MDCExtMultiselectAdapter=} adapter
+   * @param {!FoundationMapType=} foundationMap Map from subcomponent names to their subfoundations.
+   */
+  constructor(adapter = /** @type {!MDCExtMultiselectAdapter} */ ({}),
+    foundationMap = /** @type {!FoundationMapType} */ ({})) {
     super(Object.assign(MDCExtMultiselectFoundation.defaultAdapter, adapter));
-    this.disabled_ = false;
+
+    /** @type {!MDCExtMultiselectBottomLineFoundation|undefined} */
+    this.bottomLine_ = foundationMap.bottomLine;
+    /** @type {!MDCExtMultiselectLabelFoundation|undefined} */
+    this.label_ = foundationMap.label;
+
     this.settings_ = this.getDefaultSettings_();
-    this.maxSelectedItems_ = 1;
+    /** @private {boolean} */
+    this.isFocused_ = false;
+    /** @private {boolean} */
+    this.isOpen_ = false;
+    /** @private {boolean} */
+    this.useCustomValidityChecking_ = false;
+    /** @private {boolean} */
+    this.isValid_ = true;
     this.lastInputValue_ = undefined;
     this.cachedNumberOfAvailableItems_ = 0;
     this.cachedActiveItem_ = undefined;
@@ -119,19 +143,20 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.blurHandler_ = () => this.deactivateFocus_();
     this.clickHandler_ = (evt) => this.handleClick_(evt);
     this.inputKeydownHandler_ = (evt) => this.handleKeydown_(evt);
-    this.setPointerXOffset_ = (evt) => this.setBottomLineTransformOrigin_(evt);
     /** @private {function(!Event)} */
     this.inputInputHandler_ = (evt) => this.handleInputInput_(evt);
     /** @private {function(!Event): undefined} */
-        this.transitionEndHandler_ = (evt) => this.transitionEnd_(evt);
-    /** @private {boolean} */
-    this.isOpen_ = false;
+    this.setPointerXOffset_ = (evt) => this.setBottomLineTransformOrigin(evt);
+    /** @private {function(!Event): undefined} */
+    this.bottomLineAnimationEndHandler_ = () => this.handleBottomLineAnimationEnd();
+    /** @private {function(!Event)} */
+    this.documentInteractionHandler_ = (evt) => this.handleDocumentInteraction_(evt);
     /** @private {number} */
     this.changeValueTriggerTimerId_ = 0;
   }
 
   init() {
-    const {ROOT, UPGRADED} = cssClasses;
+    const {ROOT, OPEN, UPGRADED} = cssClasses;
     const {AUTOCOMPLETE, AUTOCORRECT, SPELLCHECK} = strings;
 
     if (!this.adapter_.hasClass(ROOT)) {
@@ -143,10 +168,26 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     }
 
     this.adapter_.addClass(UPGRADED);
+    if (this.adapter_.isInputFocused()) {
+      this.inputFocusHandler_();
+    }
+    this.updateStatus_();
+    // Ensure label does not collide with any pre-filled value.
+    if (this.label_ && this.getValue()) {
+      this.label_.styleFloat(
+        this.getValue(), this.isFocused_, this.isBadInput_());
+    }
+
+    if (this.adapter_.hasClass(OPEN)) {
+      this.open_();
+    }
+
     this.adapter_.setInputAttr(AUTOCOMPLETE, 'nope');
     this.adapter_.setInputAttr(AUTOCORRECT, 'off');
     this.adapter_.setInputAttr(SPELLCHECK, 'false');
     this.adapter_.registerInteractionHandler('click', this.clickHandler_);
+    this.adapter_.registerBottomLineEventHandler(
+      MDCExtMultiselectBottomLineFoundation.strings.ANIMATION_END_EVENT, this.bottomLineAnimationEndHandler_);
     this.adapter_.registerInputInteractionHandler('focus', this.focusHandler_);
     this.adapter_.registerInputInteractionHandler('blur', this.blurHandler_);
     this.adapter_.registerInputInteractionHandler('keydown', this.inputKeydownHandler_);
@@ -154,10 +195,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     ['mousedown', 'touchstart'].forEach((evtType) => {
       this.adapter_.registerInteractionHandler(evtType, this.setPointerXOffset_);
     });
-    this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
-    if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() === 0))
+    if ((this.getSettings().maxSelectedItems === 1) && (this.adapter_.getNumberOfSelectedOptions() === 0))
       this.adapter_.addSelectedOption('', '');
-    this.resize();
+    this.resize_();
   }
 
   destroy() {
@@ -166,6 +206,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     clearTimeout(this.changeValueTriggerTimerId_);
     this.adapter_.removeClass(UPGRADED);
     this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
+    this.adapter_.deregisterBottomLineEventHandler(
+      MDCExtMultiselectBottomLineFoundation.strings.ANIMATION_END_EVENT, this.bottomLineAnimationEndHandler_);
     this.adapter_.deregisterInputInteractionHandler('focus', this.focusHandler_);
     this.adapter_.deregisterInputInteractionHandler('blur', this.blurHandler_);
     this.adapter_.deregisterInputInteractionHandler('keydown', this.keydownHandler_);
@@ -173,7 +215,28 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     ['mousedown', 'touchstart'].forEach((evtType) => {
       this.adapter_.deregisterInteractionHandler(evtType, this.setPointerXOffset_);
     });
-    this.adapter_.deregisterTransitionEndHandler(this.transitionEndHandler_);
+    if (this.isOpen()) {
+      ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+        this.adapter_.deregisterDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+      });
+    }
+  }
+
+  getSettings() {
+    return this.settings_ ;
+  }
+
+  setSettings(settings) {
+    Object.assign(this.settings_, settings);
+  }
+
+  getDefaultSettings_() {
+    return {
+      itemValueProperty: 'value',
+      itemDescriptionProperty: 'description',
+      itemsLoader: undefined,
+      maxSelectedItems: 1
+    };
   }
 
   /** @return {?string} */
@@ -196,7 +259,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
          if (itemValue === value) {
            let itemDescription = this.adapter_.getTextForItemAtIndex(i);
            let itemRawdata = this.adapter_.getRawdataForItemAtIndex(i);
-           if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
+           if ((this.getSettings().maxSelectedItems === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
              this.adapter_.updateSelectedOption(0, itemValue, itemDescription, itemRawdata);
            else
              this.adapter_.addSelectedOption(itemValue, itemDescription, itemRawdata);
@@ -208,7 +271,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const input = this.getNativeInput_();
     const isValid = input.checkValidity();
 
-    if ((this.isEmpty_) && (!this.adapter_.isFocused())) {
+    if ((this.isEmpty_) && (!this.adapter_.isInputFocused())) {
       this.adapter_.removeClassFromLabel(LABEL_FLOAT_ABOVE);
     }
     else
@@ -248,7 +311,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       this.setValue('');
       return;
     }
-    if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
+    if ((this.getSettings().maxSelectedItems === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
       this.adapter_.updateSelectedOption(0, value, description, JSON.stringify(rawObject));
     else
       this.adapter_.addSelectedOption(value, description, JSON.stringify(rawObject));
@@ -257,7 +320,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const input = this.getNativeInput_();
     const isValid = input.checkValidity();
 
-    if ((this.isEmpty_) && (!this.adapter_.isFocused())) {
+    if ((this.isEmpty_) && (!this.adapter_.isInputFocused())) {
       this.adapter_.removeClassFromLabel(LABEL_FLOAT_ABOVE);
     }
     else
@@ -272,39 +335,252 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.notifyChange();
   }
 
-  isDisabled() {
-    return this.disabled_;
+  /**
+   * @return {boolean} If a custom validity is set, returns that value.
+   *     Otherwise, returns the result of native validity checks.
+   */
+  isValid() {
+    return this.useCustomValidityChecking_
+      ? this.isValid_ : this.isNativeInputValid_();
   }
 
-  setDisabled(disabled) {
-    const {DISABLED} = cssClasses;
-    const {ARIA_DISABLED} = strings;
-    this.disabled_ = disabled;
-    this.getNativeInput_().disabled = disabled;
-    if (this.disabled_) {
-      this.adapter_.addClass(DISABLED);
-      this.adapter_.setAttr(ARIA_DISABLED, 'true');
-    } else {
-      this.adapter_.removeClass(DISABLED);
-      this.adapter_.removeAttr(ARIA_DISABLED);
+  /**
+   * @param {boolean} isValid Sets the validity state of the Date Picker.
+   */
+  setValid(isValid) {
+    this.useCustomValidityChecking_ = true;
+    this.isValid_ = isValid;
+    // Retrieve from the getter to ensure correct logic is applied.
+    isValid = this.isValid();
+    this.styleValidity_(isValid);
+    if (this.label_) {
+      this.label_.styleShake(isValid, this.isFocused_);
     }
   }
 
-  getSettings() {
-    return this.settings_ ;
+  /**
+   * @return {boolean} True if the Date Picker is disabled.
+   */
+  isDisabled() {
+    return this.getNativeInput_().disabled;
   }
 
-  setSettings(settings) {
-    Object.assign(this.settings_, settings);
+  /**
+   * @param {boolean} disabled Sets the Date Picker disabled or enabled.
+   */
+  setDisabled(disabled) {
+    this.getNativeInput_().disabled = disabled;
+    this.styleDisabled_(disabled);
   }
 
-  getNumberOfSelectedOptions() {
-    return this.adapter_.getNumberOfSelectedOptions();
+  /**
+   * @return {boolean} True if the Date Picker is read only.
+   */
+  isReadOnly() {
+    return this.getNativeInput_().readOnly;
+  }
+
+  /**
+   * @param {boolean} readOnly Sets the Date Picker read only.
+   */
+  /** @param {boolean} readOnly */
+  setReadOnly(readOnly) {
+    this.getNativeInput_().readOnly = readOnly;
+  }
+
+  /**
+   * @return {boolean} True if the Date Picker is required.
+   */
+  isRequired() {
+    return this.getNativeInput_().required;
+  }
+
+  /**
+   * @param {boolean} isRequired Sets the Date Picker required or not.
+   */
+  setRequired(isRequired) {
+    this.getNativeInput_().required = isRequired;
+    // Addition of the asterisk is automatic based on CSS, but validity checking
+    // needs to be manually run.
+    this.styleValidity_(this.isValid());
+  }
+
+  /**
+   * @return {boolean} True if the Date Picker input fails in converting the
+   *     user-supplied value.
+   * @private
+   */
+  isBadInput_() {
+    return this.getNativeInput_().validity.badInput;
+  }
+
+  /**
+   * @return {boolean} The result of native validity checking
+   *     (ValidityState.valid).
+   */
+  isNativeInputValid_() {
+    return this.getNativeInput_().validity.valid;
+  }
+
+  /**
+   * Styles the component based on the validity state.
+   * @param {boolean} isValid
+   * @private
+   */
+  styleValidity_(isValid) {
+    const {INVALID} = cssClasses;
+    if (isValid) {
+      this.adapter_.removeClass(INVALID);
+    } else {
+      this.adapter_.addClass(INVALID);
+    }
+    if (this.helperText_) {
+      this.helperText_.setValidity(isValid);
+    }
+  }
+
+  /**
+   * Styles the component based on the focused state.
+   * @param {boolean} isFocused
+   * @private
+   */
+  styleFocused_(isFocused) {
+    const {FOCUSED} = cssClasses;
+    if (isFocused) {
+      this.adapter_.addClass(FOCUSED);
+    } else {
+      this.adapter_.removeClass(FOCUSED);
+    }
+  }
+
+  /**
+   * Styles the component based on the disabled state.
+   * @param {boolean} isDisabled
+   * @private
+   */
+  styleDisabled_(isDisabled) {
+    const {DISABLED, INVALID} = cssClasses;
+    const {ARIA_DISABLED} = strings;
+    if (isDisabled) {
+      this.adapter_.setAttr(ARIA_DISABLED, 'true');
+      this.adapter_.addClass(DISABLED);
+      this.adapter_.removeClass(INVALID);
+    } else {
+      this.adapter_.removeAttr(ARIA_DISABLED);
+      this.adapter_.removeClass(DISABLED);
+    }
+  }
+
+  resize_() {
+    const comboboxWidth = this.adapter_.getComboboxElOffsetWidth();
+
+    this.adapter_.setListElStyle('min-width', `${comboboxWidth}px`);
+  }
+
+  activateFocus_() {
+    this.isFocused_ = true;
+    this.updateStatus_();
+    this.styleFocused_(this.isFocused_);
+    if (this.bottomLine_) {
+      this.bottomLine_.activate();
+    }
+    if (this.label_) {
+      this.label_.styleShake(this.isValid(), this.isFocused_);
+      this.label_.styleFloat(
+        this.getValue(), this.isFocused_, this.isBadInput_());
+    }
+    if (!this.isOpen()) {
+      this.cachedNumberOfAvailableItems_ = this.adapter_.getNumberOfAvailableItems();
+      if ((this.cachedActiveItem_ === undefined) && (this.cachedNumberOfAvailableItems_ > 0)) {
+        this.adapter_.removeActiveItem();
+        this.cachedActiveItem_ = 0;
+        this.adapter_.setActiveForItemAtIndex(this.cachedActiveItem_);
+      }
+      if (this.cachedNumberOfAvailableItems_ == 0)
+        this.updateAvailableItems_();
+      else if (this.isEmpty_)
+        this.open_();
+    }
+  }
+
+  deactivateFocus_() {
+    this.isFocused_ = false;
+    const isValid = this.isValid();
+    this.styleValidity_(isValid);
+    this.styleFocused_(this.isFocused_);
+    if (this.label_) {
+      this.label_.styleShake(this.isValid(), this.isFocused_);
+      this.label_.styleFloat(
+        this.getValue(), this.isFocused_, this.isBadInput_());
+    }
+    this.clearInput_();
+    // this.close_();
+  }
+
+  /**
+   * Sets the bottom line's transform origin, so that the bottom line activate
+   * animation will animate out from the user's click location.
+   * @param {!Event} evt
+   */
+  setBottomLineTransformOrigin(evt) {
+    if (this.bottomLine_) {
+      this.bottomLine_.setTransformOrigin(evt);
+    }
+  }
+
+  /**
+   * Handles when bottom line animation ends, performing actions that must wait
+   * for animations to finish.
+   */
+  handleBottomLineAnimationEnd() {
+    // We need to wait for the bottom line to be entirely transparent
+    // before removing the class. If we do not, we see the line start to
+    // scale down before disappearing
+    if (!this.isFocused_ && this.bottomLine_) {
+      this.bottomLine_.deactivate();
+    }
   }
 
   /** @return {boolean} */
   isOpen() {
     return this.isOpen_;
+  }
+
+  /**
+   * Opens the item list.
+   */
+  open_() {
+    const {LIST_OPEN,OPEN} = cssClasses;
+
+    if (this.isDisabled()) {
+      return;
+    }
+    this.resize_();
+    this.setListStyles_();
+    ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+      this.adapter_.registerDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+    });
+    this.adapter_.addClass(OPEN);
+    this.adapter_.addClassToList(LIST_OPEN);
+    this.isOpen_ = true;
+  }
+
+  /**
+   * Closes the item list.
+   */
+  close_() {
+    const {LIST_OPEN,OPEN} = cssClasses;
+
+    ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+      this.adapter_.deregisterDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+    });
+    this.adapter_.removeClass(OPEN);
+    this.adapter_.removeClassFromList(LIST_OPEN);
+    this.isOpen_ = false;
+  }
+
+  getNumberOfSelectedOptions() {
+    return this.adapter_.getNumberOfSelectedOptions();
   }
 
   addItems(items) {
@@ -336,81 +612,18 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
         this.cachedActiveItem_ = undefined;
       }
     }
-    if (!this.isOpen() && (this.adapter_.isFocused())) {
+    if (!this.isOpen() && (this.adapter_.isInputFocused())) {
       this.open_();
     }
   }
 
-  resize() {
-    const comboboxWidth = this.adapter_.getComboboxElOffsetWidth();
-
-    this.adapter_.setListElStyle('min-width', `${comboboxWidth}px`);
-  }
-
-  getDefaultSettings_() {
-    return {
-      itemValueProperty: 'value',
-      itemDescriptionProperty: 'description',
-      itemsLoader: undefined
-    };
-  }
-
-  activateFocus_() {
-    const {BOTTOM_LINE_ACTIVE, FOCUSED, LABEL_FLOAT_ABOVE} = cssClasses;
-
-    if (this.disabled_) {
-      return;
-    }
-    this.adapter_.addClass(FOCUSED);
-    this.adapter_.addClassToBottomLine(BOTTOM_LINE_ACTIVE);
-    this.adapter_.addClassToLabel(LABEL_FLOAT_ABOVE);
-    this.updateStatus_();
-    this.showHelptext_();
-    if (!this.isOpen()) {
-      this.cachedNumberOfAvailableItems_ = this.adapter_.getNumberOfAvailableItems();
-      if ((this.cachedActiveItem_ === undefined) && (this.cachedNumberOfAvailableItems_ > 0)) {
-        this.adapter_.removeActiveItem();
-        this.cachedActiveItem_ = 0;
-        this.adapter_.setActiveForItemAtIndex(this.cachedActiveItem_);
-      }
-      if (this.cachedNumberOfAvailableItems_ == 0)
-        this.updateAvailableItems_();
-      else if (this.isEmpty_)
-        this.open_();
-    }
-  }
-
-  deactivateFocus_() {
-    const {FOCUSED, INVALID, LABEL_FLOAT_ABOVE} = cssClasses;
-    const input = this.getNativeInput_();
-    const isValid = input.checkValidity();
-
-    if (this.disabled_) {
-      return;
-    }
-    this.adapter_.removeClass(FOCUSED);
-    if (this.isEmpty_) {
-      this.adapter_.removeClassFromLabel(LABEL_FLOAT_ABOVE);
-    }
-    if (isValid) {
-      this.adapter_.removeClass(INVALID);
-    } else {
-      this.adapter_.addClass(INVALID);
-    }
-    this.updateHelptextOnDeactivation_(isValid);
-    this.clearInput_();
-    // this.close_();
-  }
-
   handleClick_(evt) {
     const {LIST_ITEM} = cssClasses;
-    console.log('click');
 
     if ((evt.target) && (evt.target.classList.contains(LIST_ITEM))) {
-      console.log('list click');
       evt.stopPropagation();
       evt.preventDefault();
-      if (this.disabled_) {
+      if (this.isDisabled()) {
         return;
       }
       if (evt.target !== this.adapter_.getActiveItem()) {
@@ -418,11 +631,11 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
         this.adapter_.setActiveItem(evt.target);
         this.cachedActiveItem_ = this.adapter_.getActiveItemIndex();
       }
-      this.adapter_.focus();
+      this.adapter_.inputFocus();
       this.applyValueFromActiveItem_();
     }
-    // if (!this.adapter_.isFocused()) {
-    //   this.adapter_.focus()
+    // if (!this.adapter_.isInputFocused()) {
+    //   this.adapter_.inputFocus()
     // } else {
     //   if (!this.isOpen()) {
     //     this.open_();
@@ -443,7 +656,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       return;
     }
 
-    if (this.disabled_) {
+    if (this.isDisabled()) {
       return;
     }
     let tryOpen = false;
@@ -512,93 +725,18 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   /**
-   * Opens the item list.
-   */
-  open_() {
-    const {LIST_OPEN,OPEN} = cssClasses;
-
-    if (this.disabled_) {
-      return;
-    }
-    this.resize();
-    this.setListStyles_();
-    this.adapter_.addClass(OPEN);
-    this.adapter_.addClassToList(LIST_OPEN);
-    this.isOpen_ = true;
-  }
-
-  /**
-   * Closes the item list.
-   * @param {Event=} evt
-   */
-  close_() {
-    const {LIST_OPEN,OPEN} = cssClasses;
-
-    this.adapter_.removeClass(OPEN);
-    this.adapter_.removeClassFromList(LIST_OPEN);
-    this.isOpen_ = false;
-  }
-
-  /**
-   * Sets the transform-origin of the bottom line, causing it to animate out
-   * from the user's click location.
+   * Handle clicks and cancel the component if not a children
    * @param {!Event} evt
    * @private
    */
-  setBottomLineTransformOrigin_(evt) {
-    const targetClientRect = evt.target.getBoundingClientRect();
-    const evtCoords = {x: evt.clientX, y: evt.clientY};
-    const normalizedX = evtCoords.x - targetClientRect.left;
-    const attributeString = `transform-origin: ${normalizedX}px center`;
-
-    this.adapter_.setBottomLineAttr('style', attributeString);
-  }
-
-  showHelptext_() {
-    const {ARIA_HIDDEN} = strings;
-    this.adapter_.removeHelptextAttr(ARIA_HIDDEN);
-  }
-
-  /**
-   * Fires when animation transition ends, performing actions that must wait
-   * for animations to finish.
-   * @param {!Event} evt
-   * @private
-   */
-  transitionEnd_(evt) {
-    const {BOTTOM_LINE_ACTIVE} = cssClasses;
-
-    // We need to wait for the bottom line to be entirely transparent
-    // before removing the class. If we do not, we see the line start to
-    // scale down before disappearing
-    if ((evt.propertyName === 'opacity') && (!this.adapter_.isFocused())) {
-      this.adapter_.removeClassFromBottomLine(BOTTOM_LINE_ACTIVE);
-    }
-  }
-
-  updateHelptextOnDeactivation_(isValid) {
-    const {HELPTEXT_PERSISTENT, HELPTEXT_VALIDATION_MSG} = cssClasses;
-    const {ALERT_ROLE, ROLE} = strings;
-    const helptextIsPersistent = this.adapter_.helptextHasClass(HELPTEXT_PERSISTENT);
-    const helptextIsValidationMsg = this.adapter_.helptextHasClass(HELPTEXT_VALIDATION_MSG);
-    const validationMsgNeedsDisplay = helptextIsValidationMsg && !isValid;
-
-    if (validationMsgNeedsDisplay) {
-      this.adapter_.setHelptextAttr(ROLE, ALERT_ROLE);
-    } else {
-      this.adapter_.removeHelptextAttr(ROLE);
-    }
-
-    if (helptextIsPersistent || validationMsgNeedsDisplay) {
+  handleDocumentInteraction_(evt) {
+    if (this.adapter_.eventTargetInComponent(evt.target))
       return;
-    }
-    this.hideHelptext_();
-  }
 
-  hideHelptext_() {
-    const {ARIA_HIDDEN} = strings;
-    this.adapter_.setHelptextAttr(ARIA_HIDDEN, 'true');
-  }
+    if (evt.type === 'click') {
+      this.close_();
+    }
+  };
 
   setListStyles_() {
     const comboboxHeight = this.adapter_.getComboboxElOffsetHeight();
@@ -609,7 +747,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
   removeLastSelection_() {
     if (this.adapter_.getNumberOfSelectedOptions() > 0) {
-      if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() === 1))
+      if ((this.getSettings().maxSelectedItems === 1) && (this.adapter_.getNumberOfSelectedOptions() === 1))
         this.adapter_.updateSelectedOption(0,'','');
       else
         this.adapter_.removeSelectedOption(this.adapter_.getNumberOfSelectedOptions() - 1);
@@ -646,7 +784,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   updateAvailableItems_() {
-    if (this.disabled_) {
+    if (this.isDisabled()) {
       return;
     }
     // Debounce multiple changed values
@@ -661,18 +799,19 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   updateStatus_() {
-    this.isFull_ = ((this.maxSelectedItems_ !== null) &&
-      (((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() === 1) && (this.adapter_.getSelectedOptionValue(0))) ||
-      ((this.maxSelectedItems_ > 1) && (this.adapter_.getNumberOfSelectedOptions() >= this.maxSelectedItems_))));
+    let maxSelectedItems = this.getSettings().maxSelectedItems;
+    this.isFull_ = ((maxSelectedItems !== null) &&
+      (((maxSelectedItems === 1) && (this.adapter_.getNumberOfSelectedOptions() === 1) && (this.adapter_.getSelectedOptionValue(0))) ||
+      ((maxSelectedItems > 1) && (this.adapter_.getNumberOfSelectedOptions() >= maxSelectedItems))));
     this.isEmpty_ = ((this.adapter_.getNumberOfSelectedOptions() === 0) ||
-      ((this.maxSelectedItems_ === 1) && (!this.adapter_.getSelectedOptionValue(0))));
+      ((maxSelectedItems === 1) && (!this.adapter_.getSelectedOptionValue(0))));
   }
 
   applyValueFromActiveItem_() {
     let currentDescription = this.adapter_.getActiveItemDescription();
     let currentValue = this.adapter_.getActiveItemValue();
     let currentRawdata = this.adapter_.getActiveItemRawdata();
-    if ((this.maxSelectedItems_ === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
+    if ((this.getSettings().maxSelectedItems === 1) && (this.adapter_.getNumberOfSelectedOptions() > 0))
       this.adapter_.updateSelectedOption(0, currentValue, currentDescription, currentRawdata);
     else
       this.adapter_.addSelectedOption(currentValue, currentDescription, currentRawdata);
@@ -688,21 +827,20 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   /**
-   * @return {!HTMLElementState}
-   * @private
-   */
-  getNativeElement_() {
-    return this.adapter_.getNativeElement();
-  }
-
-  /**
-   * @return {!InputElementState}
+   * @return {!Element|!NativeInputType} The native text input from the
+   * host environment, or a dummy if none exists.
    * @private
    */
   getNativeInput_() {
-    return this.adapter_.getNativeInput() || {
+    return this.adapter_.getNativeInput() ||
+    /** @type {!NativeInputType} */ ({
+      value: '',
       disabled: false,
-      value: null
-    };
+      readOnly: false,
+      validity: {
+        badInput: false,
+        valid: true,
+      }
+    });
   }
 }
