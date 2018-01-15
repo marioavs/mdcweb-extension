@@ -129,11 +129,10 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     foundationMap = /** @type {!FoundationMapType} */ ({})) {
     super(Object.assign(MDCExtDatePickerFoundation.defaultAdapter, adapter));
 
-    this.settings_ = this.getDefaultSettings_();
-
     /** @type {!MDCExtDatePickerLabelFoundation|undefined} */
     this.label_ = foundationMap.label;
 
+    this.settings_ = this.getDefaultSettings_();
     this.value_ = null;
     this.selectedValue_ = null;
     this.displayValue_ = null;
@@ -176,7 +175,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     /** @private {function(!Event): undefined} */
     this.datePickerInteractionHandler_ = (evt) => this.handleDatePickerInteraction(evt);
     /** @private {function(!Event)} */
-    this.bodyClickHandler_ = (evt) => this.handleDocumentClick_(evt);
+    this.documentClickHandler_ = (evt) => this.handleDocumentClick_(evt);
     /** @private {function(!Event)} */
     this.dayClickHandler_ = (evt) => this.handleDayClick_(evt);
     /** @private {function(!Event): undefined} */
@@ -202,6 +201,9 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     }
 
     this.adapter_.addClass(UPGRADED);
+    if (this.adapter_.isFocused()) {
+      this.inputFocusHandler_();
+    }
     // Ensure label does not collide with any pre-filled value.
     if (this.label_ && this.getValue()) {
       this.label_.styleFloat(
@@ -209,11 +211,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     }
 
     if (this.adapter_.hasClass(OPEN)) {
-      this.isOpen_ = true;
-    }
-
-    if (this.adapter_.isFocused()) {
-      this.inputFocusHandler_();
+      this.open_();
     }
 
     this.adapter_.registerInputInteractionHandler('focus', this.inputFocusHandler_);
@@ -236,11 +234,11 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     ['click', 'keydown', 'keyup'].forEach((evtType) => {
       this.adapter_.deregisterDatePickerInteractionHandler(evtType, this.datePickerInteractionHandler_);
     });
-    if (this.isOpen_) {
+    if (this.isOpen()) {
       ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
         this.adapter_.deregisterSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
       });
-      this.adapter_.deregisterDocumentClickHandler(this.bodyClickHandler_);
+      this.adapter_.deregisterDocumentClickHandler(this.documentClickHandler_);
       this.adapter_.deregisterDayClickHandler(this.dayClickHandler_);
       this.adapter_.deregisterTransitionEndHandler(this.transitionEndHandler_);
       this.adapter_.deregisterTableTransitionEndHandler(this.tableTransitionEndHandler_);
@@ -442,7 +440,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    */
   handleDatePickerInteraction(evt) {
     const {SURFACE} = cssClasses;
-    if ((this.getNativeInput_().disabled) || (this.getNativeInput_().readOnly)) {
+    if ((this.isDisabled()) || (this.isReadOnly())) {
       return;
     }
     this.receivedUserInput_ = true;
@@ -568,7 +566,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    * @private
    */
   handleDocumentClick_(evt) {
-    const {ANIMATING, ROOT, SURFACE} =  cssClasses;
+    const {ANIMATING} =  cssClasses;
 
     if (this.adapter_.eventTargetInSurface(evt.target))
       return;
@@ -1005,7 +1003,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
       this.adapter_.registerSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
     });
-    this.adapter_.registerDocumentClickHandler(this.bodyClickHandler_);
+    this.adapter_.registerDocumentClickHandler(this.documentClickHandler_);
     this.adapter_.registerDayClickHandler(this.dayClickHandler_);
     // this.adapter_.registerInteractionHandler('click', this.componentClickHandler_);
     this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
@@ -1020,7 +1018,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
       this.adapter_.deregisterSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
     });
-    this.adapter_.deregisterDocumentClickHandler(this.bodyClickHandler_);
+    this.adapter_.deregisterDocumentClickHandler(this.documentClickHandler_);
     this.adapter_.deregisterDayClickHandler(this.dayClickHandler_);
     // this.adapter_.deregisterInteractionHandler('click', this.componentClickHandler_);
     this.adapter_.untrapFocusOnSurface();
@@ -1037,7 +1035,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     if (this.adapter_.eventTargetHasClass(evt.target, SURFACE)) {
       this.adapter_.deregisterTransitionEndHandler(this.transitionEndHandler_);
       this.adapter_.removeClass(ANIMATING);
-      if (this.isOpen_) {
+      if (this.isOpen()) {
         this.adapter_.trapFocusOnSurface();
       };
     };

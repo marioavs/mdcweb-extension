@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "@material/animation": "^0.25.0",
-    "@material/ripple": "^0.27.0",
+    "@material/ripple": "^0.28.0",
     "@material/rtl": "^0.1.8",
-    "@material/theme": "^0.27.0",
-    "@material/typography": "^0.3.0",
+    "@material/theme": "^0.28.0",
+    "@material/typography": "^0.28.0",
     "focus-trap": "^2.4.2"
   }
 }

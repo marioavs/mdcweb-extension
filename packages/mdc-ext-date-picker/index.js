@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import {cssClasses, strings} from './constants';
 import {getCorrectEventName} from '@material/animation';
 import MDCComponent from '@material/base/component';
 import {MDCRipple, MDCRippleFoundation, util} from '@material/ripple';
@@ -87,24 +86,24 @@ class MDCExtDatePicker extends MDCComponent {
    */
   initialize(labelFactory = (el) => new MDCExtDatePickerLabel(el),
     rippleFactory = this.initRipple_) {
-    this.input_ = this.root_.querySelector(strings.INPUT_SELECTOR);
-    const labelElement = this.root_.querySelector(strings.LABEL_SELECTOR);
+    this.input_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.INPUT_SELECTOR);
+    const labelElement = this.root_.querySelector(MDCExtDatePickerFoundation.strings.LABEL_SELECTOR);
     if (labelElement) {
       this.label_ = labelFactory(labelElement);
     }
-    this.surfaceEl_ = this.root_.querySelector(strings.SURFACE_SELECTOR);
-    this.buttonYearEl_ = this.root_.querySelector(strings.BUTTON_YEAR_SELECTOR);
-    this.acceptButton_ = this.root_.querySelector(strings.ACCEPT_SELECTOR);
-    this.cancelButton_ = this.root_.querySelector(strings.CANCEL_SELECTOR);
+    this.surfaceEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.SURFACE_SELECTOR);
+    this.buttonYearEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.BUTTON_YEAR_SELECTOR);
+    this.acceptButton_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.ACCEPT_SELECTOR);
+    this.cancelButton_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.CANCEL_SELECTOR);
     this.focusTrap_ = createFocusTrapInstance(this.surfaceEl_, this.acceptButton_);
-    this.prevEl_ = this.root_.querySelector(strings.PREV_SELECTOR);
-    this.nextEl_ = this.root_.querySelector(strings.NEXT_SELECTOR);
-    this.txtDateEl_ = this.root_.querySelector(strings.TXT_DATE_SELECTOR);
-    this.txtMonthEl_ = this.root_.querySelector(strings.TXT_MONTH_SELECTOR);
-    this.txtWeekDayEl_ = this.root_.querySelector(strings.TXT_WEEK_DAY_SELECTOR);
-    this.monthsEl_ =  this.root_.querySelector(strings.MONTHS_SELECTOR);
-    this.yearSelectionEl_ = this.root_.querySelector(strings.YEAR_SELECTION_SELECTOR);
-    this.yearListEl_ = this.root_.querySelector(strings.YEAR_LIST_SELECTOR);
+    this.prevEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.PREV_SELECTOR);
+    this.nextEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.NEXT_SELECTOR);
+    this.txtDateEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.TXT_DATE_SELECTOR);
+    this.txtMonthEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.TXT_MONTH_SELECTOR);
+    this.txtWeekDayEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.TXT_WEEK_DAY_SELECTOR);
+    this.monthsEl_ =  this.root_.querySelector(MDCExtDatePickerFoundation.strings.MONTHS_SELECTOR);
+    this.yearSelectionEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.YEAR_SELECTION_SELECTOR);
+    this.yearListEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.YEAR_LIST_SELECTOR);
 
     if (this.txtMonthEl_)
       this.txtMonthEl_.tabIndex = 0;
@@ -187,9 +186,9 @@ class MDCExtDatePicker extends MDCComponent {
         eventTargetInSurface: (target) => this.surfaceEl_.contains(target),
         eventTargetHasClass: (target, className) => target.classList.contains(className),
         eventTargetDateAttr: (target) => ({
-          date: target.getAttribute(strings.DATA_DATE),
-          month: target.getAttribute(strings.DATA_MONTH),
-          year: target.getAttribute(strings.DATA_YEAR)
+          date: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_DATE),
+          month: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_MONTH),
+          year: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_YEAR)
         }),
         getDayTableDimensions: () => this.dayTableEl_.getBoundingClientRect(),
         registerDatePickerInteractionHandler: (evtType, handler) => this.root_.addEventListener(evtType, handler),
@@ -235,11 +234,11 @@ class MDCExtDatePicker extends MDCComponent {
         rmPrevAttr: (name) => this.prevEl_.removeAttribute(name),
         setNextAttr: (name, value) => this.nextEl_.setAttribute(name, value),
         rmNextAttr: (name) => this.nextEl_.removeAttribute(name),
-        isFocused: () => document.activeElement === this.root_.querySelector(strings.INPUT_SELECTOR),
+        isFocused: () => document.activeElement === this.root_.querySelector(MDCExtDatePickerFoundation.strings.INPUT_SELECTOR),
         isRtl: () => window.getComputedStyle(this.root_).getPropertyValue('direction') === 'rtl',
-        notifyAccept: () => this.emit(strings.ACCEPT_EVENT),
-        notifyCancel: () => this.emit(strings.CANCEL_EVENT),
-        notifyChange: (evtData) => this.emit(strings.CHANGE_EVENT, {type: evtData.type}),
+        notifyAccept: () => this.emit(MDCExtDatePickerFoundation.strings.ACCEPT_EVENT),
+        notifyCancel: () => this.emit(MDCExtDatePickerFoundation.strings.CANCEL_EVENT),
+        notifyChange: (evtData) => this.emit(MDCExtDatePickerFoundation.strings.CHANGE_EVENT, {type: evtData.type}),
         trapFocusOnSurface: () => this.focusTrap_.activate(),
         untrapFocusOnSurface: () => this.focusTrap_.deactivate(),
       },
@@ -277,7 +276,7 @@ class MDCExtDatePicker extends MDCComponent {
    * state.
    */
   initialSyncWithDOM() {
-    this.disabled = this.root_.getAttribute(strings.ARIA_DISABLED) === 'true' ||
+    this.disabled = this.root_.getAttribute(MDCExtDatePickerFoundation.strings.ARIA_DISABLED) === 'true' ||
       this.input_.disabled;
   }
 
@@ -327,7 +326,7 @@ class MDCExtDatePicker extends MDCComponent {
   }
 
   addDayClassAndFocus_(date, className, focus) {
-    const {CALENDAR_DAY_SELECTOR, DATA_DATE, DATA_MONTH, DATA_YEAR} = strings;
+    const {CALENDAR_DAY_SELECTOR, DATA_DATE, DATA_MONTH, DATA_YEAR} = MDCExtDatePickerFoundation.strings;
     let elements = this.monthsEl_.querySelectorAll(CALENDAR_DAY_SELECTOR);
     let dataDate = 0;
     let dataMonth = 0;
@@ -347,7 +346,7 @@ class MDCExtDatePicker extends MDCComponent {
   }
 
   removeAllDaysClass_(className) {
-    const {CALENDAR_DAY_SELECTOR} = strings;
+    const {CALENDAR_DAY_SELECTOR} = MDCExtDatePickerFoundation.strings;
     let elements = this.monthsEl_.querySelectorAll(CALENDAR_DAY_SELECTOR);
     for (let i = 0, l = elements.length; i < l; i++) {
       elements[i].classList.remove(className);
@@ -355,8 +354,8 @@ class MDCExtDatePicker extends MDCComponent {
   }
 
   setupDayTables_() {
-    const {DAY_TABLE_ACTIVE, DAY_TABLE_NEXT, DAY_TABLE_PREV} = cssClasses;
-    const {DAY_TABLE_SELECTOR} = strings;
+    const {DAY_TABLE_ACTIVE, DAY_TABLE_NEXT, DAY_TABLE_PREV} = MDCExtDatePickerFoundation.cssClasses;
+    const {DAY_TABLE_SELECTOR} = MDCExtDatePickerFoundation.strings;
     let dayTable = this.root_.querySelector(DAY_TABLE_SELECTOR);
     let clonedTable = dayTable.cloneNode(true);
     clonedTable.classList.add(DAY_TABLE_ACTIVE);
@@ -371,9 +370,9 @@ class MDCExtDatePicker extends MDCComponent {
   }
 
   replaceTableBody_(tableType, tableData) {
-    const {CALENDAR_DAY} = cssClasses;
+    const {CALENDAR_DAY} = MDCExtDatePickerFoundation.cssClasses;
     const {ARIA_DISABLED, DATA_DATE, DATA_MONTH, DATA_YEAR, DAY_ROWS_SELECTOR, DAY_TABLE_ACTIVE_SELECTOR,
-      DAY_TABLE_NEXT_SELECTOR, DAY_TABLE_PREV_SELECTOR, TYPE_NEXT, TYPE_PREV} = strings;
+      DAY_TABLE_NEXT_SELECTOR, DAY_TABLE_PREV_SELECTOR, TYPE_NEXT, TYPE_PREV} = MDCExtDatePickerFoundation.strings;
     let tableEl = undefined;
     if (tableType === TYPE_NEXT)
       tableEl = this.root_.querySelector(DAY_TABLE_NEXT_SELECTOR);
@@ -417,7 +416,7 @@ class MDCExtDatePicker extends MDCComponent {
 
   replaceTableClass_(tableType, fromClassName, toClassName) {
     const {DAY_TABLE_ACTIVE_SELECTOR, DAY_TABLE_HIDDEN_SELECTOR, DAY_TABLE_NEXT_SELECTOR,
-      DAY_TABLE_PREV_SELECTOR, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = strings;
+      DAY_TABLE_PREV_SELECTOR, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = MDCExtDatePickerFoundation.strings;
     let tableEl = undefined;
     if (tableType === TYPE_HIDDEN)
       tableEl = this.root_.querySelector(DAY_TABLE_HIDDEN_SELECTOR);
@@ -436,8 +435,8 @@ class MDCExtDatePicker extends MDCComponent {
   }
 
   setupYearList_(size, minYear, maxYear) {
-    const {CALENDAR_YEAR} = cssClasses;
-    const {YEAR_LIST_SELECTOR} = strings;
+    const {CALENDAR_YEAR} = MDCExtDatePickerFoundation.cssClasses;
+    const {YEAR_LIST_SELECTOR} = MDCExtDatePickerFoundation.strings;
     this.maxYear_ = maxYear;
     this.minYear_ = minYear;
     this.years_ = [];
@@ -455,7 +454,7 @@ class MDCExtDatePicker extends MDCComponent {
   }
 
   setFirstYear_(year) {
-    const {DATA_YEAR} = strings;
+    const {DATA_YEAR} = MDCExtDatePickerFoundation.strings;
     let currYear = year;
     for (let i = 0, l = this.years_.length; i < l; i++) {
       currYear = year + i;
