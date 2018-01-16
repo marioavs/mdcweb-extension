@@ -731,6 +731,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       } else if (isEscape) {
         evt.preventDefault();
         evt.stopPropagation();
+        this.adapter_.inputFocus();
         this.close_();
       }
     }
