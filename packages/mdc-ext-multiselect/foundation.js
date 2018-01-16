@@ -685,7 +685,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       return;
     }
     // Do nothing if Alt, Ctrl or Meta are pressed.
-    if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+    if (evt.altKey || evt.ctrlKey || evt.metaKey) {
       return;
     }
     // Do nothing if F1 - F12 are pressed.
@@ -701,6 +701,19 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const isArrowDown = key === 'ArrowDown' || keyCode === 40;
     const isSpace = key === 'Space' || keyCode === 32;
 
+    if (this.isOpen() && (isTab || isEnter)) {
+      if (shiftKey) {
+        evt.preventDefault();
+        this.adapter_.inputFocus();
+        this.close_();
+      } else {
+        let currentItem = this.adapter_.getActiveItem();
+        if (currentItem != null) {
+          this.adapter_.inputFocus();
+          this.applyValueFromActiveItem_();
+        }
+      }
+    }
     if (!this.isOpen() && (evt.target) && (this.adapter_.eventTargetHasClass(evt.target, INPUT))) {
       if ((this.isFull_) && (!isBackspace) && (!isTab) && (!isEnter)) {
         evt.preventDefault();
@@ -725,6 +738,10 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
           this.adapter_.setActiveForItemAtIndex(this.cachedActiveItem_);
           this.adapter_.focusItemAtIndex(this.cachedActiveItem_);
         }
+      } else if (isEscape) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.close_();
       }
     }
     if ((isBackspace) && (this.getNativeInput_().selectionStart == 0)) {
@@ -739,7 +756,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const {INPUT} = cssClasses;
 
     // Do nothing if Alt, Ctrl or Meta are pressed.
-    if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+    if (evt.altKey || evt.ctrlKey || evt.metaKey) {
       return true;
     }
     if (this.isDisabled()) {
@@ -758,19 +775,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     if ((evt.target) && (this.adapter_.eventTargetHasClass(evt.target, INPUT))) {
       if ((isArrowDown || isArrowUp) && !this.isOpen()) {
         this.open_();
-      }
-    } else {
-      if (this.isOpen() && (isTab || isEnter)) {
-        let currentItem = this.adapter_.getActiveItem();
-        if (currentItem != null) {
-          evt.preventDefault();
-          this.adapter_.inputFocus();
-          this.applyValueFromActiveItem_();
-        }
-      } else if (this.isOpen() && (isEscape)) {
-        evt.preventDefault();
-        evt.stopPropagation();
-        this.close_();
       }
     }
   }
@@ -836,9 +840,11 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     var self = this;
     this.getSettings().itemsLoader.apply(self, [query, function(results) {
       if (results && results.length) {
-        self.removeItems();
-        self.addItems(results);
-        self.refreshItems();
+        requestAnimationFrame(() => {
+          self.removeItems();
+          self.addItems(results);
+          self.refreshItems();
+        });
       }
     }]);
   }
@@ -846,18 +852,20 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   applyQuery_(value) {
     const {ARIA_HIDDEN} = strings;
     const {ITEM_NOMATCH} = cssClasses;
-    for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
-      const txt = this.adapter_.getTextForItemAtIndex(i).trim();
-      if (txt.toUpperCase().includes(value.toUpperCase())) {
-        this.adapter_.rmClassForItemAtIndex(i, ITEM_NOMATCH);
-        this.adapter_.rmAttrForItemAtIndex(i, ARIA_HIDDEN);
+    requestAnimationFrame(() => {
+      for (let i = 0, l = this.adapter_.getNumberOfItems(); i < l; i++) {
+        const txt = this.adapter_.getTextForItemAtIndex(i).trim();
+        if (txt.toUpperCase().includes(value.toUpperCase())) {
+          this.adapter_.rmClassForItemAtIndex(i, ITEM_NOMATCH);
+          this.adapter_.rmAttrForItemAtIndex(i, ARIA_HIDDEN);
+        }
+        else {
+          this.adapter_.addClassForItemAtIndex(i, ITEM_NOMATCH);
+          this.adapter_.setAttrForItemAtIndex(i, ARIA_HIDDEN, 'true');
+        }
       }
-      else {
-        this.adapter_.addClassForItemAtIndex(i, ITEM_NOMATCH);
-        this.adapter_.setAttrForItemAtIndex(i, ARIA_HIDDEN, 'true');
-      }
-    }
-    this.refreshItems();
+      this.refreshItems();
+    });
   }
 
   updateAvailableItems_() {
