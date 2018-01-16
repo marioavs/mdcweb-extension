@@ -287,11 +287,13 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     if (!value) {
       this.value_ = null;
       this.getNativeInput_().value = '';
+      this.selectedValue_ = null;
       return;
     }
     if ((typeof value.getDate === 'function') || (typeof value === 'string')) {
       this.value_ = new Date(value);
       this.getNativeInput_().value = this.settings_.valueToString(this.value_);
+      this.selectedValue_ = new Date(this.value_);
       const isValid = this.isValid();
       this.styleValidity_(isValid);
       if (this.label_) {
