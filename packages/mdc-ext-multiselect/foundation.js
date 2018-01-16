@@ -622,7 +622,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
         this.cachedActiveItem_ = undefined;
       }
     }
-    if (!this.isOpen() && (this.adapter_.isInputFocused())) {
+    if (!this.isOpen() && this.isEmpty_ && (this.adapter_.isInputFocused())) {
       this.open_();
     }
   }
