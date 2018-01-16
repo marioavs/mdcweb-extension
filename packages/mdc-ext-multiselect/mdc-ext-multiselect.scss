@@ -176,16 +176,10 @@
   }
 
   &--focused {
-    @mixin mdc-ext-multiselect-label-styles {
-      @include mdc-theme-prop(color, primary);
-    }
+    @include mdc-ext-multiselect-label-color(primary);
 
-    .mdc-ext-multiselect__label {
-      @include mdc-ext-multiselect-label-styles;
-
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
-        @include mdc-ext-multiselect-label-styles;
-      }
+    @include mdc-theme-dark(".mdc-ext-multiselect") {
+      @include mdc-ext-multiselect-label-color(primary-light);
     }
   }
 
