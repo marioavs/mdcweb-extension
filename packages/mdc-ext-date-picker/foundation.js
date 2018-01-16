@@ -77,8 +77,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       deregisterDocumentKeydownHandler: () => {},
       registerSurfaceInteractionHandler: () => {},
       deregisterSurfaceInteractionHandler: () => {},
-      registerDocumentClickHandler: () => {},
-      deregisterDocumentClickHandler: () => {},
+      registerDocumentInteractionHandler: () => {},
+      deregisterDocumentInteractionHandler: () => {},
       registerDayClickHandler: () => {},
       deregisterDayClickHandler: () => {},
       registerTableTransitionEndHandler: () => {},
@@ -147,6 +147,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     this.isValid_ = true;
     /** @private {boolean} */
     this.animatingYear_ = false;
+    /** @private {boolean} */
+    this.receivedTouchMove_ = false;
     /** @private {number} */
     this.startScaleX_ = 0;
     /** @private {number} */
@@ -175,7 +177,7 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     /** @private {function(!Event): undefined} */
     this.datePickerInteractionHandler_ = (evt) => this.handleDatePickerInteraction(evt);
     /** @private {function(!Event)} */
-    this.documentClickHandler_ = (evt) => this.handleDocumentClick_(evt);
+    this.documentInteractionHandler_ = (evt) => this.handleDocumentInteraction_(evt);
     /** @private {function(!Event)} */
     this.dayClickHandler_ = (evt) => this.handleDayClick_(evt);
     /** @private {function(!Event): undefined} */
@@ -238,7 +240,9 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
       ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
         this.adapter_.deregisterSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
       });
-      this.adapter_.deregisterDocumentClickHandler(this.documentClickHandler_);
+      ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+        this.adapter_.deregisterDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+      });
       this.adapter_.deregisterDayClickHandler(this.dayClickHandler_);
       this.adapter_.deregisterTransitionEndHandler(this.transitionEndHandler_);
       this.adapter_.deregisterTableTransitionEndHandler(this.tableTransitionEndHandler_);
@@ -565,17 +569,29 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
    * @param {!Event} evt
    * @private
    */
-  handleDocumentClick_(evt) {
+  handleDocumentInteraction_(evt) {
     const {ANIMATING} =  cssClasses;
 
-    if (this.adapter_.eventTargetInSurface(evt.target))
+    if ((evt.target) && this.adapter_.eventTargetInSurface(evt.target)) {
       return;
+    }
     if (this.adapter_.eventTargetInDatePicker(evt.target) &&
       this.adapter_.hasClass(ANIMATING))
       return;
-
-    this.adapter_.notifyCancel();
-    this.close_();
+    if (evt.type === 'click') {
+      this.adapter_.notifyCancel();
+      this.close_();
+    } else if (evt.type === 'touchstart') {
+      this.receivedTouchMove_ =  false;
+    } else if (evt.type === 'touchmove') {
+      this.receivedTouchMove_ =  true;
+    } else if (evt.type === 'touchend') {
+      if (!this.receivedTouchMove_) {
+        this.adapter_.notifyCancel();
+        this.close_();
+      }
+      this.receivedTouchMove_ =  false;
+    }
   };
 
   handleSurfaceInteraction(evt) {
@@ -1003,7 +1019,9 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
       this.adapter_.registerSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
     });
-    this.adapter_.registerDocumentClickHandler(this.documentClickHandler_);
+    ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+      this.adapter_.registerDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+    });
     this.adapter_.registerDayClickHandler(this.dayClickHandler_);
     // this.adapter_.registerInteractionHandler('click', this.componentClickHandler_);
     this.adapter_.registerTransitionEndHandler(this.transitionEndHandler_);
@@ -1018,7 +1036,9 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     ['click', 'keydown', 'keyup', 'wheel', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
       this.adapter_.deregisterSurfaceInteractionHandler(evtType, this.surfaceInteractionHandler_);
     });
-    this.adapter_.deregisterDocumentClickHandler(this.documentClickHandler_);
+    ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
+      this.adapter_.deregisterDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+    });
     this.adapter_.deregisterDayClickHandler(this.dayClickHandler_);
     // this.adapter_.deregisterInteractionHandler('click', this.componentClickHandler_);
     this.adapter_.untrapFocusOnSurface();

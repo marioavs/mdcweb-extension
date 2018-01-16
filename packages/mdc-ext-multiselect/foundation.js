@@ -798,8 +798,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
    * @private
    */
   handleDocumentInteraction_(evt) {
-    const {LIST_ITEM} = cssClasses;
-
     if ((evt.target) && this.adapter_.eventTargetInComponent(evt.target)) {
       return;
     }

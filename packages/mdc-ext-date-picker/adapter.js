@@ -141,9 +141,9 @@ class MDCExtDatePickerAdapter {
 
   deregisterSurfaceInteractionHandler(type, handler) {}
 
-  registerDocumentClickHandler(handler) {}
+  registerDocumentInteractionHandler(evtType, handler) {}
 
-  deregisterDocumentClickHandler(handler) {}
+  deregisterDocumentInteractionHandler(evtType, handler) {}
 
   registerDayClickHandler(handler) {}
 
