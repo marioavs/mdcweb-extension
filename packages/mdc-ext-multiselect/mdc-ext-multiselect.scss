@@ -20,6 +20,8 @@
 @import "@material/animation/variables";
 @import "@material/animation/functions";
 @import "@material/elevation/mixins";
+@import "@material/ripple/common";
+@import "@material/ripple/mixins";
 @import "@material/rtl/mixins";
 @import "@material/theme/variables";
 @import "@material/theme/mixins";
@@ -57,48 +59,41 @@
 
   &__combobox {
     position: relative;
+    background: none;
+    background-repeat: no-repeat;
+    background-position: right center;
+    border: none;
+    border-bottom: 1px solid $mdc-ext-multiselect-underline-on-light-idle;
+    min-width: 100px;
+    padding: 0 #{$dd-arrow-padding} 8px;
     width: 100%;
 
-    &-background {
-      display: block;
-      position: relative;
-      border: none;
-      border-bottom: 1px solid $mdc-ext-multiselect-underline-on-light-idle;
-      min-width: 100px;
-      padding: 0 #{$dd-arrow-padding} 8px;
+    @include mdc-ext-multiselect-dd-arrow-svg-bg_;
 
-      background: none;
-      background-repeat: no-repeat;
-      background-position: right center;
+    @include mdc-typography-base;
+    @include mdc-rtl-reflexive-box(padding, right, $dd-arrow-padding);
+    // We use only a subset of the MDC typography values here as changing things such as line-height
+    // affects how the labels are transformed.
+    @each $prop in (font-size, letter-spacing) {
+      #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
+    }
 
-      @include mdc-ext-multiselect-dd-arrow-svg-bg_;
+    @include mdc-rtl {
+      background-position: left center;
+    }
 
-      @include mdc-theme-prop(color, text-primary-on-light);
-      @include mdc-typography-base;
-      @include mdc-rtl-reflexive-box(padding, right, $dd-arrow-padding);
-      // We use only a subset of the MDC typography values here as changing things such as line-height
-      // affects how the labels are transformed.
-      @each $prop in (font-size, letter-spacing) {
-        #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
-      }
+    &:hover {
+      border-color: $mdc-ext-multiselect-underline-on-light;
+    }
 
-      @include mdc-rtl {
-        background-position: left center;
-      }
+    @include mdc-theme-dark(".mdc-ext-multiselect") {
+      @include mdc-theme-prop(color, text-primary-on-dark);
+      @include mdc-ext-multiselect-dd-arrow-svg-bg_(ffffff);
+
+      border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark-idle;
 
       &:hover {
-        border-color: $mdc-ext-multiselect-underline-on-light;
-      }
-
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
-        @include mdc-theme-prop(color, text-primary-on-dark);
-        @include mdc-ext-multiselect-dd-arrow-svg-bg_(ffffff);
-
-        border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark-idle;
-
-        &:hover {
-          border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark;
-        }
+        border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark;
       }
     }
   }
@@ -203,7 +198,7 @@
     border: 1px solid black;
     box-sizing: border-box;
     max-width: calc(100vw - 32px);
-    max-height: calc(100vh - 32px);
+    max-height: calc(100vh - 104px);
     overflow-x: hidden;
     overflow-y: overlay;
     padding: 0;
@@ -238,74 +233,29 @@
     }
 
     .mdc-list-item {
-      cursor: pointer;
-      color: inherit;
-      outline: none;
-      padding: 0 16px;
-      position: relative;
-      text-decoration: none;
-
       @include mdc-typography(subheading2);
       @include mdc-theme-prop(color, text-secondary-on-light);
+      outline: none;
+      padding: 0 16px;
+      text-decoration: none;
+      user-select: none;
 
       &__nomatch {
         visibility: hidden;
         display: none;
       }
 
-      &--active {
-        @include mdc-theme-prop(color, text-primary-on-light);
+      &--selected:not(.mdc-list-item:active) {
+        @include mdc-states;
+        @include mdc-states-selected(primary);
       }
 
       @include mdc-theme-dark(".mdc-ext-multiselect") {
-        @include mdc-theme-prop(color, text-secondary-on-dark);
+        @include mdc-theme-prop(color, white);
 
-        &--active {
-          @include mdc-theme-prop(color, text-primary-on-dark);
-        }
-      }
-    }
-
-    .mdc-list-item::before {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      transition: opacity 120ms $mdc-animation-deceleration-curve-timing-function;
-      border-radius: inherit;
-      background: currentColor;
-      content: "";
-      opacity: 0;
-    }
-
-    .mdc-list-item--active::before {
-      opacity: .12;
-    }
-
-    .mdc-list-group,
-    .mdc-list-group > .mdc-list-item:first-child {
-      margin-top: 4px;
-    }
-
-    .mdc-list-group {
-      @include mdc-theme-prop(color, text-hint-on-light);
-
-      font-weight: normal;
-
-      .mdc-list-item {
-        @include mdc-theme-prop(color, text-primary-on-light);
-      }
-    }
-
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
-      background-color: #424242;
-
-      .mdc-list-group {
-        @include mdc-theme-prop(color, text-hint-on-dark);
-
-        .mdc-list-item {
-          @include mdc-theme-prop(color, text-primary-on-dark);
+        &--selected:not(.mdc-list-item:active) {
+          @include mdc-states(white);
+          @include mdc-states-selected(primary);
         }
       }
     }

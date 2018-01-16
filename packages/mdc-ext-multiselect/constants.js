@@ -22,9 +22,11 @@ const cssClasses = {
   ROOT: ROOT,
   DISABLED: `${ROOT}--disabled`,
   FOCUSED: `${ROOT}--focused`,
+  INPUT: `${ROOT}__input`,
   INVALID: `${ROOT}--invalid`,
-  ITEM_ACTIVE: 'mdc-list-item--active',
   ITEM_NOMATCH: 'mdc-list-item__nomatch',
+  ITEM_SELECTED: 'mdc-list-item--selected',
+  LIST: 'mdc-list',
   LIST_ITEM: 'mdc-list-item',
   LIST_OPEN: `${ROOT}__list--open`,
   OPEN: `${ROOT}--open`,
@@ -61,6 +63,7 @@ const strings = {
 
 /** @enum {number} */
 const numbers = {
+  OPENING_END_LATCH_MS: 500,
   // Amount of miliseconds to wait before triggering a change value functionality.
   CHANGE_VALUE_TRIGGER_DELAY: 500,
   LABEL_SCALE: 0.75

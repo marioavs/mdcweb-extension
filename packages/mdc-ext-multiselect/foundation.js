@@ -61,6 +61,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       hasClass: (/* className: string */) => /* boolean */ false,
       hasNecessaryDom: () => /* boolean */ false,
       eventTargetInComponent: () => false,
+      eventTargetHasClass: () => false,
       getComboboxElOffsetHeight: () => /* number */ 0,
       getComboboxElOffsetTop: () => /* number */ 0,
       getComboboxElOffsetWidth: () => /* number */ 0,
@@ -102,6 +103,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       rmClassForItemAtIndex: (/* index: number, className: string */) => {},
       setAttrForItemAtIndex: (/* index: number, attr: string, value: string */) => {},
       rmAttrForItemAtIndex: (/* index: number, attr: string */) => {},
+      scrollActiveItemIntoView: () => {},
       notifyChange: () => {},
       setInputAttr: (/* attr: string, value: string */) => {},
       inputFocus: () => {},
@@ -131,6 +133,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     /** @private {boolean} */
     this.isOpen_ = false;
     /** @private {boolean} */
+    this.isOpening_ = false;
+    /** @private {boolean} */
     this.useCustomValidityChecking_ = false;
     /** @private {boolean} */
     this.isValid_ = true;
@@ -139,10 +143,15 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.cachedActiveItem_ = undefined;
     this.isEmpty_ = true;
     this.isFull_ = false;
+    /** @private {boolean} */
+    this.receivedTouchMove_ = false;
+    /** @private {number} */
+    this.changeValueTriggerTimerId_ = 0;
     this.focusHandler_ = () => this.activateFocus_();
     this.blurHandler_ = () => this.deactivateFocus_();
-    this.clickHandler_ = (evt) => this.handleClick_(evt);
-    this.inputKeydownHandler_ = (evt) => this.handleKeydown_(evt);
+    this.interactionHandler_ = (evt) => this.handleInteraction_(evt);
+    this.keydownHandler_ = (evt) => this.handleKeydown_(evt);
+    this.keyupHandler_ = (evt) => this.handleKeyup_(evt);
     /** @private {function(!Event)} */
     this.inputInputHandler_ = (evt) => this.handleInputInput_(evt);
     /** @private {function(!Event): undefined} */
@@ -151,8 +160,6 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.bottomLineAnimationEndHandler_ = () => this.handleBottomLineAnimationEnd();
     /** @private {function(!Event)} */
     this.documentInteractionHandler_ = (evt) => this.handleDocumentInteraction_(evt);
-    /** @private {number} */
-    this.changeValueTriggerTimerId_ = 0;
   }
 
   init() {
@@ -185,12 +192,15 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.setInputAttr(AUTOCOMPLETE, 'nope');
     this.adapter_.setInputAttr(AUTOCORRECT, 'off');
     this.adapter_.setInputAttr(SPELLCHECK, 'false');
-    this.adapter_.registerInteractionHandler('click', this.clickHandler_);
+    ['click', 'mousedown', 'mouseup'].forEach((evtType) => {
+      this.adapter_.registerInteractionHandler(evtType, this.interactionHandler_);
+    });
+    this.adapter_.registerInteractionHandler('keydown', this.keydownHandler_);
+    this.adapter_.registerInteractionHandler('keyup', this.keyupHandler_);
     this.adapter_.registerBottomLineEventHandler(
       MDCExtMultiselectBottomLineFoundation.strings.ANIMATION_END_EVENT, this.bottomLineAnimationEndHandler_);
     this.adapter_.registerInputInteractionHandler('focus', this.focusHandler_);
     this.adapter_.registerInputInteractionHandler('blur', this.blurHandler_);
-    this.adapter_.registerInputInteractionHandler('keydown', this.inputKeydownHandler_);
     this.adapter_.registerInputInteractionHandler('input', this.inputInputHandler_);
     ['mousedown', 'touchstart'].forEach((evtType) => {
       this.adapter_.registerInteractionHandler(evtType, this.setPointerXOffset_);
@@ -205,12 +215,15 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
 
     clearTimeout(this.changeValueTriggerTimerId_);
     this.adapter_.removeClass(UPGRADED);
-    this.adapter_.deregisterInteractionHandler('click', this.displayHandler_);
+    ['click', 'mousedown', 'mouseup'].forEach((evtType) => {
+      this.adapter_.deregisterInteractionHandler(evtType, this.interactionHandler_);
+    });
+    this.adapter_.deregisterInteractionHandler('keydown', this.keydownHandler_);
+    this.adapter_.deregisterInteractionHandler('keyup', this.keyupHandler_);
     this.adapter_.deregisterBottomLineEventHandler(
       MDCExtMultiselectBottomLineFoundation.strings.ANIMATION_END_EVENT, this.bottomLineAnimationEndHandler_);
     this.adapter_.deregisterInputInteractionHandler('focus', this.focusHandler_);
     this.adapter_.deregisterInputInteractionHandler('blur', this.blurHandler_);
-    this.adapter_.deregisterInputInteractionHandler('keydown', this.keydownHandler_);
     this.adapter_.deregisterInputInteractionHandler('input', this.inputInputHandler_);
     ['mousedown', 'touchstart'].forEach((evtType) => {
       this.adapter_.deregisterInteractionHandler(evtType, this.setPointerXOffset_);
@@ -504,7 +517,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   deactivateFocus_() {
-    this.isFocused_ = false;
+    this.isFocused_ = this.isOpen();
     const isValid = this.isValid();
     this.styleValidity_(isValid);
     this.styleFocused_(this.isFocused_);
@@ -513,8 +526,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       this.label_.styleFloat(
         this.getValue(), this.isFocused_, this.isBadInput_());
     }
-    this.clearInput_();
-    // this.close_();
+    if (!this.isFocused_)
+      this.clearInput_();
   }
 
   /**
@@ -555,6 +568,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     if (this.isDisabled()) {
       return;
     }
+    this.isOpening_ = true;
     this.resize_();
     this.setListStyles_();
     ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
@@ -563,6 +577,10 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.addClass(OPEN);
     this.adapter_.addClassToList(LIST_OPEN);
     this.isOpen_ = true;
+    // this.adapter_.scrollActiveItemIntoView();
+    setTimeout(() => {
+      this.isOpening_ = false;
+    }, numbers.OPENING_END_LATCH_MS);
   }
 
   /**
@@ -577,6 +595,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.adapter_.removeClass(OPEN);
     this.adapter_.removeClassFromList(LIST_OPEN);
     this.isOpen_ = false;
+    if (!this.adapter_.isInputFocused())
+      this.deactivateFocus_();
   }
 
   getNumberOfSelectedOptions() {
@@ -617,49 +637,61 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     }
   }
 
-  handleClick_(evt) {
-    const {LIST_ITEM} = cssClasses;
+  handleInteraction_(evt) {
+    const {LIST, LIST_ITEM} = cssClasses;
 
-    if ((evt.target) && (evt.target.classList.contains(LIST_ITEM))) {
-      evt.stopPropagation();
-      evt.preventDefault();
-      if (this.isDisabled()) {
-        return;
+    if ((evt.type === 'mousedown') || (evt.type === 'mouseup')) {
+      // avoid blur event
+      if ((evt.target) && (!this.adapter_.eventTargetHasClass(evt.target, LIST_ITEM))) {
+        evt.preventDefault();
+        return false;
       }
-      if (evt.target !== this.adapter_.getActiveItem()) {
-        this.adapter_.removeActiveItem();
-        this.adapter_.setActiveItem(evt.target);
-        this.cachedActiveItem_ = this.adapter_.getActiveItemIndex();
+    } else if (evt.type === 'click') {
+      if ((evt.target) && (this.adapter_.eventTargetHasClass(evt.target, LIST_ITEM))) {
+        if (this.isDisabled()) {
+          return;
+        }
+        if (evt.target !== this.adapter_.getActiveItem()) {
+          this.adapter_.removeActiveItem();
+          this.adapter_.setActiveItem(evt.target);
+          this.cachedActiveItem_ = this.adapter_.getActiveItemIndex();
+        }
+        this.adapter_.inputFocus();
+        this.applyValueFromActiveItem_();
+      } else if ((evt.target) && (this.adapter_.eventTargetHasClass(evt.target, LIST))) {
+        // android chrome is giving the list as the event target on some combination of scrolling events
+        if ((this.cachedActiveItem_ !== undefined) && (this.cachedActiveItem_ < (this.cachedNumberOfAvailableItems_ - 1))) {
+          this.adapter_.focusItemAtIndex(this.cachedActiveItem_);
+        }
+      } else {
+        if (!this.isOpen()) {
+          if (!this.isFocused_) {
+            this.adapter_.inputFocus();
+          } else {
+            this.open_();
+          }
+        } else if (!this.isOpening_) {
+          this.adapter_.inputFocus();
+          this.close_();
+        }
       }
-      this.adapter_.inputFocus();
-      this.applyValueFromActiveItem_();
     }
-    // if (!this.adapter_.isInputFocused()) {
-    //   this.adapter_.inputFocus()
-    // } else {
-    //   if (!this.isOpen()) {
-    //     this.open_();
-    //   }
-    // }
   }
 
   handleKeydown_(evt) {
-    // We use a hard-coded 2 instead of Event.AT_TARGET to avoid having to reference a browser
-    // global.
-    const EVENT_PHASE_AT_TARGET = 2;
-    if (evt.eventPhase !== EVENT_PHASE_AT_TARGET) {
-      return;
-    }
-
-    // Do nothing if Alt, Ctrl or Meta are pressed.
-    if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
-      return;
-    }
+    const {INPUT} = cssClasses;
 
     if (this.isDisabled()) {
       return;
     }
-    let tryOpen = false;
+    // Do nothing if Alt, Ctrl or Meta are pressed.
+    if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+      return;
+    }
+    // Do nothing if F1 - F12 are pressed.
+    if ((evt.keyCode >= 112) && (evt.keyCode <= 123)) {
+      return;
+    }
     const {keyCode, key, shiftKey} = evt;
     const isBackspace = key === 'Backspace' || keyCode === 8;
     const isTab = key === 'Tab' || keyCode === 9;
@@ -667,43 +699,79 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const isEscape = key === 'Escape' || keyCode === 27;
     const isArrowUp = key === 'ArrowUp' || keyCode === 38;
     const isArrowDown = key === 'ArrowDown' || keyCode === 40;
+    const isSpace = key === 'Space' || keyCode === 32;
 
-    if (isArrowUp) {
-      tryOpen = true;
-      evt.preventDefault();
-      if ((this.cachedActiveItem_ !== undefined) && (this.cachedActiveItem_ > 0)) {
-        this.adapter_.removeActiveItem();
-        this.cachedActiveItem_--;
-        this.adapter_.setActiveForItemAtIndex(this.cachedActiveItem_);
+    if (!this.isOpen() && (evt.target) && (this.adapter_.eventTargetHasClass(evt.target, INPUT))) {
+      if ((this.isFull_) && (!isBackspace) && (!isTab) && (!isEnter)) {
+        evt.preventDefault();
+        return false;
       }
-    } else if (isArrowDown) {
-      tryOpen = true;
-      evt.preventDefault();
-      if ((this.cachedActiveItem_ !== undefined) && (this.cachedActiveItem_ < (this.cachedNumberOfAvailableItems_ - 1))) {
-        this.adapter_.removeActiveItem();
-        this.cachedActiveItem_++;
-        this.adapter_.setActiveForItemAtIndex(this.cachedActiveItem_);
+    } else {
+      if (isTab || isEnter) {
+        evt.preventDefault();
+      } else if (isArrowUp) {
+        evt.preventDefault();
+        if ((this.cachedActiveItem_ !== undefined) && (this.cachedActiveItem_ > 0)) {
+          this.adapter_.removeActiveItem();
+          this.cachedActiveItem_--;
+          this.adapter_.setActiveForItemAtIndex(this.cachedActiveItem_);
+          this.adapter_.focusItemAtIndex(this.cachedActiveItem_);
+        }
+      } else if (isArrowDown) {
+        evt.preventDefault();
+        if ((this.cachedActiveItem_ !== undefined) && (this.cachedActiveItem_ < (this.cachedNumberOfAvailableItems_ - 1))) {
+          this.adapter_.removeActiveItem();
+          this.cachedActiveItem_++;
+          this.adapter_.setActiveForItemAtIndex(this.cachedActiveItem_);
+          this.adapter_.focusItemAtIndex(this.cachedActiveItem_);
+        }
       }
-    } else if ((isBackspace) && (this.getNativeInput_().selectionStart == 0)) {
+    }
+    if ((isBackspace) && (this.getNativeInput_().selectionStart == 0)) {
       if (this.adapter_.getNumberOfSelectedOptions() > 0) {
         this.removeLastSelection_();
+        this.adapter_.inputFocus();
       }
-    } else if (this.isOpen() && ((isTab) || (isEnter))) {
-      let currentItem = this.adapter_.getActiveItem();
-      if (currentItem != null) {
-        evt.preventDefault();
-        this.applyValueFromActiveItem_();
-      }
-    } else if (this.isOpen() && (isEscape)) {
-      evt.stopPropagation();
-      this.close_();
+    }
+  }
+
+  handleKeyup_(evt) {
+    const {INPUT} = cssClasses;
+
+    // Do nothing if Alt, Ctrl or Meta are pressed.
+    if (evt.altKey || evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+      return true;
+    }
+    if (this.isDisabled()) {
+      return;
     }
 
-    if ((tryOpen) && (!this.isOpen()))
-      this.open_();
-    if ((this.isFull_) && (!isBackspace) && (!isTab) && (!isEnter)) {
-      evt.preventDefault();
-      return false;
+    const {keyCode, key, shiftKey} = evt;
+    const isBackspace = key === 'Backspace' || keyCode === 8;
+    const isTab = key === 'Tab' || keyCode === 9;
+    const isEnter = key === 'Enter' || keyCode === 13;
+    const isEscape = key === 'Escape' || keyCode === 27;
+    const isArrowUp = key === 'ArrowUp' || keyCode === 38;
+    const isArrowDown = key === 'ArrowDown' || keyCode === 40;
+    const isSpace = key === 'Space' || keyCode === 32;
+
+    if ((evt.target) && (this.adapter_.eventTargetHasClass(evt.target, INPUT))) {
+      if ((isArrowDown || isArrowUp) && !this.isOpen()) {
+        this.open_();
+      }
+    } else {
+      if (this.isOpen() && (isTab || isEnter)) {
+        let currentItem = this.adapter_.getActiveItem();
+        if (currentItem != null) {
+          evt.preventDefault();
+          this.adapter_.inputFocus();
+          this.applyValueFromActiveItem_();
+        }
+      } else if (this.isOpen() && (isEscape)) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.close_();
+      }
     }
   }
 
@@ -730,11 +798,22 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
    * @private
    */
   handleDocumentInteraction_(evt) {
-    if (this.adapter_.eventTargetInComponent(evt.target))
-      return;
+    const {LIST_ITEM} = cssClasses;
 
+    if ((evt.target) && this.adapter_.eventTargetInComponent(evt.target)) {
+      return;
+    }
     if (evt.type === 'click') {
       this.close_();
+    } else if (evt.type === 'touchstart') {
+      this.receivedTouchMove_ =  false;
+    } else if (evt.type === 'touchmove') {
+      this.receivedTouchMove_ =  true;
+    } else if (evt.type === 'touchend') {
+      if (!this.receivedTouchMove_) {
+        this.close_();
+      }
+      this.receivedTouchMove_ =  false;
     }
   };
 

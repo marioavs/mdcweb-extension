@@ -109,6 +109,7 @@ class MDCExtMultiselect extends MDCComponent {
         hasNecessaryDom: () => Boolean(this.comboboxEl_) && Boolean(this.displayEl_) && Boolean(this.input_) &&
           Boolean(this.listEl_) && Boolean(this.listUl_) && Boolean(this.selectEl_),
         eventTargetInComponent: (target) => this.root_.contains(target),
+        eventTargetHasClass: (target, className) => target.classList.contains(className),
         getComboboxElOffsetHeight: () => this.comboboxEl_.offsetHeight,
         getComboboxElOffsetTop: () => this.comboboxEl_.offsetTop,
         getComboboxElOffsetWidth: () => this.comboboxEl_.offsetWidth,
@@ -137,9 +138,12 @@ class MDCExtMultiselect extends MDCComponent {
         getActiveItemIndex: () => this.getActiveItemIndex_(),
         getActiveItemRawdata: () => this.activeItem.getAttribute(MDCExtMultiselectFoundation.strings.ITEM_DATA_RAWDATA_ATTR) || null,
         getActiveItemValue: () => this.activeItem.getAttribute(MDCExtMultiselectFoundation.strings.ITEM_DATA_VALUE_ATTR) || this.activeItem.id,
-        setActiveItem: (item) => item.classList.add(MDCExtMultiselectFoundation.cssClasses.ITEM_ACTIVE),
-        setActiveForItemAtIndex: (index) => this.availableItems[index].classList.add(MDCExtMultiselectFoundation.cssClasses.ITEM_ACTIVE),
-        removeActiveItem: () => { if (this.activeItem) this.activeItem.classList.remove(MDCExtMultiselectFoundation.cssClasses.ITEM_ACTIVE); },
+        setActiveItem: (item) => { item.classList.add(MDCExtMultiselectFoundation.cssClasses.ITEM_SELECTED) },
+        setActiveForItemAtIndex: (index) => { this.availableItems[index].classList.add(MDCExtMultiselectFoundation.cssClasses.ITEM_SELECTED) },
+        removeActiveItem: () => {
+          if (this.activeItem) this.activeItem.classList.remove(MDCExtMultiselectFoundation.cssClasses.ITEM_SELECTED);
+          // this.input_.focus();
+        },
         isActiveItemAvailable: () => (this.activeItem && (!this.activeItem.classList.contains(MDCExtMultiselectFoundation.cssClasses.ITEM_NOMATCH))),
         getRawdataForItemAtIndex: (index) => this.items[index].getAttribute(MDCExtMultiselectFoundation.strings.ITEM_DATA_RAWDATA_ATTR) || null,
         getTextForItemAtIndex: (index) => this.items[index].getAttribute(MDCExtMultiselectFoundation.strings.ITEM_DATA_DESC_ATTR) || this.items[index].textContent,
@@ -148,6 +152,8 @@ class MDCExtMultiselect extends MDCComponent {
         rmClassForItemAtIndex: (index, className) => this.items[index].classList.remove(className),
         setAttrForItemAtIndex: (index, attr, value) => this.items[index].setAttribute(attr, value),
         rmAttrForItemAtIndex: (index, attr) => this.items[index].removeAttribute(attr),
+        focusItemAtIndex: (index) => (this.availableItems[index]) && this.availableItems[index].focus(),
+        scrollActiveItemIntoView: () => (this.activeItem && this.activeItem.scrollIntoView(false)),
         notifyChange: () => this.emit(MDCExtMultiselectFoundation.strings.CHANGE_EVENT, this)
       },
       this.getInputAdapterMethods_())),
@@ -251,7 +257,7 @@ class MDCExtMultiselect extends MDCComponent {
   }
 
   get activeItem() {
-    return this.listUl_.querySelector(`.${MDCExtMultiselectFoundation.cssClasses.ITEM_ACTIVE}`);
+    return this.listUl_.querySelector(`.${MDCExtMultiselectFoundation.cssClasses.ITEM_SELECTED}`);
   }
 
   get selectedOptions() {
@@ -273,6 +279,7 @@ class MDCExtMultiselect extends MDCComponent {
       var node = document.createElement('li');
       node.classList.add(LIST_ITEM);
       node.setAttribute('role', 'option');
+      node.setAttribute('tabindex', '0');
       node.setAttribute(ITEM_DATA_VALUE_ATTR, value);
       node.setAttribute(ITEM_DATA_DESC_ATTR, description);
       if (rawdata)

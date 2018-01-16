@@ -77,6 +77,9 @@ export default class MDCExtMultiselectAdapter {
   /** @return {boolean} */
   eventTargetInComponent() {}
 
+  /** @return {boolean} */
+  eventTargetHasClass(target, className) {}
+
   /** @return {number} */
   getComboboxElOffsetHeight() {}
 
@@ -216,6 +219,10 @@ export default class MDCExtMultiselectAdapter {
   setAttrForItemAtIndex(index, attr, value) {}
 
   rmAttrForItemAtIndex(index, attr) {}
+
+  focusItemAtIndex(index) {}
+
+  scrollActiveItemIntoView() {}
 
   notifyChange() {}
 
