@@ -17,6 +17,7 @@
     "@material/animation": "^0.25.0",
     "@material/base": "^0.24.0",
     "@material/elevation": "^0.28.0",
+    "@material/list": "^0.28.0",
     "@material/rtl": "^0.1.8",
     "@material/theme": "^0.28.0",
     "@material/typography": "^0.28.0"
