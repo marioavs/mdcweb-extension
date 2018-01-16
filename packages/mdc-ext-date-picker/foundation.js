@@ -681,6 +681,8 @@ export default class MDCExtDatePickerFoundation extends MDCFoundation {
     }
     if (!this.adapter_.hasClass(YEAR_VIEW)) {
       if (evt.key && evt.key === 'Escape' || evt.keyCode === 27) {
+        evt.preventDefault();
+        evt.stopPropagation();
         this.cancel(true);
       }
       if (!this.adapter_.eventTargetHasClass(evt.target, BUTTON) &&
