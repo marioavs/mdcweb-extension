@@ -121,15 +121,17 @@ export default class MDCExtMultiselectAdapter {
    * Registers an event listener `handler` for a given event on the document.
    * @param {string} evtType
    * @param {!Function} handler
+   * @param {boolean} useCapture
    */
-  registerDocumentClickHandler(evtType, handler) {}
+  registerDocumentInteractionHandler(evtType, handler, useCapture) {}
 
   /**
    * Un-registers an event listener `handler` for a given event on the document.
    * @param {string} evtType
    * @param {!Function} handler
+   * @param {boolean} useCapture
    */
-  deregisterDocumentClickHandler(evtType, handler) {}
+  deregisterDocumentInteractionHandler(evtType, handler, useCapture) {}
 
   /**
    * Registers an event listener `handler` for event type `type` on the list element.

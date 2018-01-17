@@ -71,8 +71,8 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       deregisterInputInteractionHandler: (/* type: string, handler: EventListener */) => {},
       registerBottomLineEventHandler: () => {},
       deregisterBottomLineEventHandler: () => {},
-      registerDocumentClickHandler: () => {},
-      deregisterDocumentClickHandler: () => {},
+      registerDocumentInteractionHandler: () => {},
+      deregisterDocumentInteractionHandler: () => {},
       registerListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       deregisterListInteractionHandler: (/* type: string, handler: EventListener */) => {},
       addItem: (/* value: string, description: string, rawdata: string */) => {},
@@ -230,8 +230,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     });
     if (this.isOpen()) {
       ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
-        this.adapter_.deregisterDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+        this.adapter_.deregisterDocumentInteractionHandler(evtType, this.documentInteractionHandler_, false);
       });
+      this.adapter_.deregisterDocumentInteractionHandler('focus', this.documentInteractionHandler_, true);
     }
   }
 
@@ -562,8 +563,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     this.resize_();
     this.setListStyles_();
     ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
-      this.adapter_.registerDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+      this.adapter_.registerDocumentInteractionHandler(evtType, this.documentInteractionHandler_, false);
     });
+    this.adapter_.registerDocumentInteractionHandler('focus', this.documentInteractionHandler_, true);
     this.adapter_.addClass(OPEN);
     this.adapter_.addClassToList(LIST_OPEN);
     this.isOpen_ = true;
@@ -580,8 +582,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     const {LIST_OPEN,OPEN} = cssClasses;
 
     ['click', 'touchstart', 'touchmove', 'touchend'].forEach((evtType) => {
-      this.adapter_.deregisterDocumentInteractionHandler(evtType, this.documentInteractionHandler_);
+      this.adapter_.deregisterDocumentInteractionHandler(evtType, this.documentInteractionHandler_, false);
     });
+    this.adapter_.deregisterDocumentInteractionHandler('focus', this.documentInteractionHandler_, true);
     this.adapter_.removeClass(OPEN);
     this.adapter_.removeClassFromList(LIST_OPEN);
     this.isOpen_ = false;
@@ -796,7 +799,9 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     if ((evt.target) && this.adapter_.eventTargetInComponent(evt.target)) {
       return;
     }
-    if (evt.type === 'click') {
+    if (evt.type === 'focus') {
+      this.close_();
+    } else if (evt.type === 'click') {
       this.close_();
     } else if (evt.type === 'touchstart') {
       this.receivedTouchMove_ =  false;
