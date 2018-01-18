@@ -21,9 +21,7 @@
 // postcss-bem-linter: define pagination
 
 .mdc-ext-pagination {
-  display: flex;
-  position: relative;
-  align-items: center;
+  display: inline-block;
   box-sizing: border-box;
   outline: none;
   padding: 8px;
@@ -49,26 +47,19 @@
     @include mdc-ripple-radius;
     @include mdc-states(secondary);
 
-    display: inline-flex;
-    position: relative;
-    align-items: center;
+    display: inline;
     border: none;
     border-radius: 50%;
     box-sizing: border-box;
     cursor: pointer;
     height: 40px;
-    justify-content: center;
     outline: none;
     text-align: center;
     text-decoration: none;
     transition: box-shadow 280ms $mdc-animation-standard-curve-timing-function;
     user-select: none;
+    vertical-align: middle;
     width: 40px;
-
-    @include mdc-theme-dark {
-      @include mdc-states(white);
-      @include mdc-theme-prop(color, text-primary-on-dark);
-    }
 
     &:disabled {
       @include mdc-theme-prop(background-color, transparent);
@@ -86,6 +77,15 @@
     &:not(:disabled) {
       @include mdc-theme-prop(background-color, transparent, $edgeOptOut: true);
       @include mdc-theme-prop(color, text-primary-on-light);
+
+      @include mdc-theme-dark(".mdc-ext-pagination") {
+        @include mdc-states(white);
+        @include mdc-theme-prop(color, text-primary-on-dark);
+      }
+    }
+
+    i {
+      vertical-align: middle;
     }
   }
 
