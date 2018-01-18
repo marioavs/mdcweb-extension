@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <style type="text/css">
       .mdc-theme--dark {
+        --mdc-theme-primary: var(--mdc-theme-accent, #64dd17);
         background-color: #303030;
       }
 
@@ -20,47 +21,100 @@
         padding-left: 0;
       }
 
-      /* Hack to work around style-loader asynchronously loading styles. */
-      /* Equivalent to using mdc-typography's subheading2, which is used in the sass file. */
-      .mdc-ext-multiselect {
-        font-family: Roboto, sans-serif;
-        font-size: 1rem;
-        font-weight: 400;
-        letter-spacing: .04em;
-      }
+      .hero .mdc-ext-data-table {
+        @include mdc-elevation(4);
 
-      .example {
-        margin: 24px;
-        padding: 24px;
+        background-color: white;
       }
     </style>
   </head>
   <body>
-<table class="mdc-ext-data-table mdl-js-data-table mdc-ext-data-table--selectable shadow">
-  <thead>
-    <tr>
-      <th class="mdc-ext-data-table__cell--non-numeric">Material</th>
-      <th>Quantity</th>
-      <th>Unit price</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="mdc-ext-data-table__cell--non-numeric">Acrylic (Transparent)</td>
-      <td>25</td>
-      <td>$2.90</td>
-    </tr>
-    <tr>
-      <td class="mdc-ext-data-table__cell--non-numeric">Plywood (Birch)</td>
-      <td>50</td>
-      <td>$1.25</td>
-    </tr>
-    <tr>
-      <td class="mdc-ext-data-table__cell--non-numeric">Laminate (Gold on Blue)</td>
-      <td>10</td>
-      <td>$2.35</td>
-    </tr>
-  </tbody>
-</table>
-</body>
+    <header class="mdc-toolbar mdc-toolbar--fixed">
+      <div class="mdc-toolbar__row">
+        <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+          <span class="catalog-back">
+            <a href="/" class="mdc-toolbar__icon--menu"><i class="material-icons">&#xE5C4;</i></a>
+          </span>
+          <span class="mdc-toolbar__title catalog-title">Data Table</span>
+        </section>
+      </div>
+    </header>
+    <main>
+      <div class="mdc-toolbar-fixed-adjust"></div>
+      <section class="hero">
+        <table class="mdc-ext-data-table mdc-ext-data-table--selectable">
+          <thead>
+            <tr>
+              <th class="mdc-ext-data-table__cell--non-numeric">Material</th>
+              <th>Quantity</th>
+              <th>Unit price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mdc-ext-data-table__cell--non-numeric">Acrylic (Transparent)</td>
+              <td>25</td>
+              <td>$2.90</td>
+            </tr>
+            <tr>
+              <td class="mdc-ext-data-table__cell--non-numeric">Plywood (Birch)</td>
+              <td>50</td>
+              <td>$1.25</td>
+            </tr>
+            <tr>
+              <td class="mdc-ext-data-table__cell--non-numeric">Laminate (Gold on Blue)</td>
+              <td>10</td>
+              <td>$2.35</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="example">
+        <h2 class="mdc-typography--title">Fully-Featured Component</h2>
+        <section id="demo-wrapper">
+          <table class="mdc-ext-data-table mdc-ext-data-table--selectable" style="table-layout:fixed;">
+            <thead>
+              <tr>
+                <th class="mdc-ext-data-table__cell--non-numeric">Material</th>
+                <th>Quantity</th>
+                <th>Unit price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mdc-ext-data-table__cell--non-numeric">Acrylic (Transparent)</td>
+                <td>25</td>
+                <td>$2.90</td>
+              </tr>
+              <tr>
+                <td class="mdc-ext-data-table__cell--non-numeric">Plywood (Birch)</td>
+                <td>50</td>
+                <td>$1.25</td>
+              </tr>
+              <tr>
+                <td class="mdc-ext-data-table__cell--non-numeric">Laminate (Gold on Blue)</td>
+                <td>10</td>
+                <td>$2.35</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <div>
+          <input type="checkbox" id="dark-theme">
+          <label for="dark-theme">Dark Theme</label>
+        </div>
+      </section>
+    </main>
+    <script>
+      (function() {
+        var demoWrapper = document.getElementById('demo-wrapper');
+        var darkThemeCb = document.getElementById('dark-theme');
+
+        darkThemeCb.addEventListener('change', function() {
+          demoWrapper.classList[darkThemeCb.checked ? 'add' : 'remove']('mdc-theme--dark');
+        });
+      })();
+    </script>
+  </body>
 </html>

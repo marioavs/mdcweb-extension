@@ -1,0 +1,16 @@
+@import "@material/theme/mixins";
+@import "./variables";
+
+//
+// Public
+//
+
+@mixin mdc-ext-data-table-text-ink-color($color) {
+  @include mdc-theme-prop(color, $color);
+}
+
+@mixin mdc-ext-data-table-divider-color($color) {
+  & > tr {
+    @include mdc-theme-prop(border-color, $color);
+  }
+}

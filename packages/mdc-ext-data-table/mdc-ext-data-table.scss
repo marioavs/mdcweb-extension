@@ -14,170 +14,96 @@
 // limitations under the License.
 //
 
-@import "~@material/rtl/mixins";
-@import "~@material/theme/mixins";
-@import "~@material/typography/mixins";
+@import "@material/ripple/mixins";
+@import "@material/theme/mixins";
+@import "@material/typography/mixins";
+@import "./variables";
+@import "./mixins";
 
-/* DATA TABLE */
-
-$ext-data-table-font-size: 13px !default;
-$ext-data-table-header-font-size: 12px !default;
-$ext-data-table-header-sort-icon-size: 16px !default;
-
-$ext-data-table-header-color: rgba(#000, 0.54) !default;
-$ext-data-table-header-sorted-color: rgba(#000, 0.87) !default;
-$ext-data-table-header-sorted-icon-hover-color: rgba(#000, 0.26) !default;
-$ext-data-table-divider-color: rgba(#000, 0.12) !default;
-
-$ext-data-table-hover-color: #eeeeee !default;
-$ext-data-table-selection-color: #e0e0e0 !default;
-
-$ext-data-table-dividers: 1px solid $ext-data-table-divider-color !default;
-
-$ext-data-table-row-height: 48px !default;
-$ext-data-table-last-row-height: 56px !default;
-$ext-data-table-header-height: 56px !default;
-
-$ext-data-table-column-spacing: 36px !default;
-$ext-data-table-column-padding: $ext-data-table-column-spacing / 2;
-
-$ext-data-table-card-header-height: 64px !default;
-$ext-data-table-card-title-top: 20px !default;
-$ext-data-table-card-padding: 24px !default;
-$ext-data-table-button-padding-right: 16px !default;
-$ext-data-table-cell-top: $ext-data-table-card-padding / 2;
-$color-white : "FFF";
-
-$mdc-ext-data-table-item-spacing: 4px;
-$animation-curve-fast-out-slow-in: cubic-bezier(0.4, 0, 0.2, 1) !default;
-$animation-curve-default: $animation-curve-fast-out-slow-in !default;
-$shadow-key-umbra-opacity: 0.2 !default;
-$shadow-key-penumbra-opacity: 0.14 !default;
-$shadow-ambient-shadow-opacity: 0.12 !default;
-
-/* stylelint-disable selector-no-type */
-
-
-.shadow {
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, $shadow-key-penumbra-opacity),
-              0 3px 1px -2px rgba(0, 0, 0, $shadow-key-umbra-opacity),
-              0 1px 5px 0 rgba(0, 0, 0, $shadow-ambient-shadow-opacity);
-}
-
+// postcss-bem-linter: define data-table
 
 .mdc-ext-data-table {
-  position: relative;
-  border: $ext-data-table-dividers;
+  @include mdc-typography(body1);
+  @include mdc-ext-data-table-text-ink-color(text-primary-on-background);
+
   border-collapse: collapse;
-  white-space: nowrap;
-  font-size: $ext-data-table-font-size;
-  background-color: unquote("rgb(#{$color-white})");
+  vertical-align: middle;
+
+  @include mdc-theme-dark(".mdc-ext-data-table") {
+    @include mdc-ext-data-table-text-ink-color(text-primary-on-dark);
+  }
+
+  tr {
+    border-bottom-style: solid;
+    border-width: 1px;
+    box-sizing: border-box;
+
+    td {
+      padding-bottom: $mdc-ext-data-table-data-row-padding / 2;
+      padding-top: $mdc-ext-data-table-data-row-padding / 2;
+    }
+  }
 
   thead {
-    padding-bottom: 3px;
+    @include mdc-ext-data-table-text-ink-color(text-secondary-on-background);
+    @include mdc-ext-data-table-divider-color($mdc-ext-data-table-divider-color-light);
 
-    .mdc-ext-data-table__select {
-      margin-top: 0;
+    @include mdc-theme-dark {
+      @include mdc-ext-data-table-text-ink-color(text-secondary-on-dark);
+      @include mdc-ext-data-table-divider-color($mdc-ext-data-table-divider-color-dark);
+    }
+
+    tr th {
+      padding-bottom: $mdc-ext-data-table-header-row-padding / 2;
+      padding-top: $mdc-ext-data-table-header-row-padding / 2;
     }
   }
 
   tbody {
-    tr {
-      position: relative;
-      height: $ext-data-table-row-height;
-      transition-duration: 0.28s;
-      transition-timing-function: $animation-curve-default;
-      transition-property: background-color;
+    @include mdc-ext-data-table-divider-color($mdc-ext-data-table-divider-color-light);
 
-      &.is-selected {
-        background-color: $ext-data-table-selection-color;
-      }
-
-      &:hover {
-        background-color: $ext-data-table-hover-color;
-      }
-    }
-  }
-
-  td, th {
-    padding: 0 $ext-data-table-column-padding 12px $ext-data-table-column-padding;
-    text-align: right;
-
-    &:first-of-type {
-      padding-left: 24px;
+    @include mdc-theme-dark {
+      @include mdc-ext-data-table-divider-color($mdc-ext-data-table-divider-color-dark);
     }
 
-    &:last-of-type {
-      padding-right: 24px;
-    }
-  }
-
-  td {
-    position: relative;
-    vertical-align: middle;
-    height: $ext-data-table-row-height;
-    border-top: $ext-data-table-dividers;
-    border-bottom: $ext-data-table-dividers;
-    padding-top: $ext-data-table-cell-top;
-    box-sizing: border-box;
-
-    .mdc-ext-data-table__select {
-      vertical-align: middle;
+    tr:last-of-type {
+      border-bottom-style: none;
     }
   }
 
   th {
-    position: relative;
-    vertical-align: bottom;
+    @include mdc-typography(caption);
+
+    font-weight: #{map-get($mdc-typography-font-weight-values, medium)};
     text-overflow: ellipsis;
-    font-size: 14px;
-    font-weight: bold;
-    line-height: 24px;
-    letter-spacing: 0;
-    height: $ext-data-table-row-height;
-    font-size: $ext-data-table-header-font-size;
-    color: $ext-data-table-header-color;
-    padding-bottom: 8px;
-    box-sizing: border-box;
-    &.mdc-ext-data-table__header--sorted-ascending,
-    &.mdc-ext-data-table__header--sorted-descending {
-      color: $ext-data-table-header-sorted-color;
-      &:before {
-        font-family: 'Material Icons';
-        font-weight: normal;
-        font-style: normal;
-        font-size: 24px;
-        line-height: 1;
-        letter-spacing: normal;
-        text-transform: none;
-        display: inline-block;
-        word-wrap: normal;
-        font-feature-settings: 'liga';
-        -webkit-font-feature-settings: 'liga';
-        -webkit-font-smoothing: antialiased;
-        font-size: $ext-data-table-header-sort-icon-size;
-        content: "\e5d8";
-        margin-right: 5px;
-        vertical-align: sub;
-      }
-      &:hover {
-        cursor: pointer;
-        &:before {
-          color: $ext-data-table-header-sorted-icon-hover-color;
-        }
-      }
+  }
+
+  td, th {
+    padding: 0 $mdc-ext-data-table-column-padding;
+    text-align: right;
+
+    &:first-of-type {
+      padding-left: $mdc-ext-data-table-first-last-column-padding;
     }
-    &.mdc-ext-data-table__header--sorted-descending:before {
-      content: "\e5db";
+
+    &:last-of-type {
+      padding-right: $mdc-ext-data-table-first-last-column-padding;
+    }
+  }
+
+  & tr > .mdc-ext-data-table__cell--non-numeric {
+    text-align: left;
+  }
+}
+
+.mdc-ext-data-table:not(.mdc-ext-data-table--non-interactive) > tbody > tr {
+  &:hover {
+    background-color: $mdc-ext-data-table-hover-background-color-light;
+
+    @include mdc-theme-dark(".mdc-ext-data-table") {
+      background-color: $mdc-ext-data-table-hover-background-color-dark;
     }
   }
 }
 
-.mdc-ext-data-table__select {
-  width: 16px;
-}
-
-.mdc-ext-data-table__cell--non-numeric.mdc-ext-data-table__cell--non-numeric {
-  text-align: left;
-}
-/* stylelint-enable selector-no-type */
+// postcss-bem-linter: end
