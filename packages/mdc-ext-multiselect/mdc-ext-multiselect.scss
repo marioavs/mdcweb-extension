@@ -58,6 +58,9 @@
   margin-top: 16px;
 
   &__combobox {
+    @include mdc-theme-prop(color, text-primary-on-light);
+    @include mdc-typography-base;
+
     position: relative;
     background: none;
     background-repeat: no-repeat;
@@ -69,12 +72,10 @@
     width: 100%;
 
     @include mdc-ext-multiselect-dd-arrow-svg-bg_;
-
-    @include mdc-typography-base;
     @include mdc-rtl-reflexive-box(padding, right, $dd-arrow-padding);
     // We use only a subset of the MDC typography values here as changing things such as line-height
     // affects how the labels are transformed.
-    @each $prop in (font-size, letter-spacing) {
+    @each $prop in (letter-spacing) {
       #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
     }
 
@@ -130,14 +131,6 @@
     width: 100%;
 
     .mdc-ext-multiselect__input {
-      @include mdc-theme-prop(color, text-primary-on-light);
-      @include mdc-typography-base;
-      // We use only a subset of the MDC typography values here as changing things such as line-height
-      // affects how the labels are transformed.
-      @each $prop in (font-size, letter-spacing) {
-        #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
-      }
-
       border-style: none;
       background-color: transparent;
       display: inline;
@@ -154,8 +147,6 @@
       }
 
       @include mdc-theme-dark(".mdc-ext-multiselect") {
-        @include mdc-theme-prop(color, text-primary-on-dark);
-
         &::placeholder {
           @include mdc-theme-prop(color, text-hint-on-dark);
         }
