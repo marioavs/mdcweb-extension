@@ -61,15 +61,18 @@
     @include mdc-theme-prop(color, text-primary-on-light);
     @include mdc-typography-base;
 
+    display: inline-block;
     position: relative;
     background: none;
     background-repeat: no-repeat;
     background-position: right center;
     border: none;
     border-bottom: 1px solid $mdc-ext-multiselect-underline-on-light-idle;
+    box-sizing: border-box;
+    flex: 1 0 auto;
     min-width: 100px;
     padding: 0 #{$dd-arrow-padding} 8px;
-    width: 100%;
+    width: 179px;
 
     @include mdc-ext-multiselect-dd-arrow-svg-bg_;
     @include mdc-rtl-reflexive-box(padding, right, $dd-arrow-padding);
@@ -156,6 +159,7 @@
     .mdc-ext-multiselect__option {
       flex-grow: 0;
       overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
   }
