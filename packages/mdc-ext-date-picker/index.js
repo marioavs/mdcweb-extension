@@ -190,7 +190,7 @@ class MDCExtDatePicker extends MDCComponent {
           month: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_MONTH),
           year: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_YEAR)
         }),
-        getDayTableDimensions: () => this.dayTableEl_.getBoundingClientRect(),
+        getDayTableDimensions: () => this.monthsEl_.getBoundingClientRect(),
         registerDatePickerInteractionHandler: (evtType, handler) => this.root_.addEventListener(evtType, handler),
         deregisterDatePickerInteractionHandler: (evtType, handler) => this.root_.removeEventListener(evtType, handler),
         registerTransitionEndHandler: (handler) => this.surfaceEl_.addEventListener(getCorrectEventName(window, 'transitionend'), handler),

@@ -101,37 +101,36 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
   &__surface {
     @include mdc-elevation(2);
     @include mdc-theme-prop(background-color, background);
+    @include mdc-theme-prop(color, text-secondary-on-background);
 
-    display: flex;
-    visibility: hidden;
+    display: none;
     position: absolute;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     box-sizing: border-box;
     left: 0;
+    max-width: 280px;
     top: 0;
     transform: scale(.8);
+    transition: mdc-animation-enter(opacity, 120ms), mdc-animation-enter(transform, 120ms);
     z-index: 3;
 
     // Adjust text color for dark theme.
     @include mdc-theme-dark(".mdc-ext-date-picker") {
+      @include mdc-theme-prop(color, text-secondary-on-dark);
+
       background-color: $mdc-ext-date-picker-dark-theme-bg-color;
       background-color: var(--mdc-ext-date-picker-dark-theme-bg-color, #{$mdc-ext-date-picker-dark-theme-bg-color});
     }
   }
 
-  &--animating {
-    .mdc-ext-date-picker__surface {
-      transition: mdc-animation-enter(opacity, 120ms), mdc-animation-enter(transform, 120ms);
-      visibility: visible;
-    }
+  &--animating &__surface {
+    display: flex;
   }
 
-  &--open {
-    .mdc-ext-date-picker__surface {
-      visibility: visible;
-      transform: scale(1);
-      opacity: 1;
-    }
+  &--open &__surface {
+    display: flex;
+    transform: scale(1);
+    opacity: 1;
   }
 
   &__primary {
@@ -177,6 +176,7 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
 
   &__calendar {
     display: block;
+    touch-action: none;
   }
 
   &--year-view &__calendar {
@@ -227,11 +227,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     user-select: none;
     width: 40px;
 
-    @include mdc-theme-dark(".mdc-ext-date-picker") {
-      @include mdc-states(white);
-      @include mdc-theme-prop(color, text-primary-on-dark);
-    }
-
     &:focus {
       outline: none;
     }
@@ -252,6 +247,11 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     &:not(:disabled) {
       @include mdc-theme-prop(background-color, transparent, $edgeOptOut: true);
       @include mdc-theme-prop(color, text-primary-on-light);
+
+      @include mdc-theme-dark(".mdc-ext-pagination") {
+        @include mdc-states(white);
+        @include mdc-theme-prop(color, text-primary-on-dark);
+      }
     }
   }
 
@@ -371,6 +371,11 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     right: 0;
     top: 0;
     visibility: hidden;
+
+    @include mdc-theme-dark(".mdc-ext-date-picker") {
+      background-color: $mdc-ext-date-picker-dark-theme-bg-color;
+      background-color: var(--mdc-ext-date-picker-dark-theme-bg-color, #{$mdc-ext-date-picker-dark-theme-bg-color});
+    }
   }
 
   &--year-view &__year-selection {
@@ -383,26 +388,30 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     list-style-type: none;
     padding: 0;
     text-align: center;
-    transition: mdc-animation-enter(transform, 120ms);
+    touch-action: none;
     will-change: transform;
+
+    &--animating {
+      transition: mdc-animation-enter(transform, 120ms);
+    }
   }
 
   &__year {
     @include mdc-typography(subheading2);
     position: relative;
     line-height: 2.5rem;
+    transition: mdc-animation-exit-permanent(font-weight, 75ms);
 
     &.mdc-ext-date-picker__year--selected{
-      @include mdc-typography(title);
-      line-height: 2.5rem;
+      font-weight: 500;
     }
   }
 }
 // postcss-bem-linter: end
 
-@media screen and (min-height: 361px) {
+@media screen and (max-height: 360px) and (min-width: 380px) {
   .mdc-ext-date-picker__surface {
-    flex-wrap: wrap;
-    max-width: 280px;
+    flex-wrap: nowrap;
+    max-width: none;
   }
 }
