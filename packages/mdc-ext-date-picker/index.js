@@ -278,6 +278,9 @@ class MDCExtDatePicker extends MDCComponent {
   initialSyncWithDOM() {
     this.disabled = this.root_.getAttribute(MDCExtDatePickerFoundation.strings.ARIA_DISABLED) === 'true' ||
       this.input_.disabled;
+
+    if ((this.input_) || (this.input_.value))
+      this.value = this.input_.value;
   }
 
   /** @return {?Date} */
