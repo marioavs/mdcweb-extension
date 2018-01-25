@@ -248,6 +248,20 @@ class MDCExtMultiselect extends MDCComponent {
     this.foundation_.setDisabled(disabled);
   }
 
+  /**
+   * @return {boolean} True if the Multiselect is read only.
+   */
+  get readOnly() {
+    return this.foundation_.isReadOnly();
+  }
+
+  /**
+   * @param {boolean} readOnly Sets the Multiselect read only.
+   */
+  set readOnly(readOnly) {
+    this.foundation_.setReadOnly(readOnly);
+  }
+
   get items() {
     return this.listUl_.querySelectorAll(MDCExtMultiselectFoundation.strings.ITEM_SELECTOR);
   }

@@ -556,7 +556,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   open_() {
     const {LIST_OPEN,OPEN} = cssClasses;
 
-    if (this.isDisabled()) {
+    if (this.isDisabled() || this.isReadOnly()) {
       return;
     }
     this.isOpening_ = true;
@@ -641,7 +641,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
       }
     } else if (evt.type === 'click') {
       if ((evt.target) && (this.adapter_.eventTargetHasClass(evt.target, LIST_ITEM))) {
-        if (this.isDisabled()) {
+        if (this.isDisabled() || this.isReadOnly()) {
           return;
         }
         if (evt.target !== this.adapter_.getActiveItem()) {
@@ -674,7 +674,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   handleKeydown_(evt) {
     const {INPUT} = cssClasses;
 
-    if (this.isDisabled()) {
+    if (this.isDisabled() || this.isReadOnly()) {
       return;
     }
     // Do nothing if Alt, Ctrl or Meta are pressed.
@@ -753,7 +753,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
     if (evt.altKey || evt.ctrlKey || evt.metaKey) {
       return true;
     }
-    if (this.isDisabled()) {
+    if (this.isDisabled() || this.isReadOnly()) {
       return;
     }
 
@@ -865,7 +865,7 @@ export default class MDCExtMultiselectFoundation extends MDCFoundation {
   }
 
   updateAvailableItems_() {
-    if (this.isDisabled()) {
+    if (this.isDisabled() || this.isReadOnly()) {
       return;
     }
     // Debounce multiple changed values
