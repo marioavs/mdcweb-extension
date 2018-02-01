@@ -95,7 +95,7 @@
 }
 
 .mdc-ext-data-table:not(.mdc-ext-data-table--non-interactive) > tbody > tr {
-  &:hover {
+  &:hover, &:focus, &:focus-within {
     background-color: $mdc-ext-data-table-hover-background-color-light;
 
     @include mdc-theme-dark(".mdc-ext-data-table") {
