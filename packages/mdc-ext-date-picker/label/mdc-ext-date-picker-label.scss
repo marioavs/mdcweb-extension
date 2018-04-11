@@ -25,10 +25,6 @@
   }
   // stylelint-enable plugin/selector-bem-pattern
 
-  @include mdc-theme-dark(".mdc-ext-date-picker") {
-    @include mdc-theme-prop(color, $mdc-ext-date-picker-dark-label);
-  }
-
   &--float-above {
     transform: translateY(-100%) scale(.75, .75);
     cursor: auto;

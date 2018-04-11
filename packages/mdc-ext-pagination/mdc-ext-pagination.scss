@@ -29,11 +29,6 @@
   @include mdc-typography(caption);
   @include mdc-theme-prop(color, text-secondary-on-background);
 
-  // Adjust text color for dark theme.
-  @include mdc-theme-dark {
-    @include mdc-theme-prop(color, text-secondary-on-dark);
-  }
-
   &__txtto {
     padding: 0 2px;
   }
@@ -44,7 +39,7 @@
 
   &__button {
     @include mdc-ripple-surface;
-    @include mdc-ripple-radius;
+    @include mdc-ripple-radius-unbounded;
     @include mdc-states(secondary);
 
     display: inline;
@@ -66,10 +61,6 @@
       @include mdc-theme-prop(color, text-disabled-on-light);
       cursor: default;
       pointer-events: none;
-
-      @include mdc-theme-dark(".mdc-ext-pagination") {
-        @include mdc-theme-prop(color, text-disabled-on-dark);
-      }
     }
 
     // :not(:disabled) is used to support link styled as button
@@ -77,11 +68,6 @@
     &:not(:disabled) {
       @include mdc-theme-prop(background-color, transparent, $edgeOptOut: true);
       @include mdc-theme-prop(color, text-primary-on-light);
-
-      @include mdc-theme-dark(".mdc-ext-pagination") {
-        @include mdc-states(white);
-        @include mdc-theme-prop(color, text-primary-on-dark);
-      }
     }
 
     i {
@@ -95,10 +81,6 @@
       @include mdc-theme-prop(color, text-disabled-on-light);
       cursor: default;
       pointer-events: none;
-
-      @include mdc-theme-dark(".mdc-ext-pagination") {
-        @include mdc-theme-prop(color, text-disabled-on-dark);
-      }
     }
   }
 }

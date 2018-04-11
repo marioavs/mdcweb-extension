@@ -38,20 +38,10 @@
   @include mdc-ext-multiselect-ink-color_(text-disabled-on-light);
   @include mdc-ext-multiselect-label-color_(text-disabled-on-light);
 
-  @include mdc-theme-dark(".mdc-ext-multiselect") {
-    @include mdc-ext-multiselect-bottom-line-color_($mdc-ext-multiselect-disabled-border-on-dark);
-    @include mdc-ext-multiselect-ink-color_(text-disabled-on-dark);
-    @include mdc-ext-multiselect-label-color_(text-disabled-on-dark);
-  }
-
   pointer-events: none;
 
   .mdc-ext-multiselect__input {
     border-bottom: 1px dotted;
-
-    @include mdc-theme-dark(".mdc-ext-multiselect", true) {
-      border-bottom: 1px dotted;
-    }
   }
 
   // stylelint-disable plugin/selector-bem-pattern
@@ -59,14 +49,6 @@
     @include mdc-theme-prop(color, text-disabled-on-light);
   }
   // stylelint-enable plugin/selector-bem-pattern
-
-  @include mdc-theme-dark(".mdc-ext-multiselect", true) {
-    // stylelint-disable plugin/selector-bem-pattern
-    + .mdc-ext-multiselect-helper-text {
-      @include mdc-theme-prop(color, text-disabled-on-dark);
-    }
-    // stylelint-enable plugin/selector-bem-pattern
-  }
 
   .mdc-ext-multiselect__label {
     bottom: 8px;
@@ -96,21 +78,11 @@
     opacity: 1;
     color: $mdc-ext-multiselect-error-on-light;
   }
-
-  @include mdc-theme-dark(".mdc-ext-multiselect", true) {
-    + .mdc-ext-multiselect-helper-text--validation-msg {
-      color: $mdc-ext-multiselect-error-on-dark;
-    }
-  }
 }
 
 @mixin mdc-ext-multiselect-focused_ {
   @include mdc-required-ext-multiselect-label-asterix_ {
     color: $mdc-ext-multiselect-error-on-light;
-
-    @include mdc-theme-dark(".mdc-ext-multiselect", true) {
-      color: $mdc-ext-multiselect-error-on-dark;
-    }
   }
 
   + .mdc-ext-multiselect-helper-text:not(.mdc-ext-multiselect-helper-text--validation-msg) {

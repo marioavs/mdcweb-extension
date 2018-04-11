@@ -47,10 +47,6 @@
   @include mdc-typography(subheading2);
   @include mdc-theme-prop(color, text-primary-on-background);
 
-  @include mdc-theme-dark {
-    @include mdc-theme-prop(color, text-primary-on-dark);
-  }
-
   &-node {
     display: none;
     flex-direction: column;
@@ -89,10 +85,6 @@
     margin-top: ($mdc-ext-treeview-checkbox-touch-area - $mdc-ext-treeview-icon-toggle-size) / 2;
 
     @include mdc-ext-treeview-icon-toggle-bg_;
-
-    @include mdc-theme-dark(".mdc-ext-treeview") {
-      @include mdc-ext-treeview-icon-toggle-bg_("#ffffff");
-    }
   }
 
   &-toggle:checked ~ &-item &-icon-toggle {
@@ -146,10 +138,6 @@
       width: $mdc-ext-treeview-checkbox-ui-pct;
       margin: auto;
       pointer-events: none;
-
-      @include mdc-theme-dark(".mdc-ext-treeview") {
-        border-color: $mdc-ext-treeview-checkbox-border-color-dark;
-      }
 
       // The frame's ::before element is used as a focus indicator for the checkbox
       &::before {
@@ -242,10 +230,6 @@ fieldset:disabled .mdc-ext-treeview-checkbox__native-control,
   // postcss-bem-linter: ignore
   ~ .mdc-ext-treeview-checkbox__background {
     border-color: $mdc-ext-treeview-checkbox-disabled-color;
-
-    @include mdc-theme-dark(".mdc-ext-treeview") {
-      border-color: $mdc-ext-treeview-checkbox-disabled-color-dark;
-    }
   }
 
   &:checked,
@@ -253,10 +237,6 @@ fieldset:disabled .mdc-ext-treeview-checkbox__native-control,
     ~ .mdc-checkbox__background {
       border-color: transparent;
       background-color: $mdc-ext-treeview-checkbox-disabled-color;
-
-      @include mdc-theme-dark(".mdc-ext-treeview") {
-        background-color: $mdc-ext-treeview-checkbox-disabled-color-dark;
-      }
     }
   }
 }

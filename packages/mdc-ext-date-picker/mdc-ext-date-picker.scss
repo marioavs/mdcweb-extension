@@ -24,12 +24,6 @@
 @import "@material/typography/variables";
 @import "./label/mdc-ext-date-picker-label";
 
-$mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
-
-:root {
-  --mdc-ext-date-picker-dark-theme-bg-color: #{$mdc-ext-date-picker-dark-theme-bg-color};
-}
-
 // postcss-bem-linter: define date-picker
 
 .mdc-ext-date-picker {
@@ -78,24 +72,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     &:invalid {
       box-shadow: none;
     }
-
-    @include mdc-theme-dark {
-      @include mdc-theme-prop(color, text-primary-on-dark);
-
-      border-bottom: 1px solid $mdc-ext-date-picker-underline-on-dark-idle;
-
-      &:hover {
-        border-bottom: 1px solid $mdc-ext-date-picker-underline-on-dark;
-      }
-
-      &::placeholder {
-        @include mdc-theme-prop(color, text-hint-on-dark);
-      }
-
-      &:focus::placeholder {
-        @include mdc-theme-prop(color, $mdc-ext-date-picker-dark-placeholder);
-      }
-    }
   }
 
   &__surface {
@@ -113,14 +89,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     transform: scale(.8);
     transition: mdc-animation-enter(opacity, 120ms), mdc-animation-enter(transform, 120ms);
     z-index: 3;
-
-    // Adjust text color for dark theme.
-    @include mdc-theme-dark(".mdc-ext-date-picker") {
-      @include mdc-theme-prop(color, text-secondary-on-dark);
-
-      background-color: $mdc-ext-date-picker-dark-theme-bg-color;
-      background-color: var(--mdc-ext-date-picker-dark-theme-bg-color, #{$mdc-ext-date-picker-dark-theme-bg-color});
-    }
   }
 
   &--animating &__surface {
@@ -189,11 +157,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
 
     display: flex;
     align-items: center;
-
-    // Adjust text color for dark theme.
-    @include mdc-theme-dark(".mdc-ext-date-picker") {
-      @include mdc-theme-prop(color, text-primary-on-dark);
-    }
   }
 
   &__txtmonth {
@@ -208,7 +171,7 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
 
   &__button {
     @include mdc-ripple-surface;
-    @include mdc-ripple-radius;
+    @include mdc-ripple-radius-unbounded;
     @include mdc-states(secondary);
 
     display: inline-flex;
@@ -236,10 +199,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
       @include mdc-theme-prop(color, text-disabled-on-light);
       cursor: default;
       pointer-events: none;
-
-      @include mdc-theme-dark(".mdc-ext-date-picker") {
-        @include mdc-theme-prop(color, text-disabled-on-dark);
-      }
     }
 
     // :not(:disabled) is used to support link styled as button
@@ -247,11 +206,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     &:not(:disabled) {
       @include mdc-theme-prop(background-color, transparent, $edgeOptOut: true);
       @include mdc-theme-prop(color, text-primary-on-light);
-
-      @include mdc-theme-dark(".mdc-ext-pagination") {
-        @include mdc-states(white);
-        @include mdc-theme-prop(color, text-primary-on-dark);
-      }
     }
   }
 
@@ -272,10 +226,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     visibility: hidden;
     width: 100%;
 
-    @include mdc-theme-dark(".mdc-ext-date-picker") {
-      @include mdc-theme-prop(color, text-primary-on-dark);
-    }
-
     tr {
       height: 2.5em;
     }
@@ -283,10 +233,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     th {
       @include mdc-typography(caption);
       @include mdc-theme-prop(color, text-hint-on-light);
-
-      @include mdc-theme-dark(".mdc-ext-date-picker") {
-        @include mdc-theme-prop(color, text-hint-on-dark);
-      }
     }
 
     &--active {
@@ -335,10 +281,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
       pointer-events: none;
       content: "";
       will-change: opacity;
-
-      @include mdc-theme-dark(".mdc-ext-date-picker") {
-        @include mdc-theme-prop(background-color, white);
-      }
     }
 
     &:not(.mdc-ext-date-picker__day--selected):hover {
@@ -371,11 +313,6 @@ $mdc-ext-date-picker-dark-theme-bg-color: #303030 !default;
     right: 0;
     top: 0;
     visibility: hidden;
-
-    @include mdc-theme-dark(".mdc-ext-date-picker") {
-      background-color: $mdc-ext-date-picker-dark-theme-bg-color;
-      background-color: var(--mdc-ext-date-picker-dark-theme-bg-color, #{$mdc-ext-date-picker-dark-theme-bg-color});
-    }
   }
 
   &--year-view &__year-selection {

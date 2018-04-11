@@ -14,6 +14,10 @@
 // limitations under the License.
 //
 
+// Base style
+$mdc-theme-primary: #2e7d32;
+$mdc-theme-secondary: #00838f;
+
 @import "@mdcext/data-table/mdc-ext-data-table";
 @import "@mdcext/date-picker/mdc-ext-date-picker";
 @import "@mdcext/multiselect/mdc-ext-multiselect";

@@ -11,11 +11,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <style type="text/css">
-      .mdc-theme--dark {
-        --mdc-theme-primary: var(--mdc-theme-accent, #64dd17);
-        background-color: #303030;
-      }
-
       #demo-wrapper {
         padding: 4px;
         padding-left: 0;
@@ -100,20 +95,11 @@
             </tbody>
           </table>
         </section>
-        <div>
-          <input type="checkbox" id="dark-theme">
-          <label for="dark-theme">Dark Theme</label>
-        </div>
       </section>
     </main>
     <script>
       (function() {
         var demoWrapper = document.getElementById('demo-wrapper');
-        var darkThemeCb = document.getElementById('dark-theme');
-
-        darkThemeCb.addEventListener('change', function() {
-          demoWrapper.classList[darkThemeCb.checked ? 'add' : 'remove']('mdc-theme--dark');
-        });
       })();
     </script>
   </body>

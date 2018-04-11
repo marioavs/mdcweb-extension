@@ -27,11 +27,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <style type="text/css">
-      .mdc-theme--dark {
-        --mdc-theme-primary: var(--mdc-theme-secondary, #64dd17);
-        background-color: #303030;
-      }
-
       #country-js-select {
         width: 280px;
       }
@@ -360,10 +355,6 @@
         </section>
         <p>Currently selected: <span id="currently-selected">(none)</span></p>
         <div>
-          <input type="checkbox" id="dark-theme">
-          <label for="dark-theme">Dark Theme</label>
-        </div>
-        <div>
           <input type="checkbox" id="rtl">
           <label for="rtl">RTL</label>
         </div>
@@ -423,13 +414,9 @@
         });
 
         var demoWrapper = document.getElementById('demo-wrapper');
-        var darkThemeCb = document.getElementById('dark-theme');
         var rtlCb = document.getElementById('rtl');
         var disabledCb = document.getElementById('disabled');
 
-        darkThemeCb.addEventListener('change', function() {
-          demoWrapper.classList[darkThemeCb.checked ? 'add' : 'remove']('mdc-theme--dark');
-        });
         rtlCb.addEventListener('change', function() {
           if (rtlCb.checked) {
             demoWrapper.setAttribute('dir', 'rtl');

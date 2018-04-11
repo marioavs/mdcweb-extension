@@ -89,17 +89,6 @@
     &:hover {
       border-color: $mdc-ext-multiselect-underline-on-light;
     }
-
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
-      @include mdc-theme-prop(color, text-primary-on-dark);
-      @include mdc-ext-multiselect-dd-arrow-svg-bg_(ffffff);
-
-      border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark-idle;
-
-      &:hover {
-        border-bottom: 1px solid $mdc-ext-multiselect-underline-on-dark;
-      }
-    }
   }
 
   &__select {
@@ -148,12 +137,6 @@
       &::placeholder {
         @include mdc-theme-prop(color, text-hint-on-light);
       }
-
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
-        &::placeholder {
-          @include mdc-theme-prop(color, text-hint-on-dark);
-        }
-      }
     }
 
     .mdc-ext-multiselect__option {
@@ -172,10 +155,6 @@
 
   &--focused {
     @include mdc-ext-multiselect-label-color(primary);
-
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
-      @include mdc-ext-multiselect-label-color(primary-light);
-    }
   }
 
   &__list {
@@ -204,10 +183,6 @@
     // stylelint-enable plugin/selector-bem-pattern
 
     @include mdc-elevation(2);
-
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
-      background-color: #424242;
-    }
 
     &--open {
       display: block;
@@ -238,15 +213,6 @@
         @include mdc-states;
         @include mdc-states-selected(primary);
       }
-
-      @include mdc-theme-dark(".mdc-ext-multiselect") {
-        @include mdc-theme-prop(color, white);
-
-        &--selected:not(.mdc-list-item:active) {
-          @include mdc-states(white);
-          @include mdc-states-selected(primary);
-        }
-      }
     }
   }
 }
@@ -260,10 +226,6 @@
 
   .mdc-ext-multiselect__combobox-background {
     border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-light;
-
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
-      border-bottom: 1px dotted $mdc-ext-multiselect-disabled-border-on-dark;
-    }
   }
 
   // stylelint-disable plugin/selector-bem-pattern
@@ -272,10 +234,6 @@
   .mdc-ext-multiselect__input,
   .mdc-ext-multiselect__label {
     @include mdc-theme-prop(color, text-disabled-on-light);
-
-    @include mdc-theme-dark(".mdc-ext-multiselect") {
-      @include mdc-theme-prop(color, text-disabled-on-dark);
-    }
   }
   // stylelint-enable plugin/selector-bem-pattern
 }
@@ -308,24 +266,6 @@
 
     &:invalid:not(:focus) {
       border-color: $mdc-ext-multiselect-error-on-light;
-    }
-  }
-
-  @include mdc-theme-dark {
-    &:not(.mdc-ext-multiselect--upgraded) .mdc-ext-multiselect__select {
-      &:not(:focus) {
-        border-color: rgba(white, .12);
-      }
-
-      &:disabled {
-        @include mdc-theme-prop(color, text-disabled-on-dark);
-
-        border-color: $mdc-ext-multiselect-disabled-border-on-dark;
-      }
-
-      &:invalid:not(:focus) {
-        border-color: $mdc-ext-multiselect-error-on-dark;
-      }
     }
   }
 }

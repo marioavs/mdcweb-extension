@@ -27,11 +27,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <style type="text/css">
-      .mdc-theme--dark {
-        --mdc-theme-primary: var(--mdc-theme-accent, #64dd17);
-        background-color: #303030;
-      }
-
       #demo-wrapper {
         padding: 4px;
         padding-left: 0;
@@ -78,10 +73,6 @@
         </section>
         <p>Last event: <span id="last-event">(none)</span></p>
         <div>
-          <input type="checkbox" id="dark-theme">
-          <label for="dark-theme">Dark Theme</label>
-        </div>
-        <div>
           <input type="checkbox" id="disabled">
           <label for="disabled">Disabled</label>
         </div>
@@ -111,14 +102,10 @@
         });
 
         var demoWrapper = document.getElementById('demo-wrapper');
-        var darkThemeCb = document.getElementById('dark-theme');
         var disabledCb = document.getElementById('disabled');
         var disabledPrevCb = document.getElementById('prev-disabled');
         var disabledNextCb = document.getElementById('next-disabled');
 
-        darkThemeCb.addEventListener('change', function() {
-          demoWrapper.classList[darkThemeCb.checked ? 'add' : 'remove']('mdc-theme--dark');
-        });
         disabledCb.addEventListener('change', function() {
           pagination.disabled = disabledCb.checked;
         });
