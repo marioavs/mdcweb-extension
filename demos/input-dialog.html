@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2016 Google Inc. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License
+-->
+<html class="mdc-typography">
+  <head>
+    <meta charset="utf-8">
+    <title>Input Dialog - Extension with additional Material Components Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/images/logo_components_color_2x_web_48dp.png" />
+    <script src="assets/mdcweb-extension.css.js" charset="utf-8"></script>
+    <script src="assets/demo-styles.css.js" charset="utf-8"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <style type="text/css">
+      #top-input-dialog {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: auto;
+      }
+
+      .mdc-ext-input-dialog__surface{
+        max-width: 400px;
+        min-width: 300px;
+      }
+
+      #demo-wrapper {
+        padding: 4px;
+        padding-left: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .mdc-ext-input-dialog-anchor {
+        position: relative;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="mdc-toolbar mdc-toolbar--fixed">
+      <div class="mdc-toolbar__row">
+        <section class="mdc-toolbar__section mdc-toolbar__section--align-start">
+          <span class="catalog-back">
+            <a href="/" class="mdc-toolbar__icon--menu"><i class="material-icons">&#xE5C4;</i></a>
+          </span>
+          <span class="mdc-toolbar__title catalog-title">Input Dialog</span>
+        </section>
+      </div>
+    </header>
+    <main>
+      <div class="mdc-toolbar-fixed-adjust"></div>
+      <section class="hero">
+        <aside id="top-input-dialog" class="mdc-ext-input-dialog mdc-ext-input-dialog--open">
+          <div class="mdc-ext-input-dialog__surface">
+            <header class="mdc-ext-input-dialog__header">
+              <h2 class="mdc-ext-input-dialog__header__title">
+                Additional input value
+              </h2>
+            </header>
+            <section class="mdc-ext-input-dialog__body">
+              <div class="mdc-text-field mdc-text-field--fullwidth" data-mdc-auto-init="MDCTextField">
+                <input type="text" class="mdc-text-field__input" placeholder="Additional Value">
+                <div class="mdc-line-ripple"></div>
+              </div>
+            </section>
+            <footer class="mdc-ext-input-dialog__footer">
+              <button type="button" class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--cancel">Cancel</button>
+              <button type="button" class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--accept">Add</button>
+            </footer>
+          </div>
+        </aside>
+      </section>
+
+      <section class="example">
+        <h2 class="mdc-typography--title">Fully-Featured Component</h2>
+        <section id="demo-wrapper">
+          <div class="mdc-ext-input-dialog-anchor">
+            <button id="input-dialog-button" class="mdc-button mdc-button--raised">
+              <span>
+                Show Input Dialog
+              </span>
+            </button>
+            <aside id="js-input-dialog" class="mdc-ext-input-dialog">
+              <div class="mdc-ext-input-dialog__surface">
+                <header class="mdc-ext-input-dialog__header">
+                  <h2 class="mdc-ext-input-dialog__header__title">
+                    Additional input value
+                  </h2>
+                </header>
+                <section class="mdc-ext-input-dialog__body">
+                  <div class="mdc-text-field mdc-text-field--fullwidth">
+                    <input type="text" class="mdc-text-field__input" placeholder="Additional Value">
+                    <div class="mdc-line-ripple"></div>
+                  </div>
+                </section>
+                <footer class="mdc-ext-input-dialog__footer">
+                  <button type="button" class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--cancel">Cancel</button>
+                  <button type="button" class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--accept">Add</button>
+                </footer>
+              </div>
+              <div class="mdc-ext-input-dialog__backdrop"></div>
+            </aside>
+          </div>
+        </section>
+        <p>Last event: <span id="last-event">(none)</span></p>
+        Default Input Dialog Position:
+        <div>
+          <label><input type="radio" name="input-dialog-position" value="top start" checked>Top start</label>
+        </div>
+        <div>
+          <label><input type="radio" name="input-dialog-position" value="top end">Top end</label>
+        </div>
+        <div>
+          <label><input type="radio" name="input-dialog-position" value="bottom start">Bottom start</label>
+        </div>
+        <div>
+          <label><input type="radio" name="input-dialog-position" value="bottom end">Bottom end</label>
+        </div>
+        <div>
+          <label><input type="radio" name="input-dialog-position" value="fixed center">Fixed center</label>
+        </div>
+      </section>
+    </main>
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <script src="assets/mdcweb-extension.js"></script>
+    <script>
+      (function() {
+        [].forEach.call(document.querySelectorAll('.mdc-text-field'), function(textField) {
+          mdc.textField.MDCTextField.attachTo(textField);
+        });
+
+        var topInputDialog = document.getElementById('top-input-dialog');
+        mdcext.inputDialog.MDCExtInputDialog.attachTo(topInputDialog);
+
+        var MDCExtInputDialog = mdcext.inputDialog.MDCExtInputDialog;
+        var root = document.getElementById('js-input-dialog');
+        var inputDialog = MDCExtInputDialog.attachTo(root);
+        inputDialog.listen('MDCExtInputDialog:accept', function() {
+          console.log('accepted');
+        });
+        inputDialog.listen('MDCExtInputDialog:cancel', function() {
+          console.log('canceled');
+        });
+
+        document.querySelector('#input-dialog-button').addEventListener('click', function (evt) {
+          inputDialog.lastFocusedTarget = evt.target;
+          inputDialog.show();
+        });
+
+        radios = document.querySelectorAll('input[name="input-dialog-position"]');
+        for (var i = 0; i < radios.length; i++) {
+          radios[i].addEventListener('change', function(evt) {
+            if (evt.target.checked) {
+              switch (evt.target.value) {
+                case "top start":
+                  inputDialog.setAnchorCorner(mdcext.inputDialog.MDCExtInputDialogFoundation.Corner.TOP_START);
+                  break;
+                case "bottom start":
+                  inputDialog.setAnchorCorner(mdcext.inputDialog.MDCExtInputDialogFoundation.Corner.BOTTOM_START);
+                  break;
+                case "top end":
+                  inputDialog.setAnchorCorner(mdcext.inputDialog.MDCExtInputDialogFoundation.Corner.TOP_END);
+                  break;
+                case "bottom end":
+                  inputDialog.setAnchorCorner(mdcext.inputDialog.MDCExtInputDialogFoundation.Corner.BOTTOM_END);
+                  break;
+                case "fixed center":
+                  inputDialog.setAnchorCorner(mdcext.inputDialog.MDCExtInputDialogFoundation.Corner.FIXED_CENTER);
+                  break;
+              }
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

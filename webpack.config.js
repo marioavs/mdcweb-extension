@@ -72,6 +72,8 @@ const CSS_LOADER_CONFIG = [
 module.exports = [{
   name: 'js-components',
   entry: {
+    'date-picker': [path.resolve('./packages/mdc-ext-date-picker/index.js')],
+    'input-dialog': [path.resolve('./packages/mdc-ext-input-dialog/index.js')],
     'multiselect': [path.resolve('./packages/mdc-ext-multiselect/index.js')],
     'pagination': [path.resolve('./packages/mdc-ext-pagination/index.js')],
     'treeview': [path.resolve('./packages/mdc-ext-treeview/index.js')]
@@ -140,6 +142,8 @@ module.exports = [{
   entry: {
     'mdcweb-extension': path.resolve('./packages/mdcweb-extension/mdcweb-extension.scss'),
     'mdc-ext.data-table': path.resolve('./packages/mdc-ext-data-table/mdc-ext-data-table.scss'),
+    'mdc-ext.date-picker': path.resolve('./packages/mdc-ext-date-picker/mdc-ext-date-picker.scss'),
+    'mdc-ext.input-dialog': path.resolve('./packages/mdc-ext-input-dialog/mdc-ext-input-dialog.scss'),
     'mdc-ext.multiselect': path.resolve('./packages/mdc-ext-multiselect/mdc-ext-multiselect.scss'),
     'mdc-ext.pagination': path.resolve('./packages/mdc-ext-pagination/mdc-ext-pagination.scss'),
     'mdc-ext.treeview': path.resolve('./packages/mdc-ext-treeview/mdc-ext-treeview.scss')

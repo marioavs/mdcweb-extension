@@ -1,0 +1,158 @@
+//
+// Copyright 2018 Google Inc. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+@import "@material/animation/functions";
+@import "@material/elevation/mixins";
+@import "@material/theme/mixins";
+@import "@material/rtl/mixins";
+@import "@material/typography/mixins";
+@import "@material/typography/variables";
+
+// postcss-bem-linter: define input-dialog
+
+.mdc-ext-input-dialog {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+  z-index: 5;
+}
+
+.mdc-ext-input-dialog__backdrop {
+  @include mdc-theme-prop(background-color, text-primary-on-light);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: -1;
+}
+
+.mdc-ext-input-dialog__surface {
+  @include mdc-elevation(24);
+  @include mdc-theme-prop(background-color, background);
+
+  display: inline-flex;
+  flex-direction: column;
+  position: absolute;
+  width: calc(100% - 30px);
+  max-width: 865px;
+  transform: translateY(-100px) scale(.8);
+  border-radius: 2px;
+  opacity: 0;
+
+  @include mdc-rtl(".mdc-ext-input-dialog") {
+    text-align: right;
+  }
+}
+
+.mdc-ext-input-dialog__header {
+  display: flex;
+  align-items: center;
+  padding: 24px 24px 0;
+
+  @include mdc-rtl(".mdc-ext-input-dialog") {
+    text-align: right;
+  }
+}
+
+.mdc-ext-input-dialog__header__empty {
+  padding: 0;
+}
+
+.mdc-ext-input-dialog__header__title {
+  @include mdc-typography(headline);
+
+  flex: 1;
+  margin: 0;
+}
+
+.mdc-ext-input-dialog__body {
+  @include mdc-theme-prop(color, text-secondary-on-light);
+  @include mdc-typography(body1);
+
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  padding: 0 24px 24px;
+}
+
+.mdc-ext-input-dialog__body--scrollable {
+  max-height: 195px;
+  border-top: 1px solid rgba(0, 0, 0, .1);
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
+  overflow-x: auto;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mdc-ext-input-dialog__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+}
+
+.mdc-ext-input-dialog__button {
+  @include mdc-rtl-reflexive-box(margin, right, 8px);
+
+  &:last-child {
+    @include mdc-rtl-reflexive-box(margin, right, 0);
+  }
+}
+
+.mdc-ext-input-dialog__action {
+  @include mdc-theme-prop(color, secondary);
+}
+
+.mdc-ext-input-dialog--animating {
+  visibility: visible;
+
+  .mdc-ext-input-dialog__backdrop {
+    transition: mdc-animation-enter(opacity, 120ms);
+  }
+
+  .mdc-ext-input-dialog__surface {
+    transition: mdc-animation-enter(opacity, 120ms), mdc-animation-enter(transform, 120ms);
+  }
+}
+
+.mdc-ext-input-dialog--open {
+  visibility: visible;
+
+  .mdc-ext-input-dialog__backdrop {
+    opacity: .3;
+  }
+
+  .mdc-ext-input-dialog__surface {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+// postcss-bem-linter: end
+
+.mdc-ext-input-dialog-scroll-lock {
+  overflow: hidden;
+}

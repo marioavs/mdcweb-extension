@@ -15,6 +15,7 @@
  */
 
 import * as datePicker from '@mdcext/date-picker';
+import * as inputDialog from '@mdcext/input-dialog';
 import * as multiselect from '@mdcext/multiselect';
 import * as pagination from '@mdcext/pagination';
 import * as treeview from '@mdcext/treeview';
@@ -22,6 +23,7 @@ import autoInit from '@material/auto-init';
 
 // Register all components
 autoInit.register('MDCExtDatePicker', datePicker.MDCExtDatePicker);
+autoInit.register('MDCExtInputDialog', inputDialog.MDCExtInputDialog);
 autoInit.register('MDCExtMultiselect', multiselect.MDCExtMultiselect);
 autoInit.register('MDCExtPagination', pagination.MDCExtPagination);
 autoInit.register('MDCExtTreeview', treeview.MDCExtTreeview);
@@ -29,6 +31,7 @@ autoInit.register('MDCExtTreeview', treeview.MDCExtTreeview);
 // Export all components.
 export {
   datePicker,
+  inputDialog,
   multiselect,
   pagination,
   treeview
