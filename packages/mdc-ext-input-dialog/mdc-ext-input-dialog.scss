@@ -81,7 +81,7 @@
 }
 
 .mdc-ext-input-dialog__header__title {
-  @include mdc-typography(headline);
+  @include mdc-typography(headline6);
 
   flex: 1;
   margin: 0;
