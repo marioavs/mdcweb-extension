@@ -44,7 +44,7 @@
   outline: none;
   padding: 8px;
 
-  @include mdc-typography(subheading2);
+  @include mdc-typography(body1);
   @include mdc-theme-prop(color, text-primary-on-background);
 
   &-node {
