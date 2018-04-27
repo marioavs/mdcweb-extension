@@ -84,7 +84,7 @@
     flex-wrap: wrap;
     box-sizing: border-box;
     left: 0;
-    max-width: 280px;
+    max-width: 300px;
     top: 0;
     transform: scale(.8);
     transition: mdc-animation-enter(opacity, 120ms), mdc-animation-enter(transform, 120ms);
@@ -109,7 +109,7 @@
     flex-direction: column;
     flex-grow: 1;
     box-sizing: border-box;
-    min-width: 120px;
+    min-width: 160px;
     padding: 16px;
   }
 
@@ -129,7 +129,7 @@
   }
 
   &__txtdayanddate {
-    @include mdc-typography(headline);
+    @include mdc-typography(headline4);
     display: flex;
     flex-wrap: wrap;
   }
@@ -152,11 +152,12 @@
   }
 
   &__header {
-    @include mdc-typography(body2);
+    @include mdc-typography(subtitle2);
     @include mdc-theme-prop(color, text-primary-on-light);
 
     display: flex;
     align-items: center;
+    padding: 0 16px;
   }
 
   &__txtmonth {
@@ -217,7 +218,7 @@
   }
 
   &__days {
-    @include mdc-typography(caption);
+    @include mdc-typography(body2);
     position: relative;
     border: none;
     text-align: center;
@@ -231,7 +232,7 @@
     }
 
     th {
-      @include mdc-typography(caption);
+      @include mdc-typography(body2);
       @include mdc-theme-prop(color, text-hint-on-light);
     }
 
@@ -299,7 +300,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 16px 16px 16px;
+    padding: 0 16px 8px 16px;
   }
 
   &__year-selection {
@@ -334,13 +335,13 @@
   }
 
   &__year {
-    @include mdc-typography(subheading2);
+    @include mdc-typography(body2);
     position: relative;
     line-height: 2.5rem;
-    transition: mdc-animation-exit-permanent(font-weight, 75ms);
+    transition: mdc-animation-exit-permanent(font-size, 75ms);
 
     &.mdc-ext-date-picker__year--selected{
-      font-weight: 500;
+      font-size: 1.5rem;
     }
   }
 }
