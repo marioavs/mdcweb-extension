@@ -23,7 +23,7 @@
 // postcss-bem-linter: define data-table
 
 .mdc-ext-data-table {
-  @include mdc-typography(body1);
+  @include mdc-typography(body2);
   @include mdc-ext-data-table-text-ink-color(text-primary-on-background);
 
   border-collapse: collapse;
