@@ -79,7 +79,7 @@
     // We use only a subset of the MDC typography values here as changing things such as line-height
     // affects how the labels are transformed.
     @each $prop in (letter-spacing) {
-      #{$prop}: map-get(map-get($mdc-typography-styles, subheading2), $prop);
+      #{$prop}: map-get(map-get($mdc-typography-styles, body1), $prop);
     }
 
     @include mdc-rtl {
@@ -197,7 +197,7 @@
     }
 
     .mdc-list-item {
-      @include mdc-typography(subheading2);
+      @include mdc-typography(body1);
       @include mdc-theme-prop(color, text-secondary-on-light);
       outline: none;
       padding: 0 16px;
