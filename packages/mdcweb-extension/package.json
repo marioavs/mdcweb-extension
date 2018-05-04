@@ -12,6 +12,9 @@
     "type": "git",
     "url": "https://github.com/marioavs/mdcweb-extension.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@material/auto-init": "^0.35.0",
     "@mdcext/data-table": "^0.1.0",

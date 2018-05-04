@@ -1,7 +1,6 @@
 {
   "private": true,
   "description": "Extension with additional Material Components for the Web",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/marioavs/mdcweb-extension.git"

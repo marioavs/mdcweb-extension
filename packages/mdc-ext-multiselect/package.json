@@ -13,6 +13,9 @@
     "type": "git",
     "url": "https://github.com/marioavs/mdcweb-extension.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@material/animation": "^0.34.0",
     "@material/base": "^0.35.0",
