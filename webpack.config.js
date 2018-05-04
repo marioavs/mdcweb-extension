@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,188 +16,29 @@
 
 'use strict';
 
-const path = require('path');
-const glob = require('glob');
-const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CssBundleFactory = require('./scripts/webpack/css-bundle-factory');
+const Environment = require('./scripts/build/environment');
+const Globber = require('./scripts/webpack/globber');
+const JsBundleFactory = require('./scripts/webpack/js-bundle-factory');
+const PathResolver = require('./scripts/build/path-resolver');
+const PluginFactory = require('./scripts/webpack/plugin-factory');
 
-const OUT_PATH = path.resolve('./build');
-// Used with webpack-dev-server
-const PUBLIC_PATH = '/assets/';
-const IS_DEV = process.env.MDC_ENV === 'development';
-const IS_PROD = process.env.MDC_ENV === 'production';
+const env = new Environment();
+env.setBabelEnv();
 
-const banner = [
-  '/*!',
-  ' Material Components for the web',
-  ` Copyright (c) ${new Date().getFullYear()} ...`,
-  ' License: Apache-2.0',
-  '*/',
-].join('\n');
+const pathResolver = new PathResolver();
+const globber = new Globber({pathResolver});
+const pluginFactory = new PluginFactory({globber});
+const cssBundleFactory = new CssBundleFactory({env, pathResolver, globber, pluginFactory});
+const jsBundleFactory = new JsBundleFactory({env, pathResolver, globber, pluginFactory});
 
-const createBannerPlugin = () => new webpack.BannerPlugin({
-  banner: banner,
-  raw: true,
-  entryOnly: true,
-});
+const OUTPUT = {
+  fsDirAbsolutePath: pathResolver.getAbsolutePath('./build'),
+};
 
-const LIFECYCLE_EVENT = process.env.npm_lifecycle_event;
-if (LIFECYCLE_EVENT == 'test' || LIFECYCLE_EVENT == 'test:watch') {
-  process.env.BABEL_ENV = 'test';
-}
-
-const CSS_LOADER_CONFIG = [
-  {
-    loader: 'css-loader',
-    options: {
-      sourceMap: true
-    }
-  },
-  {
-    loader: 'postcss-loader',
-    options: {
-      sourceMap: true,
-      plugins: () =>[require('autoprefixer')({grid: false})]
-    }
-  },
-  {
-    loader: 'sass-loader',
-    options: {
-      sourceMap: true,
-      includePaths: glob.sync('packages/*/node_modules').concat(glob.sync('node_modules')).map((d) => path.join(__dirname, d))
-    }
-  }
+module.exports = [
+  jsBundleFactory.createMainJsCombined({output: OUTPUT}),
+  jsBundleFactory.createMainJsALaCarte({output: OUTPUT}),
+  cssBundleFactory.createMainCssCombined({output: OUTPUT}),
+  cssBundleFactory.createMainCssALaCarte({output: OUTPUT}),
 ];
-
-module.exports = [{
-  name: 'js-components',
-  entry: {
-    'date-picker': [path.resolve('./packages/mdc-ext-date-picker/index.js')],
-    'input-dialog': [path.resolve('./packages/mdc-ext-input-dialog/index.js')],
-    'multiselect': [path.resolve('./packages/mdc-ext-multiselect/index.js')],
-    'pagination': [path.resolve('./packages/mdc-ext-pagination/index.js')],
-    'treeview': [path.resolve('./packages/mdc-ext-treeview/index.js')]
-  },
-  output: {
-    path: OUT_PATH,
-    publicPath: PUBLIC_PATH,
-    filename: 'mdc-ext.[name].' + (IS_PROD ? 'min.' : '') + 'js',
-    libraryTarget: 'umd',
-    library: ['mdcext', '[name]']
-  },
-  // See https://github.com/webpack/webpack-dev-server/issues/882
-  // Because we only spin up dev servers temporarily, and all of our assets are publicly
-  // available on GitHub, we can safely disable this check.
-  devServer: {
-    disableHostCheck: true
-  },
-  devtool: IS_DEV ? 'source-map' : false,
-  module: {
-    rules: [{
-      test: /\.js$/,
-      // include: glob.sync('packages/*/node_modules/@material/*').map((d) => path.join(__dirname, d)),
-      exclude: /node_modules\/(?!(@material)\/).*/,
-      loader: 'babel-loader',
-      options: {
-        cacheDirectory: true
-      }
-    }]
-  },
-  plugins: [
-    createBannerPlugin()
-  ]
-},
-{
-  name: 'js-all',
-  entry: {
-    'mdcweb-extension': [path.resolve('./packages/mdcweb-extension/index.js')]
-  },
-  output: {
-    path: OUT_PATH,
-    publicPath: PUBLIC_PATH,
-    filename: '[name].' + (IS_PROD ? 'min.' : '') + 'js',
-    libraryTarget: 'umd',
-    library: 'mdcext'
-  },
-  devServer: {
-    disableHostCheck: true
-  },
-  devtool: IS_DEV ? 'source-map' : false,
-  module: {
-    rules: [{
-      test: /\.js$/,
-      exclude: /node_modules\/(?!(@material)\/).*/,
-      loader: 'babel-loader',
-      options: {
-        cacheDirectory: true
-      }
-    }]
-  },
-  plugins: [
-    createBannerPlugin()
-  ]
-},
-{
-  name: 'css',
-  entry: {
-    'mdcweb-extension': path.resolve('./packages/mdcweb-extension/mdcweb-extension.scss'),
-    'mdc-ext.data-table': path.resolve('./packages/mdc-ext-data-table/mdc-ext-data-table.scss'),
-    'mdc-ext.date-picker': path.resolve('./packages/mdc-ext-date-picker/mdc-ext-date-picker.scss'),
-    'mdc-ext.input-dialog': path.resolve('./packages/mdc-ext-input-dialog/mdc-ext-input-dialog.scss'),
-    'mdc-ext.multiselect': path.resolve('./packages/mdc-ext-multiselect/mdc-ext-multiselect.scss'),
-    'mdc-ext.pagination': path.resolve('./packages/mdc-ext-pagination/mdc-ext-pagination.scss'),
-    'mdc-ext.treeview': path.resolve('./packages/mdc-ext-treeview/mdc-ext-treeview.scss')
-  },
-  output: {
-    path: OUT_PATH,
-    publicPath: PUBLIC_PATH,
-    // In development, these are emitted as js files to facilitate hot module replacement. In
-    // all other cases, ExtractTextPlugin is used to generate the final css, so this is given a
-    // dummy ".css-entry" extension.
-    filename: '[name].' + (IS_PROD ? 'min.' : '') + 'css' + (IS_DEV ? '.js' : '-entry')
-  },
-  devServer: {
-    disableHostCheck: true
-  },
-  devtool: IS_DEV ? 'source-map' : false,
-  module: {
-    rules: [{
-      test: /\.scss$/,
-      use: IS_DEV ? [{loader: 'style-loader'}].concat(CSS_LOADER_CONFIG) : ExtractTextPlugin.extract({
-        fallback: 'style-loader',
-        use: CSS_LOADER_CONFIG
-      })
-    }]
-  },
-  plugins: [
-    new ExtractTextPlugin('[name].' + (IS_PROD ? 'min.' : '') + 'css'),
-    createBannerPlugin()
-  ]
-}];
-
-if (IS_DEV) {
-  module.exports.push({
-    name: 'demo-css',
-    entry: {
-      'demo-styles': path.resolve('./demos/demos.scss'),
-    },
-    output: {
-      path: OUT_PATH,
-      publicPath: PUBLIC_PATH,
-      filename: '[name].css.js'
-    },
-    devServer: {
-      disableHostCheck: true
-    },
-    devtool: 'source-map',
-    module: {
-      rules: [{
-        test: /\.scss$/,
-        use: [{loader: 'style-loader'}].concat(CSS_LOADER_CONFIG)
-      }]
-    },
-    plugins: [
-      createBannerPlugin()
-    ]
-  });
-}

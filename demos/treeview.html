@@ -20,12 +20,12 @@
     <title>Tree View - Extension with additional Material Components Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="/images/logo_components_color_2x_web_48dp.png" />
-    <script src="assets/mdcweb-extension.css.js" charset="utf-8"></script>
-    <script src="assets/demo-styles.css.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/assets/treeview.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <script src="/ready.js"></script>
     <style type="text/css">
       #demo-wrapper {
         padding: 4px;
@@ -373,9 +373,9 @@
         </div>
       </section>
     </main>
-    <script src="assets/mdcweb-extension.js"></script>
+    <script src="assets/mdcweb-extension.js" async></script>
     <script>
-      (function() {
+      demoReady(function() {
         var topTreeview = document.getElementById('top-treeview');
         mdcext.treeview.MDCExtTreeview.attachTo(topTreeview);
 
@@ -398,7 +398,7 @@
         disabledCb.addEventListener('change', function() {
           treeview.disabled = disabledCb.checked;
         });
-      })();
+      });
     </script>
   </body>
 </html>
