@@ -402,4 +402,4 @@ class MDCExtInputDialogFoundation extends MDCFoundation {
   }
 }
 
-export {MDCExtInputDialogFoundation};
+export default MDCExtInputDialogFoundation;

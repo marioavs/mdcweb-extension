@@ -17,7 +17,7 @@
 import {MDCComponent} from '@material/base/index';
 import {MDCRipple} from '@material/ripple/index';
 
-import {MDCExtInputDialogFoundation} from './foundation';
+import MDCExtInputDialogFoundation from './foundation';
 import {Corner} from './constants';
 import * as util from './util';
 
@@ -128,4 +128,4 @@ class MDCExtInputDialog extends MDCComponent {
   }
 }
 
-export {MDCExtInputDialogFoundation, MDCExtInputDialog, Corner};
+export {MDCExtInputDialogFoundation, MDCExtInputDialog, Corner, util};
