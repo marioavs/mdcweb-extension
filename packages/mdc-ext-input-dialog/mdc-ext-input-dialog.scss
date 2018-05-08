@@ -53,8 +53,8 @@
   @include mdc-theme-prop(background-color, background);
 
   display: inline-flex;
-  flex-direction: column;
   position: absolute;
+  flex-direction: column;
   width: calc(100% - 30px);
   max-width: 865px;
   transform: translateY(-100px) scale(.8);

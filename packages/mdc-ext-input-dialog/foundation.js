@@ -18,6 +18,7 @@ import MDCFoundation from '@material/base/foundation';
 import {MDCExtInputDialogAdapter} from './adapter';
 import {cssClasses, strings, numbers, Corner, CornerBit} from './constants';
 
+/* eslint-disable no-unused-vars */
 /**
  * @typedef {{
  *   top: number,
@@ -28,7 +29,6 @@ import {cssClasses, strings, numbers, Corner, CornerBit} from './constants';
  */
 let AnchorMargin;
 
-/* eslint-disable no-unused-vars */
 /**
  * @typedef {{
  *   viewport: { width: number, height: number },
@@ -200,8 +200,9 @@ class MDCExtInputDialogFoundation extends MDCFoundation {
     // Defaults: open from the top left.
     let corner = Corner.TOP_LEFT;
 
-    if (this.anchorCorner_ & CornerBit.FIXED_CENTER)
+    if (this.anchorCorner_ & CornerBit.FIXED_CENTER) {
       return Corner.FIXED_CENTER;
+    }
     const {viewportDistance, anchorHeight, anchorWidth, surfaceHeight, surfaceWidth} = this.measures_;
     const isBottomAligned = Boolean(this.anchorCorner_ & CornerBit.BOTTOM);
     const availableTop = isBottomAligned ? viewportDistance.top + anchorHeight + this.anchorMargin_.bottom :
@@ -298,8 +299,8 @@ class MDCExtInputDialogFoundation extends MDCFoundation {
     this.measures_ = this.getAutoLayoutMeasurements_();
 
     const corner = this.getOriginCorner_();
-    let verticalAlignment = (corner & CornerBit.BOTTOM) ? 'bottom' : 'top';
-    let horizontalAlignment = (corner & CornerBit.RIGHT) ? 'right' : 'left';
+    const verticalAlignment = (corner & CornerBit.BOTTOM) ? 'bottom' : 'top';
+    const horizontalAlignment = (corner & CornerBit.RIGHT) ? 'right' : 'left';
     const horizontalOffset = this.getHorizontalOriginOffset_(corner);
     const verticalOffset = this.getVerticalOriginOffset_(corner);
     const position = {
