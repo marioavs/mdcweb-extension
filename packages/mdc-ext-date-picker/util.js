@@ -4,7 +4,7 @@ function createFocusTrapInstance(surfaceEl, acceptButtonEl, focusTrapFactory = c
   return focusTrapFactory(surfaceEl, {
     initialFocus: acceptButtonEl,
     clickOutsideDeactivates: true,
-    escapeDeactivates: false
+    escapeDeactivates: false,
   });
 }
 

@@ -101,12 +101,13 @@ class MDCExtDatePicker extends MDCComponent {
     this.txtDateEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.TXT_DATE_SELECTOR);
     this.txtMonthEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.TXT_MONTH_SELECTOR);
     this.txtWeekDayEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.TXT_WEEK_DAY_SELECTOR);
-    this.monthsEl_ =  this.root_.querySelector(MDCExtDatePickerFoundation.strings.MONTHS_SELECTOR);
+    this.monthsEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.MONTHS_SELECTOR);
     this.yearSelectionEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.YEAR_SELECTION_SELECTOR);
     this.yearListEl_ = this.root_.querySelector(MDCExtDatePickerFoundation.strings.YEAR_LIST_SELECTOR);
 
-    if (this.txtMonthEl_)
+    if (this.txtMonthEl_) {
       this.txtMonthEl_.tabIndex = 0;
+    }
     if (this.prevEl_) {
       this.prevRipple_ = rippleFactory(this.prevEl_);
     };
@@ -145,19 +146,22 @@ class MDCExtDatePicker extends MDCComponent {
           width: DIM,
           height: DIM,
         };
-      }
+      },
     });
     const foundation = new MDCRippleFoundation(adapter);
     return new MDCRipple(el, foundation);
   }
 
   destroy() {
-    if (this.label_)
+    if (this.label_) {
       this.label_.destroy();
-    if (this.prevRipple_)
+    }
+    if (this.prevRipple_) {
       this.prevRipple_.destroy();
-    if (this.nextRipple_)
+    }
+    if (this.nextRipple_) {
       this.nextRipple_.destroy();
+    }
     super.destroy();
   }
 
@@ -188,29 +192,38 @@ class MDCExtDatePicker extends MDCComponent {
         eventTargetDateAttr: (target) => ({
           date: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_DATE),
           month: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_MONTH),
-          year: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_YEAR)
+          year: target.getAttribute(MDCExtDatePickerFoundation.strings.DATA_YEAR),
         }),
         getDayTableDimensions: () => this.monthsEl_.getBoundingClientRect(),
         registerDatePickerInteractionHandler: (evtType, handler) => this.root_.addEventListener(evtType, handler),
         deregisterDatePickerInteractionHandler: (evtType, handler) => this.root_.removeEventListener(evtType, handler),
-        registerTransitionEndHandler: (handler) => this.surfaceEl_.addEventListener(getCorrectEventName(window, 'transitionend'), handler),
-        deregisterTransitionEndHandler: (handler) => this.surfaceEl_.removeEventListener(getCorrectEventName(window, 'transitionend'), handler),
+        registerTransitionEndHandler: (handler) => this.surfaceEl_
+          .addEventListener(getCorrectEventName(window, 'transitionend'), handler),
+        deregisterTransitionEndHandler: (handler) => this.surfaceEl_
+          .removeEventListener(getCorrectEventName(window, 'transitionend'), handler),
         registerDocumentKeydownHandler: (handler) => document.addEventListener('keydown', handler),
         deregisterDocumentKeydownHandler: (handler) => document.removeEventListener('keydown', handler),
         registerSurfaceInteractionHandler: (evtType, handler) => this.surfaceEl_.addEventListener(evtType, handler),
-        deregisterSurfaceInteractionHandler: (evtType, handler) => this.surfaceEl_.removeEventListener(evtType, handler),
+        deregisterSurfaceInteractionHandler: (evtType, handler) => this.surfaceEl_
+          .removeEventListener(evtType, handler),
         registerDocumentInteractionHandler: (evtType, handler) => document.addEventListener(evtType, handler),
         deregisterDocumentInteractionHandler: (evtType, handler) => document.removeEventListener(evtType, handler),
         registerDayClickHandler: (handler) => this.monthsEl_.addEventListener('click', handler),
         deregisterDayClickHandler: (handler) => this.monthsEl_.removeEventListener('click', handler),
-        registerTableTransitionEndHandler: (handler) => this.monthsEl_.addEventListener(getCorrectEventName(window, 'transitionend'), handler),
-        deregisterTableTransitionEndHandler: (handler) => this.monthsEl_.removeEventListener(getCorrectEventName(window, 'transitionend'), handler),
-        registerYearTransitionEndHandler: (handler) => this.yearListEl_ && this.yearListEl_.addEventListener(getCorrectEventName(window, 'transitionend'), handler),
-        deregisterYearTransitionEndHandler: (handler) => this.yearListEl_ && this.yearListEl_.removeEventListener(getCorrectEventName(window, 'transitionend'), handler),
-        setYearListStyleProperty: (propertyName, value) => this.yearListEl_ && this.yearListEl_.style.setProperty(propertyName, value),
+        registerTableTransitionEndHandler: (handler) => this.monthsEl_
+          .addEventListener(getCorrectEventName(window, 'transitionend'), handler),
+        deregisterTableTransitionEndHandler: (handler) => this.monthsEl_
+          .removeEventListener(getCorrectEventName(window, 'transitionend'), handler),
+        registerYearTransitionEndHandler: (handler) => this.yearListEl_ && this.yearListEl_
+          .addEventListener(getCorrectEventName(window, 'transitionend'), handler),
+        deregisterYearTransitionEndHandler: (handler) => this.yearListEl_ && this.yearListEl_
+          .removeEventListener(getCorrectEventName(window, 'transitionend'), handler),
+        setYearListStyleProperty: (propertyName, value) => this.yearListEl_ && this.yearListEl_.style
+          .setProperty(propertyName, value),
         setupDayTables: () => this.setupDayTables_(),
         replaceTableBody: (tableType, tableData) => this.replaceTableBody_(tableType, tableData),
-        replaceTableClass: (tableType, fromClassName, toClassName) => this.replaceTableClass_(tableType, fromClassName, toClassName),
+        replaceTableClass: (tableType, fromClassName, toClassName) =>
+          this.replaceTableClass_(tableType, fromClassName, toClassName),
         setDateContent: (value) => this.txtDateEl_ && (this.txtDateEl_.textContent = value),
         setMonthContent: (value) => this.txtMonthEl_ && (this.txtMonthEl_.textContent = value),
         setMonthFocus: () => this.txtMonthEl_ && this.txtMonthEl_.focus(),
@@ -226,15 +239,20 @@ class MDCExtDatePicker extends MDCComponent {
         getAttr: (name) => this.root_.getAttribute(name),
         setAttr: (name, value) => this.root_.setAttribute(name, value),
         rmAttr: (name) => this.root_.removeAttribute(name),
-        setMonthsHeight: (height) => { this.monthsEl_.height = height },
-        setMonthsWidth: (width) => { this.monthsEl_.width = width },
+        setMonthsHeight: (height) => {
+          this.monthsEl_.height = height;
+        },
+        setMonthsWidth: (width) => {
+          this.monthsEl_.width = width;
+        },
         getPrevNativeControl: () => this.prevEl_,
         getNextNativeControl: () => this.nextEl_,
         setPrevAttr: (name, value) => this.prevEl_.setAttribute(name, value),
         rmPrevAttr: (name) => this.prevEl_.removeAttribute(name),
         setNextAttr: (name, value) => this.nextEl_.setAttribute(name, value),
         rmNextAttr: (name) => this.nextEl_.removeAttribute(name),
-        isFocused: () => document.activeElement === this.root_.querySelector(MDCExtDatePickerFoundation.strings.INPUT_SELECTOR),
+        isFocused: () => document.activeElement === this.root_
+          .querySelector(MDCExtDatePickerFoundation.strings.INPUT_SELECTOR),
         isRtl: () => window.getComputedStyle(this.root_).getPropertyValue('direction') === 'rtl',
         notifyAccept: () => this.emit(MDCExtDatePickerFoundation.strings.ACCEPT_EVENT),
         notifyCancel: () => this.emit(MDCExtDatePickerFoundation.strings.CANCEL_EVENT),
@@ -279,8 +297,9 @@ class MDCExtDatePicker extends MDCComponent {
     this.disabled = this.root_.getAttribute(MDCExtDatePickerFoundation.strings.ARIA_DISABLED) === 'true' ||
       this.input_.disabled;
 
-    if ((this.input_) || (this.input_.value))
+    if ((this.input_) || (this.input_.value)) {
       this.value = this.input_.value;
+    }
   }
 
   /** @return {?Date} */
@@ -330,7 +349,7 @@ class MDCExtDatePicker extends MDCComponent {
 
   addDayClassAndFocus_(date, className, focus) {
     const {CALENDAR_DAY_SELECTOR, DATA_DATE, DATA_MONTH, DATA_YEAR} = MDCExtDatePickerFoundation.strings;
-    let elements = this.monthsEl_.querySelectorAll(CALENDAR_DAY_SELECTOR);
+    const elements = this.monthsEl_.querySelectorAll(CALENDAR_DAY_SELECTOR);
     let dataDate = 0;
     let dataMonth = 0;
     let dataYear = 0;
@@ -341,8 +360,9 @@ class MDCExtDatePicker extends MDCComponent {
       if ((date.getDate() === dataDate) && (date.getMonth() === dataMonth) &&
         (date.getFullYear() === dataYear)) {
         elements[i].classList.add(className);
-        if (focus)
+        if (focus) {
           elements[i].focus();
+        }
         break;
       }
     }
@@ -350,7 +370,7 @@ class MDCExtDatePicker extends MDCComponent {
 
   removeAllDaysClass_(className) {
     const {CALENDAR_DAY_SELECTOR} = MDCExtDatePickerFoundation.strings;
-    let elements = this.monthsEl_.querySelectorAll(CALENDAR_DAY_SELECTOR);
+    const elements = this.monthsEl_.querySelectorAll(CALENDAR_DAY_SELECTOR);
     for (let i = 0, l = elements.length; i < l; i++) {
       elements[i].classList.remove(className);
     }
@@ -359,7 +379,7 @@ class MDCExtDatePicker extends MDCComponent {
   setupDayTables_() {
     const {DAY_TABLE_ACTIVE, DAY_TABLE_NEXT, DAY_TABLE_PREV} = MDCExtDatePickerFoundation.cssClasses;
     const {DAY_TABLE_SELECTOR} = MDCExtDatePickerFoundation.strings;
-    let dayTable = this.root_.querySelector(DAY_TABLE_SELECTOR);
+    const dayTable = this.root_.querySelector(DAY_TABLE_SELECTOR);
     let clonedTable = dayTable.cloneNode(true);
     clonedTable.classList.add(DAY_TABLE_ACTIVE);
     clonedTable.classList.add('table2');
@@ -377,20 +397,22 @@ class MDCExtDatePicker extends MDCComponent {
     const {ARIA_DISABLED, DATA_DATE, DATA_MONTH, DATA_YEAR, DAY_ROWS_SELECTOR, DAY_TABLE_ACTIVE_SELECTOR,
       DAY_TABLE_NEXT_SELECTOR, DAY_TABLE_PREV_SELECTOR, TYPE_NEXT, TYPE_PREV} = MDCExtDatePickerFoundation.strings;
     let tableEl = undefined;
-    if (tableType === TYPE_NEXT)
+    if (tableType === TYPE_NEXT) {
       tableEl = this.root_.querySelector(DAY_TABLE_NEXT_SELECTOR);
-    else if (tableType === TYPE_PREV)
+    } else if (tableType === TYPE_PREV) {
       tableEl = this.root_.querySelector(DAY_TABLE_PREV_SELECTOR);
-    else
+    } else {
       tableEl = this.root_.querySelector(DAY_TABLE_ACTIVE_SELECTOR);
-    if (!tableEl)
+    }
+    if (!tableEl) {
       return;
-    let rows = tableEl.querySelectorAll(DAY_ROWS_SELECTOR);
+    }
+    const rows = tableEl.querySelectorAll(DAY_ROWS_SELECTOR);
     for (let i = 0; i < 6; i++) {
       if (rows[i]) {
-        this.removeChildElements(rows[i])
+        this.removeChildElements(rows[i]);
         for (let j = 0; j < 7; j++) {
-          let tdNode = document.createElement('td');
+          const tdNode = document.createElement('td');
           if (tableData[i] && tableData[i][j]) {
             if (tableData[i][j]['content']) {
               tdNode.classList.add(CALENDAR_DAY);
@@ -399,8 +421,9 @@ class MDCExtDatePicker extends MDCComponent {
               tdNode.setAttribute(DATA_DATE, tableData[i][j]['date']);
               tdNode.setAttribute(DATA_MONTH, tableData[i][j]['month']);
               tdNode.setAttribute(DATA_YEAR, tableData[i][j]['year']);
-              if (!tableData[i][j]['enabled'])
+              if (!tableData[i][j]['enabled']) {
                 tdNode.setAttribute(ARIA_DISABLED, 'true');
+              }
               tdNode.textContent = tableData[i][j]['content'];
             }
             if (tableData[i][j]['cssClass']) {
@@ -421,34 +444,38 @@ class MDCExtDatePicker extends MDCComponent {
     const {DAY_TABLE_ACTIVE_SELECTOR, DAY_TABLE_HIDDEN_SELECTOR, DAY_TABLE_NEXT_SELECTOR,
       DAY_TABLE_PREV_SELECTOR, TYPE_HIDDEN, TYPE_NEXT, TYPE_PREV} = MDCExtDatePickerFoundation.strings;
     let tableEl = undefined;
-    if (tableType === TYPE_HIDDEN)
+    if (tableType === TYPE_HIDDEN) {
       tableEl = this.root_.querySelector(DAY_TABLE_HIDDEN_SELECTOR);
-    else if (tableType === TYPE_NEXT)
+    } else if (tableType === TYPE_NEXT) {
       tableEl = this.root_.querySelector(DAY_TABLE_NEXT_SELECTOR);
-    else if (tableType === TYPE_PREV)
+    } else if (tableType === TYPE_PREV) {
       tableEl = this.root_.querySelector(DAY_TABLE_PREV_SELECTOR);
-    else
+    } else {
       tableEl = this.root_.querySelector(DAY_TABLE_ACTIVE_SELECTOR);
-    if (!tableEl)
+    }
+    if (!tableEl) {
       return;
-    if (fromClassName)
+    }
+    if (fromClassName) {
       tableEl.classList.remove(fromClassName);
-    if (toClassName)
+    }
+    if (toClassName) {
       tableEl.classList.add(toClassName);
+    }
   }
 
   setupYearList_(size, minYear, maxYear) {
     const {CALENDAR_YEAR} = MDCExtDatePickerFoundation.cssClasses;
-    const {YEAR_LIST_SELECTOR} = MDCExtDatePickerFoundation.strings;
     this.maxYear_ = maxYear;
     this.minYear_ = minYear;
     this.years_ = [];
-    if ((!this.yearSelectionEl_) || (!this.yearListEl_))
+    if ((!this.yearSelectionEl_) || (!this.yearListEl_)) {
       return;
-    let el = this.yearListEl_;
+    }
+    const el = this.yearListEl_;
     while (el.firstChild) el.removeChild(el.firstChild);
     for (let i = 0; i < size; i++) {
-      let divNode = document.createElement('div');
+      const divNode = document.createElement('div');
       divNode.classList.add(CALENDAR_YEAR);
       divNode.textContent = '\xa0';
       this.yearListEl_.appendChild(divNode);
@@ -464,8 +491,7 @@ class MDCExtDatePicker extends MDCComponent {
       if ((currYear < this.minYear_) || (currYear > this.maxYear_)) {
         this.years_[i].removeAttribute(DATA_YEAR, '');
         this.years_[i].textContent = '\xa0';
-      }
-      else {
+      } else {
         this.years_[i].setAttribute(DATA_YEAR, year + i);
         this.years_[i].textContent = year + i;
       }

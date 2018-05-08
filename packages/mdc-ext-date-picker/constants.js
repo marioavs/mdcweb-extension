@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- /** @const {string} */
+/** @const {string} */
 const ROOT = 'mdc-ext-date-picker';
 
 /** @enum {string} */
@@ -44,7 +44,7 @@ const cssClasses = {
   UPGRADED: `${ROOT}--upgraded`,
   YEAR_LIST_ANIMATING: `${ROOT}__year-list--animating`,
   YEAR_SELECTED: `${ROOT}__year--selected`,
-  YEAR_VIEW: `${ROOT}--year-view`
+  YEAR_VIEW: `${ROOT}--year-view`,
 };
 
 /** @enum {string} */
@@ -81,7 +81,7 @@ const strings = {
   TYPE_ACTIVE: 'active',
   TYPE_HIDDEN: 'hidden',
   TYPE_NEXT: 'next',
-  TYPE_PREV: 'previous'
+  TYPE_PREV: 'previous',
 };
 
 export {cssClasses, strings};
