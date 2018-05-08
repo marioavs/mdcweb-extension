@@ -20,7 +20,7 @@ import domEvents from 'dom-events';
 import td from 'testdouble';
 import {createMockRaf} from '../helpers/raf';
 import {strings} from '../../../packages/mdc-ext-input-dialog/constants';
-import {MDCExtInputDialog, util} from '../../../packages/mdc-ext-input-dialog';
+import {MDCExtInputDialog} from '../../../packages/mdc-ext-input-dialog';
 import {supportsCssVariables} from '@material/ripple/util';
 
 function getFixture() {
@@ -41,8 +41,14 @@ function getFixture() {
             </div>
           </section>
           <footer class="mdc-ext-input-dialog__footer">
-            <button type="button" class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--cancel">Cancel</button>
-            <button type="button" class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--accept">Add</button>
+            <button type="button"
+              class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--cancel">
+              Cancel
+            </button>
+            <button type="button"
+              class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--accept">
+              Add
+            </button>
           </footer>
         </div>
         <div class="mdc-ext-input-dialog__backdrop"></div>
@@ -60,14 +66,15 @@ function setupTest() {
   return {openDialog, root, acceptButton, cancelButton, component};
 }
 
-function hasClassMatcher(className) {
-  return td.matchers.argThat((el) => el.classList && el.classList.contains(className));
-}
+// function hasClassMatcher(className) {
+//   return td.matchers.argThat((el) => el.classList && el.classList.contains(className));
+// }
 
 suite('MDCExtInputDialog');
 
 test('attachTo returns a component instance', () => {
-  assert.isOk(MDCExtInputDialog.attachTo(getFixture().querySelector('.mdc-ext-input-dialog')) instanceof MDCExtInputDialog);
+  assert.isOk(MDCExtInputDialog.attachTo(getFixture()
+    .querySelector('.mdc-ext-input-dialog')) instanceof MDCExtInputDialog);
 });
 
 if (supportsCssVariables(window)) {

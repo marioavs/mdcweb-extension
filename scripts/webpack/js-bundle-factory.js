@@ -130,7 +130,7 @@ class JsBundleFactory {
         inputDialog: getAbsolutePath('./packages/mdc-ext-input-dialog/index.js'),
         multiselect: getAbsolutePath('./packages/mdc-ext-multiselect/index.js'),
         pagination: getAbsolutePath('./packages/mdc-ext-pagination/index.js'),
-        treeview: getAbsolutePath('./packages/mdc-ext-treeview/index.js')
+        treeview: getAbsolutePath('./packages/mdc-ext-treeview/index.js'),
       },
       output: {
         fsDirAbsolutePath,

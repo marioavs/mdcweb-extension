@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- /** @const {string} */
+/** @const {string} */
 const ROOT = 'mdc-ext-input-dialog';
 
 /** @enum {string} */
@@ -54,7 +54,7 @@ const CornerBit = {
   CENTER: 2,
   RIGHT: 4,
   FLIP_RTL: 8,
-  FIXED_CENTER: 16
+  FIXED_CENTER: 16,
 };
 
 /**
@@ -75,7 +75,7 @@ const Corner = {
   TOP_END: CornerBit.FLIP_RTL | CornerBit.RIGHT,
   BOTTOM_START: CornerBit.BOTTOM | CornerBit.FLIP_RTL,
   BOTTOM_END: CornerBit.BOTTOM | CornerBit.RIGHT | CornerBit.FLIP_RTL,
-  FIXED_CENTER: CornerBit.FIXED_CENTER
+  FIXED_CENTER: CornerBit.FIXED_CENTER,
 };
 
 export {cssClasses, strings, numbers, CornerBit, Corner};

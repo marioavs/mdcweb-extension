@@ -42,7 +42,7 @@ test('default adapter returns a complete adapter implementation', () => {
     'registerDocumentKeydownHandler', 'deregisterDocumentKeydownHandler',
     'registerTransitionEndHandler', 'deregisterTransitionEndHandler', 'isRtl',
     'setPosition', 'notifyAccept', 'notifyCancel', 'trapFocusOnSurface',
-    'untrapFocusOnSurface', 'isInputDialog'
+    'untrapFocusOnSurface', 'isInputDialog',
   ]);
 });
 

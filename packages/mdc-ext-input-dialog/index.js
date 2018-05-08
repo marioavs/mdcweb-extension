@@ -97,7 +97,8 @@ class MDCExtInputDialog extends MDCComponent {
         if (!this.surfaceEl_) return {width: 0, height: 0};
         return {width: this.surfaceEl_.offsetWidth, height: this.surfaceEl_.offsetHeight};
       },
-      hasAnchor: () => this.root_.parentElement && this.root_.parentElement.classList.contains(MDCExtInputDialogFoundation.cssClasses.ANCHOR),
+      hasAnchor: () => this.root_.parentElement && this.root_.parentElement.classList
+        .contains(MDCExtInputDialogFoundation.cssClasses.ANCHOR),
       getAnchorDimensions: () => this.root_.parentElement.getBoundingClientRect(),
       getWindowDimensions: () => {
         return {width: window.innerWidth, height: window.innerHeight};

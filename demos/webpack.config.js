@@ -38,7 +38,7 @@ const DEMO_BASE_DIR_ABSOLUTE_PATH = pathResolver.getAbsolutePath('/demos');
 const OUTPUT = {
   fsDirAbsolutePath: pathResolver.getAbsolutePath('/build'),
   httpDirAbsolutePath: '/assets/',
-  library: 'mdcext'
+  library: 'mdcext',
 };
 
 module.exports = [
@@ -69,7 +69,7 @@ function demoJs() {
     bundleName: 'demo-js',
     mode: 'development',
     chunks: {
-      'common': pathResolver.getAbsolutePath('./demos/common.js')
+      'common': pathResolver.getAbsolutePath('./demos/common.js'),
     },
     output: Object.assign({}, OUTPUT, {
       filename: '[name].js',

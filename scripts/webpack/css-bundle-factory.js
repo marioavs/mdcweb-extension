@@ -142,7 +142,7 @@ class CssBundleFactory {
         'mdc-ext.input-dialog': getAbsolutePath('./packages/mdc-ext-input-dialog/mdc-ext-input-dialog.scss'),
         'mdc-ext.multiselect': getAbsolutePath('./packages/mdc-ext-multiselect/mdc-ext-multiselect.scss'),
         'mdc-ext.pagination': getAbsolutePath('./packages/mdc-ext-pagination/mdc-ext-pagination.scss'),
-        'mdc-ext.treeview': getAbsolutePath('./packages/mdc-ext-treeview/mdc-ext-treeview.scss')
+        'mdc-ext.treeview': getAbsolutePath('./packages/mdc-ext-treeview/mdc-ext-treeview.scss'),
       },
       output: {
         fsDirAbsolutePath,
@@ -156,8 +156,6 @@ class CssBundleFactory {
   }
 
   createCssLoader_(extractTextPlugin) {
-    const getAbsolutePath = (...args) => this.pathResolver_.getAbsolutePath(...args);
-
     return extractTextPlugin.extract({
       use: [
         {
@@ -177,7 +175,8 @@ class CssBundleFactory {
           loader: 'sass-loader',
           options: {
             sourceMap: true,
-            includePaths: this.globber_.getAbsolutePaths('packages/*/node_modules').concat(this.globber_.getAbsolutePaths('node_modules'))
+            includePaths: this.globber_.getAbsolutePaths('packages/*/node_modules')
+              .concat(this.globber_.getAbsolutePaths('node_modules')),
           },
         },
       ],

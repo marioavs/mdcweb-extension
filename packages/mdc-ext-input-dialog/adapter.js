@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+/* eslint no-unused-vars: [2, {"args": "none"}] */
+
 /**
  * Adapter for MDC Ext Input Dialog. Provides an interface for managing
  * - classes
@@ -34,100 +36,100 @@
  *
  * @record
  */
- class MDCExtInputDialogAdapter {
-   /** @param {string} className */
-   addClass(className) {}
+class MDCExtInputDialogAdapter {
+  /** @param {string} className */
+  addClass(className) {}
 
-   /** @param {string} className */
-   removeClass(className) {}
+  /** @param {string} className */
+  removeClass(className) {}
 
-   /**
-    * @param {string} className
-    * @return {boolean}
-    */
-   hasClass(className) {}
+  /**
+   * @param {string} className
+   * @return {boolean}
+   */
+  hasClass(className) {}
 
-   /** @param {string} className */
-   addBodyClass(className) {}
+  /** @param {string} className */
+  addBodyClass(className) {}
 
-   /** @param {string} className */
-   removeBodyClass(className) {}
+  /** @param {string} className */
+  removeBodyClass(className) {}
 
-   /** @return {boolean} */
-   hasNecessaryDom() {}
+  /** @return {boolean} */
+  hasNecessaryDom() {}
 
-   /** @return {{ width: number, height: number }} */
-   getInnerDimensions() {}
+  /** @return {{ width: number, height: number }} */
+  getInnerDimensions() {}
 
-   /** @return {boolean} */
-   hasAnchor() {}
+  /** @return {boolean} */
+  hasAnchor() {}
 
-   /** @return {{width: number, height: number, top: number, right: number, bottom: number, left: number}} */
-   getAnchorDimensions() {}
+  /** @return {{width: number, height: number, top: number, right: number, bottom: number, left: number}} */
+  getAnchorDimensions() {}
 
-   /** @return {{ width: number, height: number }} */
-   getWindowDimensions() {}
+  /** @return {{ width: number, height: number }} */
+  getWindowDimensions() {}
 
-   /** @return {boolean} */
-   eventTargetHasClass(target, className) {}
+  /** @return {boolean} */
+  eventTargetHasClass(target, className) {}
 
-   /**
-    * @param {string} type
-    * @param {function(!Event)} handler
-    */
-   registerInteractionHandler(type, handler) {}
+  /**
+   * @param {string} type
+   * @param {function(!Event)} handler
+   */
+  registerInteractionHandler(type, handler) {}
 
-   /**
-    * @param {string} type
-    * @param {function(!Event)} handler
-    */
-   deregisterInteractionHandler(type, handler) {}
+  /**
+   * @param {string} type
+   * @param {function(!Event)} handler
+   */
+  deregisterInteractionHandler(type, handler) {}
 
-   /**
-    * @param {string} type
-    * @param {function(!Event)} handler
-    */
-   registerSurfaceInteractionHandler(type, handler) {}
+  /**
+   * @param {string} type
+   * @param {function(!Event)} handler
+   */
+  registerSurfaceInteractionHandler(type, handler) {}
 
-   /**
-    * @param {string} type
-    * @param {function(!Event)} handler
-    */
-   deregisterSurfaceInteractionHandler(type, handler) {}
+  /**
+   * @param {string} type
+   * @param {function(!Event)} handler
+   */
+  deregisterSurfaceInteractionHandler(type, handler) {}
 
-   /** @param {function(!Event)} handler */
-   registerDocumentKeydownHandler(type, handler) {}
+  /** @param {function(!Event)} handler */
+  registerDocumentKeydownHandler(type, handler) {}
 
-   /** @param {function(!Event)} handler */
-   deregisterDocumentKeydownHandler(type, handler) {}
+  /** @param {function(!Event)} handler */
+  deregisterDocumentKeydownHandler(type, handler) {}
 
-   /** @param {function(!Event)} handler */
-   registerTransitionEndHandler(type, handler) {}
+  /** @param {function(!Event)} handler */
+  registerTransitionEndHandler(type, handler) {}
 
-   /** @param {function(!Event)} handler */
-   deregisterTransitionEndHandler(type, handler) {}
+  /** @param {function(!Event)} handler */
+  deregisterTransitionEndHandler(type, handler) {}
 
-   /** @return {boolean} */
-   isRtl() {}
+  /** @return {boolean} */
+  isRtl() {}
 
-   /** @param {{
+  /** @param {{
    *   top: (string|undefined),
    *   right: (string|undefined),
    *   bottom: (string|undefined),
    *   left: (string|undefined)
    * }} position */
-   setPosition(position) {}
+  setPosition(position) {}
 
-   notifyAccept() {}
+  notifyAccept() {}
 
-   notifyCancel() {}
+  notifyCancel() {}
 
-   trapFocusOnSurface() {}
+  trapFocusOnSurface() {}
 
-   untrapFocusOnSurface() {}
+  untrapFocusOnSurface() {}
 
-   /** @param {?Element} el */
-   isInputDialog(el) {}
+  /** @param {?Element} el */
+  isInputDialog(el) {}
 }
 
 export {MDCExtInputDialogAdapter};
