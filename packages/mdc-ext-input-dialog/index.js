@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {MDCComponent} from '@material/base/index';
+import MDCComponent from '@material/base/component';
 import {MDCRipple} from '@material/ripple/index';
 
 import MDCExtInputDialogFoundation from './foundation';
@@ -35,6 +35,8 @@ class MDCExtInputDialog extends MDCComponent {
     this.surfaceEl_;
     /** @private {?Object} */
     this.focusTrap_;
+    /** @private {?Array<MDCRipple>} */
+    this.footerBtnRipples_;
   }
 
   /**
@@ -120,8 +122,8 @@ class MDCExtInputDialog extends MDCComponent {
         this.surfaceEl_.style.top = 'top' in position ? position.top : null;
         this.surfaceEl_.style.bottom = 'bottom' in position ? position.bottom : null;
       },
-      notifyAccept: () => this.emit(MDCExtInputDialogFoundation.strings.ACCEPT_EVENT),
-      notifyCancel: () => this.emit(MDCExtInputDialogFoundation.strings.CANCEL_EVENT),
+      notifyAccept: () => this.emit(MDCExtInputDialogFoundation.strings.ACCEPT_EVENT, {}),
+      notifyCancel: () => this.emit(MDCExtInputDialogFoundation.strings.CANCEL_EVENT, {}),
       trapFocusOnSurface: () => this.focusTrap_.activate(),
       untrapFocusOnSurface: () => this.focusTrap_.deactivate(),
       isInputDialog: (el) => el === this.surfaceEl_,

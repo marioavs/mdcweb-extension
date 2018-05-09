@@ -16,9 +16,11 @@
 
 import createFocusTrap from 'focus-trap';
 
-export function createFocusTrapInstance(surfaceEl, acceptButtonEl, focusTrapFactory = createFocusTrap) {
+function createFocusTrapInstance(surfaceEl, acceptButtonEl, focusTrapFactory = createFocusTrap) {
   return focusTrapFactory(surfaceEl, {
     initialFocus: acceptButtonEl,
     clickOutsideDeactivates: true,
   });
 }
+
+export {createFocusTrapInstance};

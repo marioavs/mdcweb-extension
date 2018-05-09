@@ -8,7 +8,7 @@
   "scripts": {
     "build": "mkdirp build && webpack --progress --colors",
     "build:min": "mkdirp build && cross-env MDC_ENV=production webpack -p --progress --colors",
-    "clean": "del-cli build/**",
+    "clean": "del-cli build/** build .closure-tmp/** .closure-tmp test/screenshot/out/",
     "dist": "npm run clean && npm run build && npm run build:min",
     "dev": "npm run clean && cross-env MDC_ENV=development webpack-dev-server --config=demos/webpack.config.js --progress --inline --hot --host 0.0.0.0",
     "postinstall": "lerna bootstrap",
@@ -35,6 +35,7 @@
     "babel-traverse": "^6.26.0",
     "babel-types": "^6.26.0",
     "bel": "^6.0.0",
+    "camel-case": "^3.0.0",
     "chai": "^4.1.2",
     "cross-env": "^5.1.3",
     "css-loader": "^0.28.7",
@@ -45,6 +46,7 @@
     "eslint-plugin-mocha": "^5.0.0",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "glob": "^7.1.2",
+    "google-closure-compiler": "^20180402.0.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.2.0",
@@ -90,5 +92,8 @@
         ]
       }
     }
-  }
+  },
+  "closureWhitelist": [
+    "mdc-ext-input-dialog"
+  ]
 }

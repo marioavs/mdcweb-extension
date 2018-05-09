@@ -98,16 +98,16 @@ class MDCExtInputDialogAdapter {
   deregisterSurfaceInteractionHandler(type, handler) {}
 
   /** @param {function(!Event)} handler */
-  registerDocumentKeydownHandler(type, handler) {}
+  registerDocumentKeydownHandler(handler) {}
 
   /** @param {function(!Event)} handler */
-  deregisterDocumentKeydownHandler(type, handler) {}
+  deregisterDocumentKeydownHandler(handler) {}
 
   /** @param {function(!Event)} handler */
-  registerTransitionEndHandler(type, handler) {}
+  registerTransitionEndHandler(handler) {}
 
   /** @param {function(!Event)} handler */
-  deregisterTransitionEndHandler(type, handler) {}
+  deregisterTransitionEndHandler(handler) {}
 
   /** @return {boolean} */
   isRtl() {}

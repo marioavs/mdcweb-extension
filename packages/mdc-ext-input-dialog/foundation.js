@@ -156,11 +156,6 @@ class MDCExtInputDialogFoundation extends MDCFoundation {
     }
   }
 
-  /** @return enum{number} */
-  static get Corner() {
-    return Corner;
-  }
-
   /**
    * @param {!Corner} corner Default anchor corner alignment of top-left surface corner.
    */
