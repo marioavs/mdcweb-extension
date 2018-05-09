@@ -1,7 +1,7 @@
 {
   "name": "mdcweb-extension",
   "description": "Extension with additional Material Components for the Web",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "license": "Apache-2.0",
   "keywords": [
     "material components extension",
@@ -17,11 +17,11 @@
   },
   "dependencies": {
     "@material/auto-init": "^0.35.0",
-    "@mdcext/data-table": "^0.3.0",
-    "@mdcext/date-picker": "^0.3.0",
-    "@mdcext/input-dialog": "^0.3.0",
-    "@mdcext/multiselect": "^0.3.0",
-    "@mdcext/pagination": "^0.3.0",
-    "@mdcext/treeview": "^0.3.0"
+    "@mdcext/data-table": "^0.3.1",
+    "@mdcext/date-picker": "^0.3.1",
+    "@mdcext/input-dialog": "^0.3.1",
+    "@mdcext/multiselect": "^0.3.1",
+    "@mdcext/pagination": "^0.3.1",
+    "@mdcext/treeview": "^0.3.1"
   }
 }

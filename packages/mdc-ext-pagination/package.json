@@ -1,7 +1,7 @@
 {
   "name": "@mdcext/pagination",
   "description": "The additional Material Components Web pagination component",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "Apache-2.0",
   "keywords": [
     "material components extension",
