@@ -1,7 +1,7 @@
 {
   "name": "mdcweb-extension",
   "description": "Extension with additional Material Components for the Web",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "Apache-2.0",
   "keywords": [
     "material components extension",
