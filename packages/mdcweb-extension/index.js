@@ -34,5 +34,5 @@ export {
   inputDialog,
   multiselect,
   pagination,
-  treeview
+  treeview,
 };

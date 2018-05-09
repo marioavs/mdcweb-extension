@@ -1,12 +1,12 @@
-# Material Components Web (MDC-Web)
+# Extension with additional Material Components for the Web (MDCWeb-Ext)
 
-This package contains the master library for Material Components Web. It simply wraps all of its
+This package contains the master library for Material Components Web Extension. It simply wraps all of its
 sibling packages up into one comprehensive library for convenience.
 
 ## Installation
 
 ```
-npm install --save material-components-web
+npm install --save mdcweb-extension
 ```
 
 ## Usage
@@ -14,46 +14,61 @@ npm install --save material-components-web
 ### Including the Sass
 
 ```scss
-@import "material-components-web/material-components-web";
+@import "mdcweb-extension/mdcweb-extension";
 ```
 
 ### Including the Javascript
 
 ```js
-import * as mdc from 'material-components-web';
-const checkbox = new mdc.checkbox.MDCCheckbox(document.querySelector('.mdc-checkbox'));
+import * as mdcext from 'mdcweb-extension';
+const multiselect = new mdcext.multiselect.MDCExtMultiselect(document.querySelector('.mdc-ext-multiselect'));
 // OR
-import { checkbox } from 'material-components-web';
-const checkbox = new checkbox.MDCCheckbox(document.querySelector('.mdc-checkbox'));
+import { multiselect } from 'mdcweb-extension';
+const multiselectControl = new multiselect.MDCExtMultiselect(document.querySelector('.mdc-ext-multiselect'));
 ```
-
-> NOTE: Built CSS files as well as UMD JS bundles will be available as part of the package
-> post-alpha.
 
 ### Auto-initialization of components
 
 The `material-components-web` package automatically registers all MDC-Web components with
-[mdc-auto-init](../mdc-auto-init), making it dead simple to create and initialize components
+[mdc-auto-init](https://github.com/material-components/material-components-web/tree/master/packages/mdc-auto-init),
+making it dead simple to create and initialize components
 with zero configuration or manual work.
 
-For example, say you want to use an [icon toggle](../mdc-icon-toggle). Simply render the necessary
-DOM, an attach the `data-mdc-auto-init="MDCIconToggle"` attribute.
+For example, say you want to use an [input dialog](../mdc-ext-input-dialog). Simply render the necessary
+DOM, an attach the `data-mdc-auto-init="MDCExtInputDialog"` attribute.
 
 ```html
-<i class="mdc-icon-toggle material-icons" role="button" aria-pressed="false"
-   aria-label="Add to favorites" tabindex="0"
-   data-toggle-on='{"label": "Remove from favorites", "content": "favorite"}'
-   data-toggle-off='{"label": "Add to favorites", "content": "favorite_border"}'
-   data-mdc-auto-init="MDCIconToggle">
-  favorite_border
-</i>
+<aside id="js-input-dialog" class="mdc-ext-input-dialog" data-mdc-auto-init="MDCExtInputDialog">
+  <div class="mdc-ext-input-dialog__surface">
+    <header class="mdc-ext-input-dialog__header">
+      <h2 class="mdc-ext-input-dialog__header__title">
+        Additional input value
+      </h2>
+    </header>
+    <section class="mdc-ext-input-dialog__body">
+      <div class="mdc-text-field mdc-text-field--fullwidth">
+        <input type="text" class="mdc-text-field__input" placeholder="Additional Value">
+        <div class="mdc-line-ripple"></div>
+      </div>
+    </section>
+    <footer class="mdc-ext-input-dialog__footer">
+      <button type="button" class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--cancel">Cancel</button>
+      <button type="button" class="mdc-button mdc-ext-input-dialog__button mdc-ext-input-dialog__button--accept">Add</button>
+    </footer>
+  </div>
+  <div class="mdc-ext-input-dialog__backdrop"></div>
+</aside>
 ```
 
-Then at the bottom of your html, insert this one-line script tag:
+Then at the bottom of your html, insert this script tag:
 
 ```html
-<script>mdc.autoInit()</script>
+<script>
+  mdc.autoInit.register('MDCExtDatePicker', mdcext.datePicker.MDCExtDatePicker);
+  mdc.autoInit()
+</script>
 ```
 
-This will automatically initialize the icon toggle, as well as any other components marked with the
-auto init data attribute. See [mdc-auto-init](../mdc-auto-init) for more info.
+This will automatically initialize the input dialog, as well as any other components marked with the
+auto init data attribute. See [mdc-auto-init](https://github.com/material-components/material-components-web/tree/master/packages/mdc-auto-init)
+for more info.
