@@ -209,10 +209,8 @@
         display: none;
       }
 
-      &--selected:not(.mdc-list-item:active) {
-        @include mdc-states;
-        @include mdc-states-selected(primary);
-      }
+      @include mdc-states;
+      @include mdc-states-selected(primary);
     }
   }
 }
