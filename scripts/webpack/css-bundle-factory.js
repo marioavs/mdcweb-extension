@@ -56,6 +56,7 @@ class CssBundleFactory {
   createCustomCss(
     {
       bundleName,
+      mode = 'production',
       chunks,
       chunkGlobConfig: {
         inputDirectory = null,
@@ -82,6 +83,7 @@ class CssBundleFactory {
 
     return {
       name: bundleName,
+      mode,
       entry: chunks,
       output: {
         path: fsDirAbsolutePath,
@@ -182,7 +184,7 @@ class CssBundleFactory {
           loader: 'sass-loader',
           options: {
             sourceMap: true,
-            includePaths: [getAbsolutePath('/packages/*/node_modules'), getAbsolutePath('node_modules')],
+            includePaths: [getAbsolutePath('/packages/mdcweb-extension/node_modules'), getAbsolutePath('node_modules')],
             implementation: require('dart-sass'),
             fiber: require('fibers'),
           },
