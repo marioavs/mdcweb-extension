@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 Google Inc.
+ * Copyright 2020 Google Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,15 +30,15 @@
 const webpack = require('webpack');
 
 class CopyrightBannerPlugin extends webpack.BannerPlugin {
-  constructor({projectName, authorName, licenseName}) {
+  constructor() {
     super({
-      banner: [
-        '/*!',
-        ` ${projectName}`,
-        ` Copyright (c) ${new Date().getFullYear()} ${authorName}`,
-        ` License: ${licenseName}`,
-        '*/',
-      ].join('\n'),
+      banner: `/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/material-components/material-components-web/blob/master/LICENSE
+ */`,
       raw: true,
       entryOnly: true,
     });

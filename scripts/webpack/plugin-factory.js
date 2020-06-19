@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 Google Inc.
+ * Copyright 2020 Google Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,19 +29,15 @@
 
 const CopyrightBannerPlugin = require('./copyright-banner-plugin');
 const CssCleanupPlugin = require('./css-cleanup-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 class PluginFactory {
   constructor({globber} = {}) {
     this.globber_ = globber;
   }
 
-  createCopyrightBannerPlugin({
-    projectName = 'Extension for Material Components for the Web',
-    authorName = 'Google Inc.',
-    licenseName = 'MIT',
-  } = {}) {
-    return new CopyrightBannerPlugin({projectName, authorName, licenseName});
+  createCopyrightBannerPlugin() {
+    return new CopyrightBannerPlugin();
   }
 
   createCssCleanupPlugin({cleanupDirRelativePath} = {}) {
@@ -51,8 +47,8 @@ class PluginFactory {
     });
   }
 
-  createCssExtractorPlugin(outputFilenamePattern) {
-    return new ExtractTextPlugin(outputFilenamePattern);
+  createCssExtractorPlugin(filename) {
+    return new MiniCssExtractPlugin({filename});
   }
 }
 

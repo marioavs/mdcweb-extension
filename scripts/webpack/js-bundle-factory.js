@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc.
+ * Copyright 2020 Google Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,9 @@
 
 'use strict';
 
+const path = require('path');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+
 class JsBundleFactory {
   constructor({
     env,
@@ -50,25 +53,45 @@ class JsBundleFactory {
   createCustomJs(
     {
       bundleName,
-      mode = 'production',
       chunks,
+      extensions = ['.ts', '.js'],
       chunkGlobConfig: {
         inputDirectory = null,
         filePathPattern = '**/*.js',
       } = {},
       output: {
         fsDirAbsolutePath = undefined, // Required for building the npm distribution and writing output files to disk
-        httpDirAbsolutePath = undefined, // Required for running the demo server
+        httpDirAbsolutePath = undefined, // Required for running the catalog server
         filenamePattern = this.env_.isProd() ? '[name].min.js' : '[name].js',
         library,
+        globalObject = 'this',
       },
+      rules= [],
       plugins = [],
+      tsConfigFilePath = path.resolve(__dirname, '../../tsconfig.json'),
     }) {
     chunks = chunks || this.globber_.getChunks({inputDirectory, filePathPattern});
 
+    const babelLoader = {
+      loader: 'babel-loader',
+      options: {
+        cacheDirectory: true,
+      },
+    };
+
+    const uglifyOptions = {
+      output: {
+        comments: false, // Removes repeated @license comments and other code comments.
+      },
+      sourceMap: true,
+    };
+
+    const commonPlugins = [
+      this.pluginFactory_.createCopyrightBannerPlugin(),
+    ];
+
     return {
       name: bundleName,
-      mode,
       entry: chunks,
       output: {
         path: fsDirAbsolutePath,
@@ -76,21 +99,41 @@ class JsBundleFactory {
         filename: filenamePattern,
         libraryTarget: 'umd',
         library,
+        globalObject,
       },
+      resolve: { extensions },
       devtool: 'source-map',
       module: {
-        rules: [{
-          test: /\.js$/,
-          exclude: /node_modules\/(?!(@material)\/).*/,
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
+        rules: [
+          {
+            test: /\.ts$/,
+            exclude: /node_modules/,
+            use: [
+              babelLoader,
+              {
+                loader: 'ts-loader',
+                options: { configFile: tsConfigFilePath },
+              },
+            ],
+          }, {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: [babelLoader],
           },
-        }],
+          ...rules,
+        ],
+      },
+      optimization: {
+        minimize: this.env_.isProd(),
+        minimizer: [new UglifyJSPlugin({ uglifyOptions })],
       },
       plugins: [
+        ...commonPlugins,
         ...plugins,
       ],
+      watchOptions: {
+        ignored: /node_modules/ // Avoid webpack-dev-server to watch many file
+      }
     };
   }
 
@@ -106,17 +149,14 @@ class JsBundleFactory {
 
     return this.createCustomJs({
       bundleName: 'main-js-combined',
-      chunks: getAbsolutePath('/packages/mdcweb-extension/index.js'),
+      chunks: getAbsolutePath('/packages/mdcweb-extension/index.ts'),
       output: {
         fsDirAbsolutePath,
         httpDirAbsolutePath,
         filenamePattern: this.env_.isProd() ? 'mdcweb-extension.min.js' : 'mdcweb-extension.js',
         library: 'mdcext',
       },
-      plugins: [
-        this.pluginFactory_.createCopyrightBannerPlugin(),
-        ...plugins,
-      ],
+      plugins,
     });
   }
 
@@ -133,11 +173,10 @@ class JsBundleFactory {
     return this.createCustomJs({
       bundleName: 'main-js-a-la-carte',
       chunks: {
-        datePicker: getAbsolutePath('./packages/mdc-ext-date-picker/index.js'),
-        inputDialog: getAbsolutePath('./packages/mdc-ext-input-dialog/index.js'),
-        multiselect: getAbsolutePath('./packages/mdc-ext-multiselect/index.js'),
-        pagination: getAbsolutePath('./packages/mdc-ext-pagination/index.js'),
-        treeview: getAbsolutePath('./packages/mdc-ext-treeview/index.js'),
+        // datePicker: getAbsolutePath('./packages/mdc-ext-date-picker/index.ts'),
+        // multiselect: getAbsolutePath('./packages/mdc-ext-multiselect/index.ts'),
+        // pagination: getAbsolutePath('./packages/mdc-ext-pagination/index.ts'),
+        treeview: getAbsolutePath('./packages/mdc-ext-treeview/index.ts'),
       },
       output: {
         fsDirAbsolutePath,
@@ -145,10 +184,7 @@ class JsBundleFactory {
         filenamePattern: this.env_.isProd() ? 'mdc-ext.[name].min.js' : 'mdc-ext.[name].js',
         library: ['mdcext', '[name]'],
       },
-      plugins: [
-        this.pluginFactory_.createCopyrightBannerPlugin(),
-        ...plugins,
-      ],
+      plugins,
     });
   }
 }

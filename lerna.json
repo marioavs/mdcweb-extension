@@ -1,14 +1,18 @@
 {
-  "lerna": "2.0.0-rc.5",
-  "version": "independent",
-  "commands": {
+  "version": "6.0.0",
+  "command": {
+    "version": {
+      "conventionalCommits": true
+    },
     "publish": {
-      "ignore": [
-        "*.md"
+      "ignoreChanges": [
+        "*.md",
+        "*.test-increment3"
       ]
     }
   },
   "packages": [
-    "packages/*"
+    "packages/*",
+    "catalog"
   ]
 }

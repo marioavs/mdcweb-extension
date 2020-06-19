@@ -1,14 +1,39 @@
-$mdc-ext-treeview-checkbox-mark-color: white !default;
-$mdc-ext-treeview-checkbox-border-color: rgba(black, .54) !default;
-$mdc-ext-treeview-checkbox-border-color-dark: white !default;
-$mdc-ext-treeview-checkbox-disabled-color: rgba(black, .26) !default;
-$mdc-ext-treeview-checkbox-disabled-color-dark: rgba(white, .3) !default;
+/**
+ * @license
+ * Copyright 2020 Google Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-$mdc-ext-treeview-node-padding: 24px;
-$mdc-ext-treeview-checkbox-border-width: 2px;
-$mdc-ext-treeview-checkbox-size: 18px;
-$mdc-ext-treeview-checkbox-touch-area: 32px;
-$mdc-ext-treeview-checkbox-mark-stroke-size: 2/15 * $mdc-ext-treeview-checkbox-size;
-$mdc-ext-treeview-checkbox-ui-pct: percentage($mdc-ext-treeview-checkbox-size / $mdc-ext-treeview-checkbox-touch-area);
-$mdc-ext-treeview-icon-toggle-size: 24px;
-$mdc-ext-treeview-item-text-margin: 2px;
+@use "@material/density/variables" as density-variables;
+
+$node-padding: 24px !default;
+$toggle-icon-size: 24px !default;
+
+$height: 48px !default;
+$minimum-height: 28px !default;
+$maximum-height: $height !default;
+$density-scale: density-variables.$default-scale !default;
+$density-config: (
+  height: (
+    default: $height,
+    minimum: $minimum-height,
+    maximum: $maximum-height,
+  ),
+) !default;

@@ -1,244 +1,26 @@
-//
-// Copyright 2017 Google Inc. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/**
+ * @license
+ * Copyright 2020 Google Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-@import "@material/ripple/mixins";
-@import "@material/theme/mixins";
-@import "@material/typography/mixins";
-@import "./variables";
-
-@mixin mdc-ext-treeview-icon-toggle-bg_($stroke: "#000000", $opacity: .54) {
-  background-image: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2024%2024%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20fill%3D%22#{$stroke}%22%20stroke%3D%22#{$stroke}%22%20opacity%3D%22#{$opacity}%22%20d%3D%22M10%206L8.59%207.41%2013.17%2012l-4.58%204.59L10%2018l6-6z%22/%3E%3C/svg%3E);
-}
-
-@mixin mdc-ext-treeview-default-checkmark-bg_($stroke: "#000000", $stroke-width: ($mdc-ext-treeview-checkbox-mark-stroke-size * 1.3), $opacity: 1) {
-  background-image: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2024%2024%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22#{$stroke}%22%20stroke-width%3D%22#{$stroke-width}%22%20opacity%3D%22#{$opacity}%22%20d%3D%22M1.73%2C12.91%208.1%2C19.28%2022.79%2C4.59%22/%3E%3C/svg%3E);
-}
-
-@mixin mdc-ext-treeview-cover-element {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-// postcss-bem-linter: define treeview
-
-.mdc-ext-treeview {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  outline: none;
-  padding: 8px;
-
-  @include mdc-typography(body1);
-  @include mdc-theme-prop(color, text-primary-on-background);
-
-  &-node {
-    display: none;
-    flex-direction: column;
-    list-style-type: none;
-    padding-left: $mdc-ext-treeview-node-padding;
-  }
-
-  &-row {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &-item {
-    display: flex;
-    position: relative;
-    vertical-align: middle;
-  }
-  &-item__text {
-    display: inline-block;
-    flex: 1 0 auto;
-    margin-top: $mdc-ext-treeview-item-text-margin;
-    vertical-align: top;
-  }
-
-  &-toggle {
-    display: none;
-  }
-
-  &-icon-toggle {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: $mdc-ext-treeview-icon-toggle-size;
-    width: $mdc-ext-treeview-icon-toggle-size;
-    margin-top: ($mdc-ext-treeview-checkbox-touch-area - $mdc-ext-treeview-icon-toggle-size) / 2;
-
-    @include mdc-ext-treeview-icon-toggle-bg_;
-  }
-
-  &-toggle:checked ~ &-item &-icon-toggle {
-    transform: rotate(90deg);
-  }
-
-  &-toggle:checked ~ &-node, & > &-node {
-    display: flex;
-  }
-
-  &__native-checkbox {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    opacity: 0;
-    cursor: inherit;
-  }
-
-  &-checkbox {
-    display: inline-block;
-    position: relative;
-    box-sizing: content-box;
-    height: $mdc-ext-treeview-checkbox-size;
-    width: $mdc-ext-treeview-checkbox-size;
-    margin-left: $mdc-ext-treeview-icon-toggle-size;
-    padding: ($mdc-ext-treeview-checkbox-touch-area - $mdc-ext-treeview-checkbox-size) / 2;
-
-    &__native-control {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      opacity: 0;
-    }
-
-    &__background {
-      @include mdc-ext-treeview-cover-element;
-      display: inline-flex;
-      background-color: transparent;
-      border: $mdc-ext-treeview-checkbox-border-width solid $mdc-ext-treeview-checkbox-border-color;
-      border-radius: 2px;
-      box-sizing: border-box;
-      height: $mdc-ext-treeview-checkbox-ui-pct;
-      width: $mdc-ext-treeview-checkbox-ui-pct;
-      margin: auto;
-      pointer-events: none;
-
-      // The frame's ::before element is used as a focus indicator for the checkbox
-      &::before {
-        @include mdc-ext-treeview-cover-element;
-        @include mdc-theme-prop(background, primary);
-
-        border-radius: 50%;
-        content: "";
-        height: 100%;
-        width: 100%;
-        opacity: 0;
-        pointer-events: none;
-      }
-    }
-
-    &__checkmark {
-      @include mdc-ext-treeview-cover-element;
-
-      fill: $mdc-ext-treeview-checkbox-mark-color;
-      opacity: 0;
-      width: 100%;
-
-      &__path {
-        stroke: $mdc-ext-treeview-checkbox-mark-color;
-        stroke-width: $mdc-ext-treeview-checkbox-mark-stroke-size * 1.3;
-        // stroke-dashoffset: $_mdc-checkbox-mark-path-length;
-        // stroke-dasharray: $_mdc-checkbox-mark-path-length;
-      }
-    }
-
-    &__default-checkmark {
-      @include mdc-ext-treeview-default-checkmark-bg_($mdc-ext-treeview-checkbox-mark-color);
-    }
-
-    &__mixedmark {
-      @include mdc-ext-treeview-cover-element;
-
-      width: 100%;
-      height: floor($mdc-ext-treeview-checkbox-mark-stroke-size);
-      background-color: $mdc-ext-treeview-checkbox-mark-color;
-      opacity: 0;
-      margin: auto 0;
-    }
-  }
-
-  &-checkbox__native-control:focus {
-    ~ .mdc-ext-treeview-checkbox__background::before {
-      transform: scale(2.75, 2.75);
-      opacity: .26;
-    }
-  }
-
-  &-checkbox__native-control:checked {
-    ~ .mdc-ext-treeview-checkbox__background {
-      @include mdc-theme-prop(border-color, primary);
-      @include mdc-theme-prop(background-color, primary);
-
-      .mdc-ext-treeview-checkbox__checkmark {
-        opacity: 1;
-      }
-    }
-  }
-
-  &-checkbox__native-control:indeterminate {
-    ~ .mdc-ext-treeview-checkbox__background {
-      @include mdc-theme-prop(border-color, primary);
-      @include mdc-theme-prop(background-color, primary);
-
-      .mdc-ext-treeview-checkbox__checkmark {
-        opacity: 0;
-      }
-
-      .mdc-ext-treeview-checkbox__mixedmark {
-        opacity: 1;
-      }
-    }
-  }
-
-  &--disabled {
-    cursor: default;
-    pointer-events: none;
-  }
-}
-
-.mdc-ext-treeview-checkbox__native-control:disabled,
-fieldset:disabled .mdc-ext-treeview-checkbox__native-control,
-[aria-disabled="true"] .mdc-ext-treeview-checkbox__native-control {
-  cursor: default;
-
-  // postcss-bem-linter: ignore
-  ~ .mdc-ext-treeview-checkbox__background {
-    border-color: $mdc-ext-treeview-checkbox-disabled-color;
-  }
-
-  &:checked,
-  &:indeterminate {
-    ~ .mdc-checkbox__background {
-      border-color: transparent;
-      background-color: $mdc-ext-treeview-checkbox-disabled-color;
-    }
-  }
-}
-
-// postcss-bem-linter: end
+ @use "./mixins";
+ @include mixins.core-styles;
+ 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 Google Inc.
+ * Copyright 2020 Google Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 'use strict';
 
 const autoprefixer = require('autoprefixer');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 class CssBundleFactory {
   constructor({
@@ -56,7 +57,6 @@ class CssBundleFactory {
   createCustomCss(
     {
       bundleName,
-      mode = 'production',
       chunks,
       chunkGlobConfig: {
         inputDirectory = null,
@@ -83,7 +83,6 @@ class CssBundleFactory {
 
     return {
       name: bundleName,
-      mode,
       entry: chunks,
       output: {
         path: fsDirAbsolutePath,
@@ -96,6 +95,9 @@ class CssBundleFactory {
           test: /\.scss$/,
           use: this.createCssLoader_(cssExtractorPlugin),
         }],
+      },
+      optimization: {
+        minimize: this.env_.isProd(),
       },
       plugins: [
         cssExtractorPlugin,
@@ -144,9 +146,7 @@ class CssBundleFactory {
     return this.createCustomCss({
       bundleName: 'main-css-a-la-carte',
       chunks: {
-        'mdc-ext.data-table': getAbsolutePath('./packages/mdc-ext-data-table/mdc-ext-data-table.scss'),
         'mdc-ext.date-picker': getAbsolutePath('./packages/mdc-ext-date-picker/mdc-ext-date-picker.scss'),
-        'mdc-ext.input-dialog': getAbsolutePath('./packages/mdc-ext-input-dialog/mdc-ext-input-dialog.scss'),
         'mdc-ext.multiselect': getAbsolutePath('./packages/mdc-ext-multiselect/mdc-ext-multiselect.scss'),
         'mdc-ext.pagination': getAbsolutePath('./packages/mdc-ext-pagination/mdc-ext-pagination.scss'),
         'mdc-ext.treeview': getAbsolutePath('./packages/mdc-ext-treeview/mdc-ext-treeview.scss'),
@@ -162,35 +162,34 @@ class CssBundleFactory {
     });
   }
 
-  createCssLoader_(extractTextPlugin) {
+  createCssLoader_() {
     const getAbsolutePath = (...args) => this.pathResolver_.getAbsolutePath(...args);
 
-    return extractTextPlugin.extract({
-      use: [
-        {
-          loader: 'css-loader',
-          options: {
-            sourceMap: true,
-          },
+    return [
+      MiniCssExtractPlugin.loader,
+      {
+        loader: 'css-loader',
+        options: {
+          sourceMap: true,
         },
-        {
-          loader: 'postcss-loader',
-          options: {
-            sourceMap: true,
-            plugins: () => [this.autoprefixerLib_()],
-          },
+      },
+      {
+        loader: 'postcss-loader',
+        options: {
+          sourceMap: true,
+          plugins: () => [this.autoprefixerLib_()],
         },
-        {
-          loader: 'sass-loader',
-          options: {
-            sourceMap: true,
-            includePaths: [getAbsolutePath('/packages/mdcweb-extension/node_modules'), getAbsolutePath('node_modules')],
-            implementation: require('dart-sass'),
-            fiber: require('fibers'),
-          },
+      },
+      {
+        loader: 'sass-loader',
+        options: {
+          sourceMap: true,
+          includePaths: [getAbsolutePath('/packages/mdcweb-extension/node_modules'), getAbsolutePath('node_modules')],
+          implementation: require('dart-sass'),
+          fiber: require('fibers'),
         },
-      ],
-    });
+      },
+    ];
   }
 }
 

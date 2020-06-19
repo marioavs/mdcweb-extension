@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2019 Google Inc.
+ * Copyright 2020 Google Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@
 /**
  * @fileoverview Deletes all *.css.js files from the output directory after Webpack has finished compiling.
  *
- * Webpack 3.x emits ALL bundles as JavaScript files - even CSS. To get a plain .css file, we have to use
- * `extract-text-webpack-plugin` to yank the CSS out of the .css.js file and write it to a .css file.
+ * Webpack 4.x emits ALL bundles as JavaScript files - even CSS. To get a plain .css file, we have to use
+ * `mini-css-extract-plugin` to yank the CSS out of the .css.js file and write it to a .css file.
  * This is done by `createCssExtractorPlugin()` in `plugin-factory.js`.
  *
  * However, we still end up with bunch of unneeded .css.js files in the output directory, so this plugin deletes them.

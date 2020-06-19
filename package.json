@@ -6,81 +6,90 @@
     "url": "https://github.com/marioavs/mdcweb-extension.git"
   },
   "scripts": {
-    "build": "mkdirp build && webpack --progress --colors",
-    "build:min": "mkdirp build && cross-env MDC_ENV=production webpack -p --progress --colors",
-    "clean": "del-cli build/** build .closure-tmp/** .closure-tmp test/screenshot/out/",
-    "dist": "npm run clean && npm run build && npm run build:min",
-    "dev": "npm run clean && cross-env MDC_ENV=development webpack-dev-server --config=demos/webpack.config.js --progress --inline --hot --host 0.0.0.0",
-    "postinstall": "lerna bootstrap",
-    "lint:js": "eslint packages test scripts webpack.config.js demos/webpack.config.js karma.conf.js",
+    "build": "npm run clean && mkdirp build && webpack --mode=development --progress --colors --display=minimal",
+    "build:esmodules": "tsc --project ./tsconfig.json --module esnext --outDir ./packages --importHelpers",
+    "build:min": "mkdirp build && cross-env MDC_ENV=production webpack -p --mode=production --progress --colors --display=minimal",
+    "clean": "node ./scripts/build/clean",
+    "clean:site": "node ./scripts/build/clean --site-generator-tmp",
+    "dev": "cd catalog && npm run dev",
+    "dist": "npm run build && npm run build:min && npm run build:esmodules",
+    "docgen": "npm run clean && npm run build:esmodules && tsc ./scripts/documentation/tsdoc.ts --resolveJsonModule && node ./scripts/documentation/tsdoc.js",
+    "fix:js": "eslint --fix scripts webpack.config.js karma.conf.js",
+    "fix:ts": "tslint --exclude \"**/*.d.ts\" --exclude \"packages/**/test/*.ts\" --fix \"packages/test/*.ts\" \"test/**/*.ts\" \"scripts/**/*.ts\"",
+    "fix:css": "stylelint --fix \"packages/**/*.scss\"",
+    "fix": "npm-run-all --parallel fix:*",
     "lint:css": "stylelint \"packages/**/*.scss\"",
+    "lint:js": "eslint scripts webpack.config.js karma.conf.js",
+    "lint:ts": "tslint --exclude \"**/*.d.ts\" --exclude \"packages/**/test/*.ts\" \"packages/test/*.ts\" \"test/**/*.ts\" \"scripts/**/*.ts\"",
     "lint": "npm-run-all --parallel lint:*",
-    "test": "npm run test:unit && npm run test:closure && npm run test:dependency && npm run build && npm run clean",
+    "postinstall": "lerna bootstrap --no-ci",
+    "pretest": "npm run lint",
+    "test": "npm run test:unit && npm run test:dependency && npm run build && npm run clean",
+    "test:sass": "jasmine --config=jasmine-node.json",
+    "test:dependency": "./scripts/dependency-test.sh",
+    "test:site": "npm run clean:site && ./scripts/site-generator-test.sh",
     "test:unit": "karma start --single-run",
-    "test:closure": "./scripts/closure-test.sh",
-    "test:dependency": "./scripts/dependency-test.sh"
+    "test:watch": "karma start --auto-watch",
+    "version": "cat lerna.json | grep -e '^  \"version\": ' | awk '{print $2}' | sed 's/[\",]//g'"
   },
   "keywords": [
-    "material",
-    "components"
+    "material components",
+    "material design",
+    "material components web extension"
   ],
-  "author": "marioavs",
-  "license": "Apache-2.0",
   "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/parser": "^7.2.3",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/traverse": "^7.3.4",
+    "@babel/types": "^7.3.4",
+    "@documentalist/compiler": "^2.7.0",
+    "@types/babel__traverse": "^7.0.9",
+    "@types/glob": "^7.1.1",
+    "@types/jasmine": "^3.5.9",
+    "@types/node": "^12.0.10",
+    "@types/resolve": "0.0.8",
     "autoprefixer": "^9.0.0",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-transform-object-assign": "^6.22.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-traverse": "^6.26.0",
-    "babel-types": "^6.26.0",
-    "bel": "^6.0.0",
-    "camel-case": "^3.0.0",
-    "chai": "^4.1.2",
-    "cp-file": "^6.0.0",
-    "cross-env": "^5.1.3",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-transform-object-assign": "^6.8.0",
     "css-loader": "^2.0.0",
-    "cssom": "^0.3.2",
-    "dart-sass": "^1.16.1",
-    "del-cli": "^1.1.0",
-    "dom-events": "^0.1.1",
+    "dart-sass": "^1.24.3",
+    "del": "^4.0.0",
     "eslint": "^5.1.0",
-    "eslint-config-google": "^0.11.0",
-    "eslint-plugin-mocha": "^5.0.0",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "fibers": "^3.1.1",
-    "glob": "^7.1.2",
-    "google-closure-compiler": "^20181008.0.0",
-    "istanbul-instrumenter-loader": "^3.0.1",
-    "karma": "^3.0.0",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-coverage": "^1.1.2",
-    "karma-firefox-launcher": "^1.1.0",
-    "karma-mocha": "^1.3.0",
-    "karma-sauce-launcher": "^1.2.0",
+    "fibers": "^4.0.2",
+    "glob": "^7.1.6",
+    "jasmine": "^3.5.0",
+    "jasmine-core": "^3.5.0",
+    "karma": "^4.4.1",
+    "karma-babel-preprocessor": "^8.0.1",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-sauce-launcher": "^2.0.2",
     "karma-sourcemap-loader": "^0.3.7",
+    "karma-tap": "^4.0.0",
+    "karma-typescript": "^4.1.1",
     "karma-webpack": "^3.0.0",
-    "lerna": "^2.11.0",
-    "material-components-web": "^0.43.0",
+    "lerna": "^3.20.2",
+    "material-components-web": "^6.0.0",
+    "mini-css-extract-plugin": "^0.7.0",
     "mkdirp": "^0.5.1",
-    "mocha": "^5.1.1",
     "postcss-loader": "^3.0.0",
-    "recast": "^0.16.0",
     "sass-loader": "^7.1.0",
-    "stylelint": "^9.2.0",
-    "stylelint-config-standard": "^18.2.0",
-    "stylelint-order": "^2.0.0",
-    "stylelint-scss": "^3.1.0",
-    "stylelint-selector-bem-pattern": "^2.0.0",
-    "testdouble": "^3.8.0",
-    "to-slug-case": "^1.0.0",
-    "webpack": "^4.7.0",
-    "webpack-dev-server": "^3.1.4"
+    "ts-loader": "^6.0.3",
+    "ts-node": "^8.0.3",
+    "tslint": "^5.12.0",
+    "typescript": "^3.8.0",
+    "uglifyjs-webpack-plugin": "^2.1.3",
+    "webpack": "^4.34.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0"
   },
   "babel": {
     "presets": [
       [
-        "es2015",
+        "@babel/preset-env",
         {
           "modules": false
         }
@@ -88,41 +97,6 @@
     ],
     "plugins": [
       "transform-object-assign"
-    ],
-    "env": {
-      "test": {
-        "presets": [
-          "es2015"
-        ]
-      }
-    }
-  },
-  "config": {
-    "validate-commit-msg": {
-      "helpMessage": "%s\nNOTE: Please see angular's commit message guidelines (https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits) for in formation on how to format commit messages.\n\nAs an example, here is a valid commit message: 'docs(slider): Document slider public api'\n\nIf this commit is on a development / WIP branch, you can disable this by running `git commit --no-verify`.",
-      "scope": {
-        "allowed": [
-          "data-table",
-          "date-picker",
-          "input-dialog",
-          "multiselect",
-          "pagination",
-          "treeview",
-          "demos",
-          "infrastructure",
-          "package"
-        ],
-        "validate": true
-      }
-    },
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "closureWhitelist": [
-    "mdc-ext-input-dialog"
-  ],
-  "dependencies": {
-    "webpack-cli": "^3.2.1"
+    ]
   }
 }

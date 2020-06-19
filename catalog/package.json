@@ -1,0 +1,61 @@
+{
+  "name": "mdcext-catalog",
+  "description": "Catalog of additional Material Components for the Web",
+  "version": "6.0.0",
+  "license": "MIT",
+  "keywords": [
+    "material components",
+    "material design",
+    "material components web extension",
+    "catalog"
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marioavs/mdcweb-extension.git"
+  },
+  "scripts": {
+    "build": "npm run clean && mkdirp build && cross-env MDC_ENV=production webpack --mode=production --progress --colors --display=minimal",
+    "clean": "node ../scripts/build/clean",
+    "dev": "npm run clean && cross-env MDC_ENV=development webpack-dev-server --mode=development --progress"
+  },
+  "dependencies": {
+    "@mdcext/treeview": "^6.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/preset-react": "^7.10.1",
+    "babel-loader": "^8.1.0",
+    "classnames": "^2.2.6",
+    "cross-env": "^7.0.2",
+    "material-components-web": "^6.0.0",
+    "pretty": "^2.0.0",
+    "react": "^16.13.1",
+    "react-copy-to-clipboard": "^5.0.2",
+    "react-dom": "^16.13.1",
+    "react-ga": "^3.0.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "react-syntax-highlighter": "^12.2.1",
+    "react-transition-group": "^4.4.1",
+    "svg-inline-loader": "^0.8.2"
+  },
+  "private": true,
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "modules": false
+        }
+      ],
+      [
+        "@babel/preset-react"
+      ]
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ]
+  }
+}

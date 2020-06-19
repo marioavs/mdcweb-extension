@@ -1,0 +1,30 @@
+@use "@material/icon-button/mdc-icon-button";
+@use "@material/theme/color-palette" as theme-color-palette;
+@use "@material/top-app-bar/mixins" as top-app-bar-mixins;
+@use "@material/top-app-bar/mdc-top-app-bar";
+
+.catalog-top-app-bar {
+  @include top-app-bar-mixins.fill-color(theme-color-palette.$grey-900);
+
+  position: absolute;
+}
+
+.catalog-top-app-bar__title {
+  text-transform: uppercase;
+  font-family: Roboto Mono, serif;
+  font-weight: 400;
+}
+
+.catalog-top-app-bar__title--small-screen {
+  display: none;
+}
+
+@media (max-width: 599px) {
+  .catalog-top-app-bar__title--small-screen {
+    display: inline-block;
+  }
+
+  .catalog-top-app-bar__title--large-screen {
+    display: none;
+  }
+}

@@ -1,0 +1,235 @@
+/**
+ * @license
+ * Copyright 2020 Google Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+@use "@material/checkbox/mixins" as checkbox-mixins;
+@use "@material/density/functions" as density-functions;
+@use "@material/feature-targeting/functions" as feature-targeting-functions;
+@use "@material/feature-targeting/mixins" as feature-targeting-mixins;
+@use "@material/rtl/mixins" as rtl-mixins;
+@use "./variables";
+
+//
+// Public
+//
+
+@mixin core-styles($query: feature-targeting-functions.all()) {
+  @include without-ripple($query);
+  @include checkbox-mixins.core-styles($query);
+}
+
+// This API is intended for use by frameworks that may want to separate the ripple-related styles from the other
+// card styles. It is recommended that most users use `mdc-card-core-styles` instead.
+@mixin without-ripple($query: feature-targeting-functions.all()) {
+  $feat-structure: feature-targeting-functions.create-target($query, structure);
+
+  .mdc-ext-treeview {
+    @include feature-targeting-mixins.targets($feat-structure) {
+      @include _base;
+    }
+  }
+
+  .mdc-ext-treeview--disabled {
+    @include _disabled($query);
+  }
+
+  .mdc-ext-treeview__node {
+    @include feature-targeting-mixins.targets($feat-structure) {
+      @include _node-base;
+    }
+  }
+
+  .mdc-ext-treeview__item {
+    @include feature-targeting-mixins.targets($feat-structure) {
+      @include _item-base;
+    }
+  }
+
+  .mdc-ext-treeview__row {
+    @include feature-targeting-mixins.targets($feat-structure) {
+      @include _row-base;
+    }
+  }
+
+  .mdc-ext-treeview__toggle {
+    @include feature-targeting-mixins.targets($feat-structure) {
+      @include _toggle-base;
+    }
+  }
+
+  .mdc-ext-treeview__toggle-icon {
+    @include feature-targeting-mixins.targets($feat-structure) {
+      @include _toggle-icon-base;
+    }
+  }
+
+  @include feature-targeting-mixins.targets($feat-structure) {
+    @include _first-node;
+    @include _toggle-icon-node($query);
+  }
+  @include _toggle-checked($query);
+}
+
+///
+/// Establishes each treeview node's padding.
+///
+/// @param {Number} $padding The node's leading padding.
+///
+/// @access public
+///
+@mixin node-padding(
+    $padding, $query: feature-targeting-functions.all()) {
+  $feat-structure: feature-targeting-functions.create-target($query, structure);
+
+  @include feature-targeting-mixins.targets($feat-structure) {
+      @include rtl-mixins.reflexive-property(
+        padding, $padding, 0);
+  }
+}
+
+///
+/// Sets density scale for treeview.
+///
+/// @param {Number | String} $density-scale - Density scale value for component. Supported density scale values `-4`,
+///     `-3`, `-2`, `-1`, `0`.
+///
+@mixin density($density-scale, $query: feature-targeting-functions.all()) {
+  $height: density-functions.prop-value(
+    $density-config: $density-config,
+    $density-scale: $density-scale,
+    $property-name: height,
+  );
+
+  @include item-height($height, $query: $query);
+  @include checkbox-mixins.density($density-scale, $query: $query);
+}
+
+@mixin item-height($height, $query: feature-targeting-functions.all()) {
+  $feat-structure: feature-targeting-functions.create-target($query, structure);
+
+  .mdc-ext-treeview__item {
+    @include feature-targeting-mixins.targets($feat-structure) {
+      height: $height;
+    }
+  }
+}
+
+//
+// Private
+//
+
+/// Selector for enabled state
+/// @access private
+@mixin _if-enabled {
+  &:not(.mdc-ext-treeview--disabled) {
+    @content;
+  }
+}
+
+/// Selector for disabled state
+/// @access private
+@mixin _if-disabled {
+  &.mdc-ext-treeview--disabled {
+    @content;
+  }
+}
+
+@mixin _base {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  position: relative;
+  outline: none;
+  padding: 8px;
+}
+
+@mixin _disabled($query: feature-targeting-functions.all()) {
+  $feat-structure: feature-targeting-functions.create-target($query, structure);
+
+  @include feature-targeting-mixins.targets($feat-structure) {
+    @include _if-disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+  }
+}
+
+@mixin _node-base {
+  display: none;
+  flex-direction: column;
+  list-style-type: none;
+  padding-left: variables.$node-padding;
+}
+
+@mixin _first-node {
+  .mdc-ext-treeview > .mdc-ext-treeview__node {
+    display: flex;
+  }
+}
+
+@mixin _item-base {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin _row-base {
+  display: flex;
+  align-items: center;
+}
+
+@mixin _toggle-base {
+  display: none;
+}
+
+@mixin _toggle-checked($query: feature-targeting-functions.all()) {
+  $feat-structure: feature-targeting-functions.create-target($query, structure);
+
+  @include feature-targeting-mixins.targets($feat-structure) {
+    .mdc-ext-treeview__toggle:checked ~ .mdc-ext-treeview__row .mdc-ext-treeview__toggle-icon {
+      transform: rotate(90deg);
+    }
+
+    .mdc-ext-treeview__toggle:checked ~ .mdc-ext-treeview__node {
+      display: flex;
+    }
+  }
+}
+
+@mixin _toggle-icon-base($stroke: "000000", $opacity: .54) {
+  display: inline-block;
+  background-position: center center;
+  background-image: none;
+  left: 0;
+  top: 0;
+  height: variables.$toggle-icon-size;
+  width: variables.$toggle-icon-size;
+}
+
+@mixin _toggle-icon-node($query: feature-targeting-functions.all()) {
+  .mdc-ext-treeview__row--with-children .mdc-ext-treeview__toggle-icon {
+    @include _toggle-icon-bg;
+  }
+}
+
+@mixin _toggle-icon-bg($stroke: "000000", $opacity: .54) {
+  background-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%3Cpath%20stroke%3D%22#{$stroke}%22%20opacity%3D%22#{$opacity}%22%20d%3D%22M10%206L8.59%207.41%2013.17%2012l-4.58%204.59L10%2018l6-6z%22%2F%3E%3C%2Fsvg%3E);
+}

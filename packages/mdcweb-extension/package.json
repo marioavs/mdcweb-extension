@@ -1,27 +1,26 @@
 {
   "name": "mdcweb-extension",
   "description": "Extension with additional Material Components for the Web",
-  "version": "0.3.3",
-  "license": "Apache-2.0",
+  "version": "6.0.0",
+  "license": "MIT",
   "keywords": [
-    "material components extension",
-    "material design"
+    "material components",
+    "material design",
+    "material components web extension"
   ],
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/marioavs/mdcweb-extension.git"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "dependencies": {
-    "@material/auto-init": "^0.35.0",
-    "@mdcext/data-table": "^0.3.1",
-    "@mdcext/date-picker": "^0.3.1",
-    "@mdcext/input-dialog": "^0.3.1",
-    "@mdcext/multiselect": "^0.3.1",
-    "@mdcext/pagination": "^0.3.1",
-    "@mdcext/treeview": "^0.3.1"
+    "@mdcext/treeview": "^6.0.0"
+  },
+  "peerDependencies": {
+    "@material/base": "^6.0.0",
+    "@material/feature-targeting": "^6.0.0",
+    "@material/ripple": "^6.0.0",
+    "@material/rtl": "^6.0.0",
+    "@material/theme": "^6.0.0"
   }
 }

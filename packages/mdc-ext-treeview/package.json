@@ -1,25 +1,29 @@
 {
   "name": "@mdcext/treeview",
   "description": "The additional Material Components Web tree view component",
-  "version": "0.3.1",
-  "license": "Apache-2.0",
+  "version": "6.0.0",
+  "license": "MIT",
   "keywords": [
-    "material components extension",
+    "material components",
     "material design",
+    "material components web extension",
     "treeview"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/marioavs/mdcweb-extension.git"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "dependencies": {
-    "@material/base": "^0.35.0",
-    "@material/ripple": "^0.35.0",
-    "@material/rtl": "^0.35.0",
-    "@material/theme": "^0.35.0",
-    "@material/typography": "^0.35.0"
+  },
+  "devDependencies": {
+  },
+  "peerDependencies": {
+    "@material/base": "^6.0.0",
+    "@material/checkbox": "6.0.0",
+    "@material/density": "^6.0.0",
+    "@material/feature-targeting": "^6.0.0",
+    "@material/ripple": "^6.0.0",
+    "@material/rtl": "^6.0.0",
+    "@material/theme": "^6.0.0"
   }
 }
