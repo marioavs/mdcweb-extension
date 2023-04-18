@@ -71,7 +71,7 @@
     "karma-tap": "^4.0.0",
     "karma-typescript": "^4.1.1",
     "karma-webpack": "^3.0.0",
-    "lerna": "^3.20.2",
+    "lerna": "^6.6.1",
     "material-components-web": "^6.0.0",
     "mini-css-extract-plugin": "^0.7.0",
     "mkdirp": "^0.5.1",
